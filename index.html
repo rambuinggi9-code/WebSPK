@@ -5,16 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Generator & Database SPK Konstruksi - PT Bangun Cinta Alam</title>
     
+    <!-- React & ReactDOM CDN -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     
+    <!-- Babel CDN untuk kompilasi JSX langsung di browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
+        /* Pengaturan Khusus Mode Cetak (Print) */
         @media print {
             body {
                 background-color: white !important;
@@ -25,7 +30,7 @@
                 display: none !important;
             }
             @page {
-                /* MARGIN ATAS SUDAH DIPERKECIL MENJADI 10mm */
+                /* MARGIN ATAS SUDAH DIPERKECIL MENJADI 10mm SESUAI REQUEST */
                 margin: 10mm 15mm 20mm 15mm;
             }
             thead {
@@ -37,24 +42,51 @@
             tr {
                 page-break-inside: avoid !important;
             }
+            /* Mencegah pemisahan elemen / tabel / tanda tangan di tengah halaman */
+            .print-avoid-break {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+            /* Memastikan gambar tanda tangan tidak pecah saat cetak */
+            img.signature-img {
+                max-height: 60px !important;
+                width: auto !important;
+                margin: 0 auto;
+            }
+            /* Paksa grid tanda tangan sejajar 4 kolom saat dicetak */
+            .print-cols-4 {
+                display: grid !important;
+                grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+                gap: 1rem !important;
+            }
         }
         
+        /* Custom Scrollbar untuk Panel Editor */
         .custom-scrollbar::-webkit-scrollbar {
-            width: 5px;
+            width: 6px;
+            height: 6px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.15);
-            border-radius: 4px;
+            border-radius: 8px;
         }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: rgba(255, 255, 255, 0.3);
         }
+
+        /* Efek kertas A4 untuk Preview */
+        .paper-preview {
+            max-width: 210mm;
+            margin-left: auto;
+            margin-right: auto;
+        }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans antialiased pb-12 print:p-0 print:bg-white print:text-black">
+<body class="bg-slate-950 text-slate-100 font-sans antialiased pb-12 print:p-0 print:bg-white print:text-black">
 
     <div id="root"></div>
 
@@ -126,7 +158,8 @@
             ],
             laborBorongan: [], 
             keuanganName: "Sita Dita C",
-            kepalaKantorName: "Fika Faradila C"
+            kepalaKantorName: "Fika Faradila C",
+            pjSignatureImage: null // Gambar tanda tangan digital default kosong
         };
 
         function App() {
@@ -162,6 +195,7 @@
             // Penandatanganan State
             const [keuanganName, setKeuanganName] = useState(DEFAULT_STATE.keuanganName);
             const [kepalaKantorName, setKepalaKantorName] = useState(DEFAULT_STATE.kepalaKantorName);
+            const [pjSignatureImage, setPjSignatureImage] = useState(DEFAULT_STATE.pjSignatureImage); 
 
             // State Notifikasi popup
             const [notification, setNotification] = useState(null);
@@ -193,7 +227,7 @@
                         const generated = `042/BCA-SPK/${monthRoman}/${projectCode}-${year}`;
                         setSpkNumber(generated);
                     } else {
-                        setSpkNumber(""); // Kosongkan nomor SPK jika form belum diisi
+                        setSpkNumber(""); 
                     }
                 }
             }, [selectedProyekIdx, startDate, isManualSpk]);
@@ -220,6 +254,7 @@
                 setLaborBorongan(JSON.parse(JSON.stringify(DEFAULT_STATE.laborBorongan)));
                 setKeuanganName(DEFAULT_STATE.keuanganName);
                 setKepalaKantorName(DEFAULT_STATE.kepalaKantorName);
+                setPjSignatureImage(DEFAULT_STATE.pjSignatureImage); 
                 
                 // Kembalikan kop surat ke default
                 setInstansiName("PT. BANGUN CINTA ALAM");
@@ -234,6 +269,23 @@
                     previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     showNotification("Menampilkan Pratinjau Dokumen SPK.", "info");
                 }
+            };
+
+            const handlePrint = () => {
+                const originalTitle = document.title;
+                // Mengganti semua karakter garis miring (/) dengan underscore (_)
+                const safeSpkNumber = spkNumber ? spkNumber.replace(/\//g, '_') : 'Draf_Baru';
+                
+                // Ubah title document sesaat menjadi format SPK_068_BCA-SPK_V_GPK-2026
+                document.title = `SPK_${safeSpkNumber}`;
+                
+                // Panggil dialog print browser
+                window.print();
+                
+                // Kembalikan title dokumen seperti semula setelah delay
+                setTimeout(() => {
+                    document.title = originalTitle;
+                }, 2000);
             };
 
             const handleSaveSpk = () => {
@@ -258,6 +310,7 @@
                     laborBorongan,
                     keuanganName,
                     kepalaKantorName,
+                    pjSignatureImage, 
                     instansiName,
                     instansiAddress,
                     lastUpdated: new Date().toLocaleString('id-ID')
@@ -290,6 +343,7 @@
                     setLaborBorongan(target.laborBorongan || []);
                     setKeuanganName(target.keuanganName || "");
                     setKepalaKantorName(target.kepalaKantorName || "");
+                    setPjSignatureImage(target.pjSignatureImage || null); 
                     
                     setInstansiName(target.instansiName || "PT. BANGUN CINTA ALAM");
                     setInstansiAddress(target.instansiAddress || "Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com");
@@ -322,9 +376,31 @@
                 }
             };
 
+            // Handler Tanda Tangan Digital PJ
+            const handlePjSignatureUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    if (!file.type.startsWith('image/')) {
+                        showNotification("Harap upload file gambar (PNG/JPG/SVG)!", "error");
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setPjSignatureImage(reader.result);
+                        showNotification("Tanda tangan digital PJ berhasil diunggah.");
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
             const clearLogo = (target) => {
                 if (target === 'kiri') setLogoKiri(null);
                 if (target === 'kanan') setLogoKanan(null);
+            };
+
+            const clearPjSignature = () => {
+                setPjSignatureImage(null);
+                showNotification("Tanda tangan digital PJ telah dihapus.", "info");
             };
 
             const durasiHari = (startDate && endDate) ? calculateWorkingDays(startDate, endDate) : 0;
@@ -447,30 +523,30 @@
             const grandTotal = totalMaterial + totalLabor;
 
             return (
-                <div className="min-h-screen bg-slate-900 text-slate-100 font-sans antialiased pb-12 print:p-0 print:bg-white print:text-black">
+                <div className="min-h-screen bg-slate-955 text-slate-100 font-sans antialiased pb-12 print:p-0 print:bg-white print:text-black">
                     
                     {/* NOTIFIKASI POPUP */}
                     {notification && (
-                        <div className={`fixed bottom-5 right-5 z-50 flex items-center gap-3 px-5 py-3 rounded-lg shadow-xl border transition-all animate-bounce ${
-                            notification.type === 'error' ? 'bg-red-500/20 text-red-200 border-red-500/30' : 
-                            notification.type === 'info' ? 'bg-amber-500/20 text-amber-200 border-amber-500/30' :
-                            'bg-emerald-500/20 text-emerald-200 border-emerald-500/30'
+                        <div className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border transition-all animate-[slideInDown_0.3s_ease-out] ${
+                            notification.type === 'error' ? 'bg-red-950/90 text-red-200 border-red-500/50 backdrop-blur-md' : 
+                            notification.type === 'info' ? 'bg-indigo-950/90 text-indigo-200 border-indigo-500/50 backdrop-blur-md' :
+                            'bg-emerald-950/90 text-emerald-200 border-emerald-500/50 backdrop-blur-md'
                         }`}>
-                            <i data-lucide="alert-circle" class="w-5 h-5 shrink-0"></i>
-                            <span className="text-sm font-semibold">{notification.message}</span>
+                            <i data-lucide={notification.type === 'error' ? "alert-triangle" : notification.type === 'info' ? "info" : "check-circle"} className="w-5 h-5 shrink-0"></i>
+                            <span className="text-sm font-semibold tracking-wide">{notification.message}</span>
                         </div>
                     )}
 
                     {/* HEADER CONTROL BAR (Hidden during Print) */}
-                    <header className="bg-slate-950 border-b border-slate-800 py-4 px-6 sticky top-0 z-40 shadow-lg print:hidden">
-                        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2.5 bg-sky-600/10 rounded-lg text-sky-400 border border-sky-500/20">
-                                    <i data-lucide="building-2" class="w-6 h-6"></i>
+                    <header className="bg-slate-900 border-b border-slate-800 py-4 px-6 sticky top-0 z-40 shadow-lg print:hidden">
+                        <div className="max-w-[90rem] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-indigo-600/10 rounded-xl text-indigo-400 border border-indigo-500/20 shadow-inner">
+                                    <i data-lucide="building-2" className="w-6 h-6"></i>
                                 </div>
                                 <div>
-                                    <h1 className="font-bold text-lg tracking-wide text-white">SPK GENERATOR & DATABASE</h1>
-                                    <p className="text-xs text-slate-400">PT Bangun Cinta Alam • Konstruksi Proyek</p>
+                                    <h1 className="font-extrabold text-lg tracking-wide text-white">SPK GENERATOR & DATABASE</h1>
+                                    <p className="text-xs text-slate-400 font-medium mt-0.5">PT Bangun Cinta Alam • Sistem Manajemen Proyek</p>
                                 </div>
                             </div>
                             
@@ -478,91 +554,99 @@
                             <div className="flex items-center gap-3 flex-wrap w-full md:w-auto">
                                 <button 
                                     onClick={handleResetData}
-                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold px-4 py-2.5 rounded-lg border border-slate-700 transition-all text-xs"
+                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-700 transition-all text-xs"
                                 >
-                                    <i data-lucide="rotate-ccw" class="w-4 h-4 text-slate-400"></i>
+                                    <i data-lucide="rotate-ccw" className="w-4 h-4 text-slate-400"></i>
                                     Reset Data
                                 </button>
                                 
                                 <button 
                                     onClick={handlePreviewScroll}
-                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold px-4 py-2.5 rounded-lg border border-slate-700 transition-all text-xs"
+                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-slate-800 hover:bg-slate-750 text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-700 transition-all text-xs"
                                 >
-                                    <i data-lucide="eye" class="w-4 h-4 text-sky-400"></i>
+                                    <i data-lucide="eye" className="w-4 h-4 text-indigo-400"></i>
                                     Pratinjau
                                 </button>
 
                                 <button 
                                     onClick={handleSaveSpk}
-                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2.5 rounded-lg transition-all text-xs"
+                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-4 py-2.5 rounded-xl transition-all text-xs shadow-lg shadow-emerald-900/20"
                                 >
-                                    <i data-lucide="save" class="w-4 h-4"></i>
+                                    <i data-lucide="save" className="w-4 h-4"></i>
                                     {activeSpkId ? "Update SPK" : "Simpan SPK"}
                                 </button>
 
+                                {}
                                 <button 
-                                    onClick={() => window.print()}
-                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg shadow-lg transition-all active:scale-95 text-xs"
+                                    onClick={handlePrint}
+                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-900/30 transition-all active:scale-95 text-xs"
                                 >
-                                    <i data-lucide="printer" class="w-4 h-4"></i>
-                                    Cetak / PDF
+                                    <i data-lucide="printer" className="w-4 h-4"></i>
+                                    Cetak Dokumen
                                 </button>
                             </div>
                         </div>
                     </header>
 
                     {/* MAIN CONTAINER */}
-                    <div className="max-w-7xl mx-auto px-4 md:px-6 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6 print:p-0 print:block">
+                    <div className="max-w-[90rem] mx-auto px-4 md:px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 print:p-0 print:block">
                         
                         {/* LEFT COLUMN: CONTROL PANEL & SPK DATABASE MENU */}
-                        <aside className="lg:col-span-5 space-y-6 print:hidden">
+                        <aside className="lg:col-span-4 space-y-6 print:hidden">
                             
                             {/* MENU: SPK DATABASE MANAGER */}
-                            <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-5 backdrop-blur-sm shadow-xl">
-                                <div className="flex items-center gap-2 mb-4 border-b border-slate-800 pb-3 justify-between">
+                            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                                <div className="flex items-center gap-2 mb-4 border-b border-slate-800/80 pb-4 justify-between">
                                     <div className="flex items-center gap-2">
-                                        <i data-lucide="folder-open" class="w-5 h-5 text-sky-400"></i>
-                                        <h2 className="font-semibold text-slate-200">Database SPK Lokal</h2>
+                                        <i data-lucide="folder-open" className="w-5 h-5 text-indigo-400"></i>
+                                        <h2 className="font-bold text-slate-100">Database SPK Lokal</h2>
                                     </div>
-                                    <span className="bg-sky-500/10 text-sky-400 border border-sky-500/20 text-[10px] px-2 py-0.5 rounded font-bold">
+                                    <span className="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] px-2.5 py-1 rounded-md font-bold">
                                         {daftarSpk.length} Tersimpan
                                     </span>
                                 </div>
 
                                 {daftarSpk.length === 0 ? (
-                                    <div className="text-center py-6 bg-slate-900/40 rounded-lg border border-slate-800/80">
-                                        <p className="text-xs text-slate-500 font-medium">Belum ada dokumen SPK yang disimpan.</p>
-                                        <p className="text-[10px] text-slate-600 mt-1">Klik tombol "Simpan SPK" untuk mengarsipkan.</p>
+                                    <div className="text-center py-8 bg-slate-950/50 rounded-xl border border-dashed border-slate-800/80">
+                                        <div className="w-10 h-10 mx-auto bg-slate-800 rounded-full flex items-center justify-center mb-3">
+                                            <i data-lucide="inbox" className="w-5 h-5 text-slate-500"></i>
+                                        </div>
+                                        <p className="text-xs text-slate-400 font-medium">Belum ada dokumen SPK.</p>
+                                        <p className="text-[10px] text-slate-500 mt-1">Klik tombol "Simpan SPK" untuk menyimpan draft.</p>
                                     </div>
                                 ) : (
-                                    <div className="space-y-2 max-h-56 overflow-y-auto pr-1 custom-scrollbar">
+                                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
                                         {daftarSpk.map((item) => (
                                             <div 
                                                 key={item.id}
                                                 onClick={() => handleLoadSpk(item.id)}
-                                                className={`p-3 rounded-lg border text-left transition-all cursor-pointer flex justify-between items-center ${
+                                                className={`p-3.5 rounded-xl border text-left transition-all cursor-pointer flex justify-between items-center group ${
                                                     activeSpkId === item.id 
-                                                        ? 'bg-sky-950/40 border-sky-500 text-sky-200' 
-                                                        : 'bg-slate-900/60 border-slate-800 hover:border-slate-700 text-slate-300'
+                                                        ? 'bg-indigo-900/30 border-indigo-500/50 text-indigo-100' 
+                                                        : 'bg-slate-955 border-slate-800 hover:border-slate-700 hover:bg-slate-800/50 text-slate-300'
                                                 }`}
                                             >
-                                                <div className="space-y-1 min-w-0 flex-1 pr-2">
-                                                    <h4 className="text-xs font-bold font-mono tracking-wide truncate">{item.spkNumber || "Draf SPK"}</h4>
-                                                    <p className="text-[10px] text-slate-400 truncate font-semibold">{item.proyekNama || "Belum ada nama proyek"}</p>
-                                                    <span className="text-[9px] text-slate-500 block">Diedit: {item.lastUpdated}</span>
+                                                <div className="space-y-1.5 min-w-0 flex-1 pr-3">
+                                                    <h4 className="text-xs font-bold font-mono tracking-wider truncate text-indigo-300">{item.spkNumber || "Draf SPK"}</h4>
+                                                    <p className="text-[11px] text-slate-400 truncate font-medium">{item.proyekNama || "Belum ada nama proyek"}</p>
+                                                    <span className="text-[9px] text-slate-500 font-mono flex items-center gap-1">
+                                                        <i data-lucide="clock" className="w-3 h-3"></i> {item.lastUpdated}
+                                                    </span>
                                                 </div>
-                                                <div className="flex items-center gap-1 shrink-0">
+                                                <div className="flex items-center gap-1.5 shrink-0 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
                                                     <button 
                                                         onClick={(e) => { e.stopPropagation(); handleLoadSpk(item.id); }}
-                                                        className="p-1.5 text-sky-400 hover:bg-sky-500/10 rounded transition-colors"
+                                                        className="p-2 text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 rounded-lg transition-colors"
+                                                        title="Muat Data"
                                                     >
-                                                        <i data-lucide="edit" class="w-3.5 h-3.5"></i>
+                                                        <i data-lucide="edit" className="w-4 h-4"></i>
                                                     </button>
                                                     <button 
                                                         onClick={(e) => handleDeleteSpk(item.id, e)}
-                                                        className="p-1.5 text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                                                        className="p-2 text-red-400 hover:bg-red-500/20 hover:text-red-300 rounded-lg transition-colors"
+                                                        title="Hapus Data"
                                                     >
-                                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                        <i data-lucide="trash-2" className="w-4 h-4"></i>
                                                     </button>
                                                 </div>
                                             </div>
@@ -572,72 +656,72 @@
                             </div>
 
                             {/* SECTION 1: KOP SURAT SETTINGS */}
-                            <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-5 backdrop-blur-sm shadow-xl">
-                                <div className="flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
-                                    <i data-lucide="settings" class="w-5 h-5 text-sky-400"></i>
-                                    <h2 className="font-semibold text-slate-200">Kustomisasi Kop & Identitas</h2>
+                            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+                                <div className="flex items-center gap-2 mb-4 border-b border-slate-800/80 pb-4">
+                                    <i data-lucide="image" className="w-5 h-5 text-indigo-400"></i>
+                                    <h2 className="font-bold text-slate-100">Identitas & Kop Surat</h2>
                                 </div>
                                 
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Nama Perusahaan/Instansi</label>
+                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Nama Perusahaan/Instansi</label>
                                         <input 
                                             type="text" 
                                             value={instansiName} 
                                             onChange={(e) => setInstansiName(e.target.value)}
-                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
                                         />
                                     </div>
 
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Alamat Lengkap & Kontak Kantor</label>
+                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Alamat Lengkap & Kontak Kantor</label>
                                         <textarea 
                                             rows="3"
                                             value={instansiAddress} 
                                             onChange={(e) => setInstansiAddress(e.target.value)}
-                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500"
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all resize-none"
                                         />
                                     </div>
 
                                     {/* Upload Logo Kiri & Kanan */}
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-lg">
-                                            <span className="block text-[11px] font-bold text-slate-400 uppercase mb-2">Logo Kiri</span>
+                                    <div className="grid grid-cols-2 gap-4 pt-2">
+                                        <div className="p-3 bg-slate-950/50 border border-slate-800 rounded-xl">
+                                            <span className="block text-[10px] font-bold text-slate-400 uppercase mb-3 text-center">Logo Kiri</span>
                                             {logoKiri ? (
-                                                <div className="relative group aspect-square max-h-20 bg-white rounded flex items-center justify-center p-1">
+                                                <div className="relative group aspect-square max-h-24 mx-auto bg-white rounded-lg flex items-center justify-center p-2 shadow-inner border border-slate-200">
                                                     <img src={logoKiri} alt="Logo Kiri" className="max-h-full max-w-full object-contain" />
                                                     <button 
                                                         onClick={() => clearLogo('kiri')}
-                                                        className="absolute inset-0 bg-red-600/80 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded transition-opacity text-xs"
+                                                        className="absolute inset-0 bg-slate-900/80 text-red-400 font-bold opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-lg transition-opacity text-xs backdrop-blur-sm"
                                                     >
-                                                        Hapus
+                                                        <i data-lucide="trash" className="w-5 h-5 mb-1"></i> Hapus
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <label className="cursor-pointer flex flex-col items-center justify-center aspect-square max-h-20 border border-dashed border-slate-700 hover:border-sky-500/50 hover:bg-slate-800/30 rounded transition-all">
-                                                    <i data-lucide="upload" class="w-5 h-5 text-slate-500"></i>
-                                                    <span className="text-[10px] text-slate-500 mt-1">Upload</span>
+                                                <label className="cursor-pointer flex flex-col items-center justify-center aspect-square max-h-24 mx-auto border-2 border-dashed border-slate-700 hover:border-indigo-500/50 hover:bg-slate-900 rounded-lg transition-all group">
+                                                    <i data-lucide="upload" className="w-5 h-5 text-slate-500 group-hover:text-indigo-400 mb-1.5 transition-colors"></i>
+                                                    <span className="text-[10px] font-medium text-slate-500 group-hover:text-indigo-300">Unggah Logo</span>
                                                     <input type="file" accept="image/*" className="hidden" onChange={(e) => handleLogoUpload(e, 'kiri')} />
                                                 </label>
                                             )}
                                         </div>
 
-                                        <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-lg">
-                                            <span className="block text-[11px] font-bold text-slate-400 uppercase mb-2">Logo Kanan</span>
+                                        <div className="p-3 bg-slate-950/50 border border-slate-800 rounded-xl">
+                                            <span className="block text-[10px] font-bold text-slate-400 uppercase mb-3 text-center">Logo Kanan</span>
                                             {logoKanan ? (
-                                                <div className="relative group aspect-square max-h-20 bg-white rounded flex items-center justify-center p-1">
+                                                <div className="relative group aspect-square max-h-24 mx-auto bg-white rounded-lg flex items-center justify-center p-2 shadow-inner border border-slate-200">
                                                     <img src={logoKanan} alt="Logo Kanan" className="max-h-full max-w-full object-contain" />
                                                     <button 
                                                         onClick={() => clearLogo('kanan')}
-                                                        className="absolute inset-0 bg-red-600/80 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded transition-opacity text-xs"
+                                                        className="absolute inset-0 bg-slate-900/80 text-red-400 font-bold opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-lg transition-opacity text-xs backdrop-blur-sm"
                                                     >
-                                                        Hapus
+                                                        <i data-lucide="trash" className="w-5 h-5 mb-1"></i> Hapus
                                                     </button>
                                                 </div>
                                             ) : (
-                                                <label className="cursor-pointer flex flex-col items-center justify-center aspect-square max-h-20 border border-dashed border-slate-700 hover:border-sky-500/50 hover:bg-slate-800/30 rounded transition-all">
-                                                    <i data-lucide="upload" class="w-5 h-5 text-slate-500"></i>
-                                                    <span className="text-[10px] text-slate-500 mt-1">Upload</span>
+                                                <label className="cursor-pointer flex flex-col items-center justify-center aspect-square max-h-24 mx-auto border-2 border-dashed border-slate-700 hover:border-indigo-500/50 hover:bg-slate-900 rounded-lg transition-all group">
+                                                    <i data-lucide="upload" className="w-5 h-5 text-slate-500 group-hover:text-indigo-400 mb-1.5 transition-colors"></i>
+                                                    <span className="text-[10px] font-medium text-slate-500 group-hover:text-indigo-300">Unggah Logo</span>
                                                     <input type="file" accept="image/*" className="hidden" onChange={(e) => handleLogoUpload(e, 'kanan')} />
                                                 </label>
                                             )}
@@ -646,281 +730,335 @@
                                 </div>
                             </div>
 
-                            {/* SECTION 2: SPK & DATA PROYEK */}
-                            <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-5 backdrop-blur-sm shadow-xl space-y-4">
-                                <div className="flex items-center gap-2 mb-2 border-b border-slate-800 pb-3">
-                                    <i data-lucide="file-text" class="w-5 h-5 text-sky-400"></i>
-                                    <h2 className="font-semibold text-slate-200">Nomor & Data Utama Proyek</h2>
-                                </div>
-
-                                {/* SPK Number Control */}
-                                <div>
-                                    <div className="flex justify-between items-center mb-1.5">
-                                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">No. SPK (Editable)</label>
-                                        <button 
-                                            onClick={() => setIsManualSpk(!isManualSpk)}
-                                            className={`text-[10px] px-2 py-0.5 rounded transition-colors ${isManualSpk ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-slate-800 text-slate-400 hover:bg-slate-750'}`}
-                                        >
-                                            {isManualSpk ? "Ganti ke Otomatis" : "Edit Manual"}
-                                        </button>
-                                    </div>
-                                    <input 
-                                        type="text" 
-                                        value={spkNumber} 
-                                        placeholder="Pilih proyek dan tanggal untuk generate otomatis..."
-                                        onChange={(e) => {
-                                            setSpkNumber(e.target.value);
-                                            setIsManualSpk(true);
-                                        }}
-                                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-amber-300 font-mono tracking-wide focus:outline-none focus:ring-1 focus:ring-amber-500 placeholder:text-slate-600"
-                                    />
-                                </div>
-
-                                {/* Nama Proyek */}
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Nama Proyek</label>
-                                    <div className="relative">
-                                        <select 
-                                            value={selectedProyekIdx}
-                                            onChange={(e) => setSelectedProyekIdx(e.target.value === "" ? "" : Number(e.target.value))}
-                                            className={`w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 appearance-none pr-10 ${selectedProyekIdx === "" ? "text-slate-500" : "text-slate-200"}`}
-                                        >
-                                            <option value="" disabled>-- Pilih Proyek --</option>
-                                            {DAFTAR_PROYEK.map((item, index) => (
-                                                <option key={index} value={index}>{item.nama}</option>
-                                            ))}
-                                        </select>
-                                        <i data-lucide="chevron-down" class="absolute right-3 top-3.5 w-4 h-4 text-slate-500 pointer-events-none"></i>
-                                    </div>
-                                </div>
-
-                                {/* Lokasi Proyek (Otomatis) */}
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Lokasi Proyek (Otomatis)</label>
-                                    <div className="bg-slate-900/50 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-400 flex items-center gap-2">
-                                        <i data-lucide="building" class="w-4 h-4 text-sky-500/70"></i>
-                                        <span>{selectedProyekIdx !== "" ? DAFTAR_PROYEK[selectedProyekIdx]?.lokasi : "-"}</span>
-                                    </div>
-                                </div>
-
-                                {/* Pemberi Tugas */}
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Pemberi Tugas</label>
-                                    <input 
-                                        type="text" 
-                                        value={pemberiTugas} 
-                                        onChange={(e) => setPemberiTugas(e.target.value)}
-                                        className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-1 focus:ring-sky-500"
-                                    />
-                                </div>
-
-                                {/* Penanggungjawab */}
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Penanggung Jawab (Dropdown)</label>
-                                    <div className="relative">
-                                        <select 
-                                            value={selectedPjIdx}
-                                            onChange={(e) => setSelectedPjIdx(e.target.value === "" ? "" : Number(e.target.value))}
-                                            className={`w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 appearance-none pr-10 ${selectedPjIdx === "" ? "text-slate-500" : "text-slate-200"}`}
-                                        >
-                                            <option value="" disabled>-- Pilih Penanggung Jawab --</option>
-                                            {DAFTAR_PENANGGUNGJAWAB.map((item, index) => (
-                                                <option key={index} value={index}>{item.nama}</option>
-                                            ))}
-                                        </select>
-                                        <i data-lucide="chevron-down" class="absolute right-3 top-3.5 w-4 h-4 text-slate-500 pointer-events-none"></i>
-                                    </div>
-                                </div>
-
-                                {/* Jabatan (Auto) */}
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Jabatan Penanggung Jawab (Otomatis)</label>
-                                    <div className="bg-slate-900/50 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-400 flex items-center gap-2">
-                                        <i data-lucide="briefcase" class="w-4 h-4 text-sky-500/70"></i>
-                                        <span>{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.jabatan : "-"}</span>
-                                    </div>
-                                </div>
-
-                                {/* Tanggal Mulai & Tanggal Selesai */}
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Tgl Mulai</label>
-                                        <input 
-                                            type="date" 
-                                            value={startDate} 
-                                            onChange={(e) => setStartDate(e.target.value)}
-                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Tgl Selesai</label>
-                                        <input 
-                                            type="date" 
-                                            value={endDate} 
-                                            onChange={(e) => setEndDate(e.target.value)}
-                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none"
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Durasi Box */}
-                                {endDate && startDate && (
-                                    <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3 flex items-start gap-2">
-                                        <i data-lucide="clock" class="w-5 h-5 text-emerald-400 shrink-0 mt-0.5"></i>
-                                        <div>
-                                            <h4 className="text-xs font-bold text-emerald-300 uppercase">Durasi Kerja Kontrak</h4>
-                                            <p className="text-sm text-slate-300 mt-1">
-                                                Durasi: <span className="font-bold text-white text-base">{durasiHari} Hari</span> 
-                                                <span className="text-[11px] text-slate-400 block mt-0.5">(Tanpa menghitung hari Minggu)</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
                             {/* SECTION 3: TANDA TANGAN SETTINGS */}
-                            <div className="bg-slate-950/80 border border-slate-800 rounded-xl p-5 backdrop-blur-sm shadow-xl space-y-4">
-                                <div className="flex items-center gap-2 mb-2 border-b border-slate-800 pb-3">
-                                    <i data-lucide="users" class="w-5 h-5 text-sky-400"></i>
-                                    <h2 className="font-semibold text-slate-200">Pengaturan Penandatanganan</h2>
+                            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-5">
+                                <div className="flex items-center gap-2 mb-2 border-b border-slate-800/80 pb-4">
+                                    <i data-lucide="pen-tool" className="w-5 h-5 text-indigo-400"></i>
+                                    <h2 className="font-bold text-slate-100">Otorisasi & Tanda Tangan</h2>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Staf Keuangan</label>
+                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Staf Keuangan</label>
                                         <input 
                                             type="text" 
                                             value={keuanganName} 
                                             onChange={(e) => setKeuanganName(e.target.value)}
-                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none"
+                                            className="w-full bg-slate-950 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
                                         />
                                     </div>
                                     <div>
-                                        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Kepala Kantor</label>
+                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Kepala Kantor</label>
                                         <input 
                                             type="text" 
                                             value={kepalaKantorName} 
                                             onChange={(e) => setKepalaKantorName(e.target.value)}
-                                            className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:outline-none"
+                                            className="w-full bg-slate-955 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
                                         />
                                     </div>
+                                </div>
+
+                                {/* INPUT UNTUK UPLOAD TANDA TANGAN DIGITAL PJ */}
+                                <div className="pt-3 border-t border-slate-800/80">
+                                    <label className="block text-[10px] font-bold text-indigo-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                        <i data-lucide="image-plus" className="w-3.5 h-3.5"></i>
+                                        Tanda Tangan Digital Penanggung Jawab
+                                    </label>
+                                    
+                                    {pjSignatureImage ? (
+                                        <div className="relative group p-3 bg-white rounded-xl border border-slate-300 flex items-center justify-center h-28 overflow-hidden shadow-inner">
+                                            <img src={pjSignatureImage} alt="Tanda Tangan PJ" className="max-h-full max-w-full object-contain" />
+                                            <button 
+                                                onClick={clearPjSignature}
+                                                className="absolute inset-0 bg-slate-900/80 text-red-400 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-xl transition-opacity duration-200 backdrop-blur-sm"
+                                            >
+                                                <i data-lucide="trash-2" className="w-6 h-6 mb-2"></i>
+                                                <span className="text-xs font-bold tracking-wide">Hapus Tanda Tangan</span>
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-700 hover:border-indigo-500/50 hover:bg-slate-950 rounded-xl transition-all group bg-slate-950/50">
+                                            <div className="p-2 bg-slate-800 rounded-full mb-2 group-hover:bg-indigo-900/50 group-hover:text-indigo-400 transition-colors">
+                                                <i data-lucide="upload-cloud" className="w-5 h-5 text-slate-400 group-hover:text-indigo-400"></i>
+                                            </div>
+                                            <span className="text-xs text-slate-300 group-hover:text-indigo-300 font-medium">Unggah Scan Tanda Tangan</span>
+                                            <span className="text-[10px] text-slate-500 mt-1">Disarankan PNG berlatar transparan</span>
+                                            <input type="file" accept="image/*" className="hidden" onChange={handlePjSignatureUpload} />
+                                        </label>
+                                    )}
                                 </div>
                             </div>
                         </aside>
 
                         {/* RIGHT COLUMN: INTERACTIVE EDITOR & LIVE PREVIEW PRINT AREA */}
-                        <main className="lg:col-span-7 space-y-6 print:p-0 print:m-0 print:col-span-12">
+                        <main className="lg:col-span-8 space-y-6 print:p-0 print:m-0 print:col-span-12">
                             
+                            {/* SECTION 2: SPK & DATA PROYEK */}
+                            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-5 print:hidden">
+                                <div className="flex items-center justify-between border-b border-slate-800/80 pb-4">
+                                    <div className="flex items-center gap-2">
+                                        <i data-lucide="file-text" className="w-5 h-5 text-indigo-400"></i>
+                                        <h2 className="font-bold text-slate-100 text-lg">Informasi Kontrak & Proyek</h2>
+                                    </div>
+                                    
+                                    <div className="flex items-center gap-3">
+                                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Mode SPK:</label>
+                                        <div className="flex bg-slate-955 p-1 rounded-lg border border-slate-800">
+                                            <button 
+                                                onClick={() => setIsManualSpk(false)}
+                                                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${!isManualSpk ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-300'}`}
+                                            >
+                                                Otomatis
+                                            </button>
+                                            <button 
+                                                onClick={() => setIsManualSpk(true)}
+                                                className={`px-3 py-1.5 text-xs font-bold rounded-md transition-all ${isManualSpk ? 'bg-amber-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-300'}`}
+                                            >
+                                                Manual Edit
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    {/* SPK Number Control */}
+                                    <div className="md:col-span-2">
+                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Nomor Surat Perintah Kerja (SPK)</label>
+                                        <input 
+                                            type="text" 
+                                            value={spkNumber} 
+                                            placeholder="Pilih proyek dan tanggal untuk generate otomatis..."
+                                            onChange={(e) => {
+                                                setSpkNumber(e.target.value);
+                                                setIsManualSpk(true);
+                                            }}
+                                            className={`w-full bg-slate-955 border rounded-xl px-4 py-3 text-base font-mono tracking-wider focus:outline-none focus:ring-2 transition-all ${isManualSpk ? 'border-amber-500/50 text-amber-400 focus:ring-amber-500/50' : 'border-indigo-500/30 text-indigo-300 focus:ring-indigo-500/50'} placeholder:text-slate-700`}
+                                        />
+                                    </div>
+
+                                    {/* Nama Proyek */}
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Nama Proyek</label>
+                                        <div className="relative">
+                                            <select 
+                                                value={selectedProyekIdx}
+                                                onChange={(e) => setSelectedProyekIdx(e.target.value === "" ? "" : Number(e.target.value))}
+                                                className={`w-full bg-slate-955 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 appearance-none pr-10 transition-colors ${selectedProyekIdx === "" ? "text-slate-500" : "text-slate-200"}`}
+                                            >
+                                                <option value="" disabled>-- Pilih Proyek Terdaftar --</option>
+                                                {DAFTAR_PROYEK.map((item, index) => (
+                                                    <option key={index} value={index}>{item.nama}</option>
+                                                ))}
+                                            </select>
+                                            <i data-lucide="chevron-down" className="absolute right-3.5 top-3 w-4 h-4 text-slate-500 pointer-events-none"></i>
+                                        </div>
+                                    </div>
+
+                                    {/* Lokasi Proyek (Otomatis) */}
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Lokasi Proyek (Otomatis)</label>
+                                        <div className="bg-slate-955 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-400 flex items-center gap-2 h-[42px]">
+                                            <i data-lucide="map-pin" className="w-4 h-4 text-indigo-500/70"></i>
+                                            <span className="truncate">{selectedProyekIdx !== "" ? DAFTAR_PROYEK[selectedProyekIdx]?.lokasi : "Pilih proyek terlebih dahulu"}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Pemberi Tugas */}
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Pemberi Tugas (Direktur/Owner)</label>
+                                        <input 
+                                            type="text" 
+                                            value={pemberiTugas} 
+                                            onChange={(e) => setPemberiTugas(e.target.value)}
+                                            className="w-full bg-slate-955 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                                        />
+                                    </div>
+
+                                    {/* Penanggungjawab */}
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Penanggung Jawab Proyek (Dropdown)</label>
+                                        <div className="relative">
+                                            <select 
+                                                value={selectedPjIdx}
+                                                onChange={(e) => setSelectedPjIdx(e.target.value === "" ? "" : Number(e.target.value))}
+                                                className={`w-full bg-slate-955 border border-slate-800 rounded-xl px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 appearance-none pr-10 transition-colors ${selectedPjIdx === "" ? "text-slate-500" : "text-slate-200"}`}
+                                            >
+                                                <option value="" disabled>-- Pilih Penanggung Jawab --</option>
+                                                {DAFTAR_PENANGGUNGJAWAB.map((item, index) => (
+                                                    <option key={index} value={index}>{item.nama}</option>
+                                                ))}
+                                            </select>
+                                            <i data-lucide="chevron-down" className="absolute right-3.5 top-3 w-4 h-4 text-slate-500 pointer-events-none"></i>
+                                        </div>
+                                    </div>
+
+                                    {/* Tanggal Mulai & Tanggal Selesai */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Tgl Mulai Kontrak</label>
+                                            <input 
+                                                type="date" 
+                                                value={startDate} 
+                                                onChange={(e) => setStartDate(e.target.value)}
+                                                className="w-full bg-slate-955 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 custom-scrollbar"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Tgl Selesai Kontrak</label>
+                                            <input 
+                                                type="date" 
+                                                value={endDate} 
+                                                onChange={(e) => setEndDate(e.target.value)}
+                                                className="w-full bg-slate-955 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 custom-scrollbar"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Durasi Box */}
+                                    <div className="h-full">
+                                        {endDate && startDate ? (
+                                            <div className="bg-emerald-950/40 border border-emerald-500/30 rounded-xl p-3.5 flex items-start gap-3 h-full">
+                                                <div className="p-2 bg-emerald-500/20 rounded-lg shrink-0 mt-0.5">
+                                                    <i data-lucide="calendar-check" className="w-5 h-5 text-emerald-400"></i>
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">Kalkulasi Durasi Kerja</h4>
+                                                    <p className="text-sm text-slate-300 mt-1 flex items-baseline gap-2">
+                                                        <span className="font-black text-white text-xl">{durasiHari}</span> 
+                                                        <span className="font-semibold">Hari Aktif</span>
+                                                    </p>
+                                                    <span className="text-[10px] text-slate-400 block mt-1">(Pengecualian hari Minggu / Libur)</span>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="bg-slate-955 border border-slate-800 border-dashed rounded-xl p-3.5 flex items-center justify-center h-full text-slate-500 text-xs">
+                                                Pilih rentang tanggal untuk menghitung durasi
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
                             {/* TAB & EDITOR FOR TABLES (Hidden in Print) */}
-                            <section className="bg-slate-950/80 border border-slate-800 rounded-xl p-5 shadow-xl print:hidden space-y-6">
+                            <section className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl print:hidden space-y-8">
                                 
-                                <div className="border-b border-slate-800 pb-2 flex items-center justify-between">
-                                    <span className="text-sm font-bold text-sky-400 uppercase tracking-wider py-1">Tabel Estimasi & Anggaran Kerja</span>
+                                <div className="border-b border-slate-800/80 pb-4">
+                                    <h2 className="text-lg font-bold text-indigo-400 flex items-center gap-2">
+                                        <i data-lucide="calculator" className="w-5 h-5"></i>
+                                        Penyusunan Anggaran & Ruang Lingkup
+                                    </h2>
+                                    <p className="text-xs text-slate-400 mt-1">Kelola detail pekerjaan, estimasi bahan, dan hitungan upah tenaga kerja.</p>
                                 </div>
 
                                 {/* TAB 1: RUANG LINGKUP PEKERJAAN EDITOR */}
                                 <div className="space-y-4">
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <i data-lucide="layers" class="w-5 h-5 text-sky-400"></i>
-                                            <h3 className="font-semibold text-slate-200 text-sm">Tabel Ruang Lingkup Pekerjaan</h3>
+                                        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700">
+                                            <i data-lucide="layers" className="w-4 h-4 text-indigo-400"></i>
+                                            <h3 className="font-bold text-slate-200 text-sm">Tabel Ruang Lingkup Pekerjaan</h3>
                                         </div>
                                         <button 
                                             onClick={addRuangLingkup}
-                                            className="flex items-center gap-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 border border-sky-500/30 text-xs px-3 py-1.5 rounded-lg transition-colors font-medium"
+                                            className="flex items-center gap-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 text-xs px-3.5 py-2 rounded-xl transition-colors font-bold shadow-sm"
                                         >
-                                            <i data-lucide="plus" class="w-4 h-4"></i> Tambah Pekerjaan Utama
+                                            <i data-lucide="plus" className="w-4 h-4"></i> Tambah Item Pekerjaan
                                         </button>
                                     </div>
 
                                     {ruangLingkup.length === 0 && (
-                                        <div className="text-center py-6 border border-dashed border-slate-800 rounded-lg">
-                                            <p className="text-slate-500 text-xs">Belum ada daftar pekerjaan utama.</p>
+                                        <div className="text-center py-8 bg-slate-950/50 border border-dashed border-slate-800 rounded-xl">
+                                            <p className="text-slate-500 text-xs font-medium">Belum ada daftar pekerjaan utama yang ditambahkan.</p>
                                         </div>
                                     )}
 
-                                    <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                                    <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
                                         {ruangLingkup.map((item, parentIdx) => (
-                                            <div key={item.id} className="p-4 bg-slate-900/60 border border-slate-800 rounded-lg space-y-3 relative group">
-                                                <div className="flex items-center gap-2 justify-between">
-                                                    <span className="text-xs font-bold text-sky-500 font-mono">Pekerjaan Utama #{parentIdx + 1}</span>
+                                            <div key={item.id} className="p-5 bg-slate-955 border border-slate-800 rounded-xl space-y-4 relative group hover:border-slate-700 transition-colors">
+                                                <div className="flex items-center gap-2 justify-between border-b border-slate-800/60 pb-3">
+                                                    <span className="text-[11px] font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
+                                                        <div className="w-5 h-5 rounded bg-indigo-900/50 flex items-center justify-center text-indigo-300">{parentIdx + 1}</div>
+                                                        Pekerjaan Utama
+                                                    </span>
                                                     <button 
                                                         onClick={() => removeRuangLingkup(parentIdx)}
-                                                        className="text-red-400 hover:text-red-300 transition-colors p-1"
+                                                        className="text-red-400/70 hover:text-red-400 hover:bg-red-950/50 transition-colors p-1.5 rounded-lg"
+                                                        title="Hapus Pekerjaan Utama"
                                                     >
-                                                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                                        <i data-lucide="trash-2" className="w-4 h-4"></i>
                                                     </button>
                                                 </div>
 
-                                                <div className="grid grid-cols-12 gap-2">
+                                                <div className="grid grid-cols-12 gap-3">
                                                     <div className="col-span-12 md:col-span-6">
                                                         <input 
                                                             type="text" 
-                                                            placeholder="Uraian Pekerjaan Utama"
+                                                            placeholder="Uraian Pekerjaan Utama (misal: Pekerjaan Persiapan)"
                                                             value={item.uraian} 
                                                             onChange={(e) => updateRuangLingkup(parentIdx, 'uraian', e.target.value)}
-                                                            className="w-full bg-slate-955 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200"
+                                                            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
                                                         />
                                                     </div>
                                                     <div className="col-span-6 md:col-span-3">
                                                         <input 
                                                             type="text" 
-                                                            placeholder="Vol"
+                                                            placeholder="Volume (opsional)"
                                                             value={item.volume} 
                                                             onChange={(e) => updateRuangLingkup(parentIdx, 'volume', e.target.value)}
-                                                            className="w-full bg-slate-955 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 text-center"
+                                                            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 text-center focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
                                                         />
                                                     </div>
                                                     <div className="col-span-6 md:col-span-3">
                                                         <input 
                                                             type="text" 
-                                                            placeholder="Satuan"
+                                                            placeholder="Satuan (opsional)"
                                                             value={item.satuan} 
                                                             onChange={(e) => updateRuangLingkup(parentIdx, 'satuan', e.target.value)}
-                                                            className="w-full bg-slate-955 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-200 text-center"
+                                                            className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-200 text-center focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
                                                         />
                                                     </div>
                                                 </div>
 
                                                 {/* Sub Pekerjaan Nesting */}
-                                                <div className="pl-6 border-l-2 border-slate-800 space-y-2">
+                                                <div className="pl-6 border-l-2 border-indigo-900/50 space-y-3 mt-2">
                                                     {item.subs && item.subs.map((sub, subIdx) => (
-                                                        <div key={sub.id} className="flex items-center gap-2">
-                                                            <span className="text-[10px] font-bold text-slate-500 font-mono shrink-0">Sub #{parentIdx + 1}.{subIdx + 1}</span>
+                                                        <div key={sub.id} className="flex flex-wrap md:flex-nowrap items-center gap-2 bg-slate-900/50 p-2 rounded-lg border border-slate-800/50">
+                                                            <span className="text-[10px] font-bold text-slate-500 font-mono shrink-0 w-8 text-center">{parentIdx + 1}.{subIdx + 1}</span>
                                                             <input 
                                                                 type="text" 
-                                                                placeholder="Detail Sub-Pekerjaan"
+                                                                placeholder="Detail Sub-Pekerjaan (misal: Pembersihan Lahan)"
                                                                 value={sub.uraian} 
                                                                 onChange={(e) => updateSubPekerjaan(parentIdx, subIdx, 'uraian', e.target.value)}
-                                                                className="flex-1 bg-slate-955 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300"
+                                                                className="flex-1 bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-slate-300 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none min-w-[200px]"
                                                             />
-                                                            <input 
-                                                                type="text" 
-                                                                placeholder="Vol"
-                                                                value={sub.volume} 
-                                                                onChange={(e) => updateSubPekerjaan(parentIdx, subIdx, 'volume', e.target.value)}
-                                                                className="w-12 bg-slate-955 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300 text-center"
-                                                            />
-                                                            <input 
-                                                                type="text" 
-                                                                placeholder="Sat"
-                                                                value={sub.satuan} 
-                                                                onChange={(e) => updateSubPekerjaan(parentIdx, subIdx, 'satuan', e.target.value)}
-                                                                className="w-12 bg-slate-955 border border-slate-800 rounded px-2 py-1 text-xs text-slate-300 text-center"
-                                                            />
-                                                            <button 
-                                                                onClick={() => removeSubPekerjaan(parentIdx, subIdx)}
-                                                                className="text-red-400 hover:text-red-300 transition-colors p-1"
-                                                            >
-                                                                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-                                                            </button>
+                                                            <div className="flex gap-2 w-full md:w-auto">
+                                                                <input 
+                                                                    type="text" 
+                                                                    placeholder="Vol"
+                                                                    value={sub.volume} 
+                                                                    onChange={(e) => updateSubPekerjaan(parentIdx, subIdx, 'volume', e.target.value)}
+                                                                    className="w-16 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-slate-300 text-center focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                                                />
+                                                                <input 
+                                                                    type="text" 
+                                                                    placeholder="Sat"
+                                                                    value={sub.satuan} 
+                                                                    onChange={(e) => updateSubPekerjaan(parentIdx, subIdx, 'satuan', e.target.value)}
+                                                                    className="w-16 bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-slate-300 text-center focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                                                                />
+                                                                <button 
+                                                                    onClick={() => removeSubPekerjaan(parentIdx, subIdx)}
+                                                                    className="text-red-400 hover:text-red-300 hover:bg-red-950/50 transition-colors p-1.5 rounded shrink-0"
+                                                                >
+                                                                    <i data-lucide="x" className="w-4 h-4"></i>
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     ))}
                                                     <button 
                                                         onClick={() => addSubPekerjaan(parentIdx)}
-                                                        className="flex items-center gap-1 text-[11px] text-sky-400 hover:text-sky-300 font-medium transition-colors"
+                                                        className="flex items-center gap-1.5 text-[11px] text-indigo-400 hover:text-indigo-300 hover:bg-indigo-955/30 px-2 py-1 rounded-md font-medium transition-colors"
                                                     >
-                                                        <i data-lucide="plus" class="w-3.5 h-3.5"></i> Tambah Sub-Pekerjaan
+                                                        <i data-lucide="plus-circle" className="w-3.5 h-3.5"></i> Tambah Sub-Pekerjaan
                                                     </button>
                                                 </div>
                                             </div>
@@ -929,82 +1067,82 @@
                                 </div>
 
                                 {/* TAB 2: BIAYA MATERIAL EDITOR */}
-                                <div className="space-y-4 pt-4 border-t border-slate-800">
+                                <div className="space-y-4 pt-6 border-t border-slate-800">
                                     <div className="flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <i data-lucide="package" class="w-5 h-5 text-sky-400"></i>
-                                            <h3 className="font-semibold text-slate-200 text-sm">Tabel Rincian Material</h3>
+                                        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700">
+                                            <i data-lucide="package" className="w-4 h-4 text-indigo-400"></i>
+                                            <h3 className="font-bold text-slate-200 text-sm">Tabel Rincian Material</h3>
                                         </div>
                                         <button 
                                             onClick={addMaterial}
-                                            className="flex items-center gap-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 border border-sky-500/30 text-xs px-3 py-1.5 rounded-lg transition-colors font-medium"
+                                            className="flex items-center gap-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 text-xs px-3.5 py-2 rounded-xl transition-colors font-bold shadow-sm"
                                         >
-                                            <i data-lucide="plus" class="w-4 h-4"></i> Tambah Material
+                                            <i data-lucide="plus" className="w-4 h-4"></i> Tambah Material
                                         </button>
                                     </div>
 
                                     {materials.length === 0 && (
-                                        <div className="text-center py-6 border border-dashed border-slate-800 rounded-lg">
-                                            <p className="text-slate-500 text-xs">Belum ada data material diinput.</p>
+                                        <div className="text-center py-8 bg-slate-950/50 border border-dashed border-slate-800 rounded-xl">
+                                            <p className="text-slate-500 text-xs font-medium">Belum ada rincian material yang diinput.</p>
                                         </div>
                                     )}
 
                                     {materials.length > 0 && (
-                                        <div className="overflow-x-auto">
+                                        <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
                                             <table className="w-full text-left text-xs text-slate-300">
                                                 <thead>
-                                                    <tr className="border-b border-slate-800 text-slate-400 uppercase font-bold tracking-wider">
-                                                        <th className="py-2 px-1">Nama Material</th>
-                                                        <th className="py-2 px-1 w-16 text-center">Qty</th>
-                                                        <th className="py-2 px-1 w-16 text-center">Satuan</th>
-                                                        <th className="py-2 px-1 w-28 text-right">Harga Satuan</th>
-                                                        <th className="py-2 px-1 w-24 text-right">Total</th>
-                                                        <th className="py-2 px-1 w-10 text-center">Aksi</th>
+                                                    <tr className="border-b border-slate-800 bg-slate-900/50 text-slate-400 uppercase font-bold tracking-wider text-[10px]">
+                                                        <th className="py-3 px-3">Nama Material</th>
+                                                        <th className="py-3 px-2 w-20 text-center">Qty</th>
+                                                        <th className="py-3 px-2 w-20 text-center">Satuan</th>
+                                                        <th className="py-3 px-3 w-32 text-right">Harga Satuan (Rp)</th>
+                                                        <th className="py-3 px-3 w-32 text-right">Total Harga</th>
+                                                        <th className="py-3 px-3 w-12 text-center">Aksi</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {materials.map((mat, idx) => (
-                                                        <tr key={mat.id} className="border-b border-slate-900 hover:bg-slate-900/40">
-                                                            <td className="py-1.5 pr-1">
+                                                        <tr key={mat.id} className="border-b border-slate-800/50 hover:bg-slate-900/40 transition-colors">
+                                                            <td className="py-2 px-3">
                                                                 <input 
                                                                     type="text" 
                                                                     value={mat.nama} 
                                                                     onChange={(e) => updateMaterial(idx, 'nama', e.target.value)}
-                                                                    placeholder="Nama Material"
-                                                                    className="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200"
+                                                                    placeholder="Cth: Semen Gresik"
+                                                                    className="w-full bg-slate-900 border border-slate-700 rounded-md px-2.5 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                 />
                                                             </td>
-                                                            <td className="py-1.5 pr-1 text-center">
+                                                            <td className="py-2 px-2 text-center">
                                                                 <input 
                                                                     type="number" 
                                                                     value={mat.qty} 
                                                                     onChange={(e) => updateMaterial(idx, 'qty', e.target.value)}
-                                                                    className="w-full bg-slate-900 border border-slate-800 rounded px-1 py-1 text-xs text-slate-200 text-center"
+                                                                    className="w-full bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-slate-200 text-center focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                 />
                                                             </td>
-                                                            <td className="py-1.5 pr-1 text-center">
+                                                            <td className="py-2 px-2 text-center">
                                                                 <input 
                                                                     type="text" 
                                                                     value={mat.satuan} 
                                                                     onChange={(e) => updateMaterial(idx, 'satuan', e.target.value)}
                                                                     placeholder="Sak"
-                                                                    className="w-full bg-slate-900 border border-slate-800 rounded px-1 py-1 text-xs text-slate-200 text-center"
+                                                                    className="w-full bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-slate-200 text-center focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                 />
                                                             </td>
-                                                            <td className="py-1.5 pr-1 text-right">
+                                                            <td className="py-2 px-3 text-right">
                                                                 <input 
                                                                     type="number" 
                                                                     value={mat.harga} 
                                                                     onChange={(e) => updateMaterial(idx, 'harga', e.target.value)}
-                                                                    className="w-full bg-slate-900 border border-slate-800 rounded px-1 py-1 text-xs text-slate-200 text-right"
+                                                                    className="w-full bg-slate-900 border border-slate-700 rounded-md px-2.5 py-1.5 text-xs text-slate-200 text-right focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                 />
                                                             </td>
-                                                            <td className="py-1.5 text-right font-mono font-bold text-slate-400">
+                                                            <td className="py-2 px-3 text-right font-mono font-bold text-slate-300">
                                                                 {((Number(mat.qty)||0) * (Number(mat.harga)||0)).toLocaleString('id-ID')}
                                                             </td>
-                                                            <td className="py-1.5 text-center">
-                                                                <button onClick={() => removeMaterial(idx)} className="text-red-400 hover:text-red-300">
-                                                                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                            <td className="py-2 px-3 text-center">
+                                                                <button onClick={() => removeMaterial(idx)} className="text-red-400 hover:text-red-300 hover:bg-red-950/50 p-1.5 rounded transition-colors">
+                                                                    <i data-lucide="trash-2" className="w-4 h-4"></i>
                                                                 </button>
                                                             </td>
                                                         </tr>
@@ -1016,24 +1154,24 @@
                                 </div>
 
                                 {/* TAB 3: BIAYA TENAGA KERJA EDITOR */}
-                                <div className="space-y-4 pt-4 border-t border-slate-800">
-                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                                        <div className="flex items-center gap-2">
-                                            <i data-lucide="users" class="w-5 h-5 text-sky-400"></i>
-                                            <h3 className="font-semibold text-slate-200 text-sm">Tabel Tenaga Kerja</h3>
+                                <div className="space-y-4 pt-6 border-t border-slate-800">
+                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                        <div className="flex items-center gap-2 bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700">
+                                            <i data-lucide="users" className="w-4 h-4 text-indigo-400"></i>
+                                            <h3 className="font-bold text-slate-200 text-sm">Tabel Tenaga Kerja</h3>
                                         </div>
                                         
                                         {/* Switcher Tipe Tenaga Kerja */}
-                                        <div className="flex bg-slate-900 p-1 rounded-lg border border-slate-800 shrink-0">
+                                        <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 shrink-0">
                                             <button 
                                                 onClick={() => setLaborType('harian')}
-                                                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${laborType === 'harian' ? 'bg-sky-600 text-white' : 'text-slate-400'}`}
+                                                className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${laborType === 'harian' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}
                                             >
                                                 Harian (Default)
                                             </button>
                                             <button 
                                                 onClick={() => setLaborType('borongan')}
-                                                className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${laborType === 'borongan' ? 'bg-sky-600 text-white' : 'text-slate-400'}`}
+                                                className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${laborType === 'borongan' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}
                                             >
                                                 Borongan
                                             </button>
@@ -1046,64 +1184,64 @@
                                             <div className="flex justify-end">
                                                 <button 
                                                     onClick={addLaborHarian}
-                                                    className="flex items-center gap-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 border border-sky-500/30 text-xs px-3 py-1.5 rounded-lg transition-colors font-medium"
+                                                    className="flex items-center gap-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 text-xs px-3.5 py-2 rounded-xl transition-colors font-bold shadow-sm"
                                                 >
-                                                    <i data-lucide="plus" class="w-4 h-4"></i> Tambah Tenaga Harian
+                                                    <i data-lucide="plus" className="w-4 h-4"></i> Tambah Tenaga Harian
                                                 </button>
                                             </div>
-                                            <div className="overflow-x-auto">
+                                            <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
                                                 <table className="w-full text-left text-xs text-slate-300">
                                                     <thead>
-                                                        <tr className="border-b border-slate-800 text-slate-400 uppercase font-bold tracking-wider">
-                                                            <th className="py-2 px-1">Tenaga Kerja (Default: Tukang/Kuli)</th>
-                                                            <th className="py-2 px-1 w-24 text-center">Satuan</th>
-                                                            <th className="py-2 px-1 w-24 text-center">Volume (Hari)</th>
-                                                            <th className="py-2 px-1 w-28 text-right">Harga Satuan</th>
-                                                            <th className="py-2 px-1 w-24 text-right">Total</th>
-                                                            <th className="py-2 px-1 w-10 text-center">Aksi</th>
+                                                        <tr className="border-b border-slate-800 bg-slate-900/50 text-slate-400 uppercase font-bold tracking-wider text-[10px]">
+                                                            <th className="py-3 px-3">Golongan Tenaga Kerja</th>
+                                                            <th className="py-3 px-2 w-28 text-center">Satuan</th>
+                                                            <th className="py-3 px-2 w-28 text-center">Volume (Hari)</th>
+                                                            <th className="py-3 px-3 w-32 text-right">Harga Satuan (Rp)</th>
+                                                            <th className="py-3 px-3 w-32 text-right">Total Harga</th>
+                                                            <th className="py-3 px-3 w-12 text-center">Aksi</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody>
                                                         {laborHarian.map((lab, idx) => (
-                                                            <tr key={lab.id} className="border-b border-slate-900 hover:bg-slate-900/40">
-                                                                <td className="py-1.5 pr-1">
+                                                            <tr key={lab.id} className="border-b border-slate-800/50 hover:bg-slate-900/40 transition-colors">
+                                                                <td className="py-2 px-3">
                                                                     <input 
                                                                         type="text" 
                                                                         value={lab.tenaga} 
                                                                         onChange={(e) => updateLaborHarian(idx, 'tenaga', e.target.value)}
-                                                                        className="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200"
+                                                                        className="w-full bg-slate-900 border border-slate-700 rounded-md px-2.5 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                     />
                                                                 </td>
-                                                                <td className="py-1.5 pr-1 text-center">
+                                                                <td className="py-2 px-2 text-center">
                                                                     <input 
                                                                         type="text" 
                                                                         value={lab.satuan} 
                                                                         onChange={(e) => updateLaborHarian(idx, 'satuan', e.target.value)}
-                                                                        className="w-full bg-slate-900 border border-slate-800 rounded px-1 py-1 text-xs text-slate-200 text-center"
+                                                                        className="w-full bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-slate-200 text-center focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                     />
                                                                 </td>
-                                                                <td className="py-1.5 pr-1 text-center">
+                                                                <td className="py-2 px-2 text-center">
                                                                     <input 
                                                                         type="number" 
                                                                         value={lab.volume} 
                                                                         onChange={(e) => updateLaborHarian(idx, 'volume', e.target.value)}
-                                                                        className="w-full bg-slate-900 border border-slate-800 rounded px-1 py-1 text-xs text-slate-200 text-center"
+                                                                        className="w-full bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-slate-200 text-center focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                     />
                                                                 </td>
-                                                                <td className="py-1.5 pr-1 text-right">
+                                                                <td className="py-2 px-3 text-right">
                                                                     <input 
                                                                         type="number" 
                                                                         value={lab.harga} 
                                                                         onChange={(e) => updateLaborHarian(idx, 'harga', e.target.value)}
-                                                                        className="w-full bg-slate-900 border border-slate-800 rounded px-1 py-1 text-xs text-slate-200 text-right"
+                                                                        className="w-full bg-slate-900 border border-slate-700 rounded-md px-2.5 py-1.5 text-xs text-slate-200 text-right focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                     />
                                                                 </td>
-                                                                <td className="py-1.5 text-right font-mono font-bold text-slate-400">
+                                                                <td className="py-2 px-3 text-right font-mono font-bold text-slate-300">
                                                                     {((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}
                                                                 </td>
-                                                                <td className="py-1.5 text-center">
-                                                                    <button onClick={() => removeLaborHarian(idx)} className="text-red-400 hover:text-red-300">
-                                                                        <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                                <td className="py-2 px-3 text-center">
+                                                                    <button onClick={() => removeLaborHarian(idx)} className="text-red-400 hover:text-red-300 hover:bg-red-950/50 p-1.5 rounded transition-colors">
+                                                                        <i data-lucide="trash-2" className="w-4 h-4"></i>
                                                                     </button>
                                                                 </td>
                                                             </tr>
@@ -1118,73 +1256,73 @@
                                             <div className="flex justify-end">
                                                 <button 
                                                     onClick={addLaborBorongan}
-                                                    className="flex items-center gap-1.5 bg-sky-600/20 hover:bg-sky-600/30 text-sky-400 border border-sky-500/30 text-xs px-3 py-1.5 rounded-lg transition-colors font-medium"
+                                                    className="flex items-center gap-1.5 bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 text-xs px-3.5 py-2 rounded-xl transition-colors font-bold shadow-sm"
                                                 >
-                                                    <i data-lucide="plus" class="w-4 h-4"></i> Tambah Borongan
+                                                    <i data-lucide="plus" className="w-4 h-4"></i> Tambah Borongan
                                                 </button>
                                             </div>
 
                                             {laborBorongan.length === 0 && (
-                                                <div className="text-center py-6 border border-dashed border-slate-800 rounded-lg">
-                                                    <p className="text-slate-500 text-xs">Belum ada data tenaga borongan diinput.</p>
+                                                <div className="text-center py-8 bg-slate-950/50 border border-dashed border-slate-800 rounded-xl">
+                                                    <p className="text-slate-500 text-xs font-medium">Belum ada data tenaga borongan diinput.</p>
                                                 </div>
                                             )}
 
                                             {laborBorongan.length > 0 && (
-                                                <div className="overflow-x-auto">
+                                                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
                                                     <table className="w-full text-left text-xs text-slate-300">
                                                         <thead>
-                                                            <tr className="border-b border-slate-800 text-slate-400 uppercase font-bold tracking-wider">
-                                                                <th className="py-2 px-1">Uraian Pekerjaan Borongan</th>
-                                                                <th className="py-2 px-1 w-20 text-center">Vol</th>
-                                                                <th className="py-2 px-1 w-20 text-center">Satuan</th>
-                                                                <th className="py-2 px-1 w-28 text-right">Harga Borongan</th>
-                                                                <th className="py-2 px-1 w-24 text-right">Total</th>
-                                                                <th className="py-2 px-1 w-10 text-center">Aksi</th>
+                                                            <tr className="border-b border-slate-800 bg-slate-900/50 text-slate-400 uppercase font-bold tracking-wider text-[10px]">
+                                                                <th className="py-3 px-3">Uraian Pekerjaan Borongan</th>
+                                                                <th className="py-3 px-2 w-24 text-center">Volume</th>
+                                                                <th className="py-3 px-2 w-24 text-center">Satuan</th>
+                                                                <th className="py-3 px-3 w-32 text-right">Harga Satuan (Rp)</th>
+                                                                <th className="py-3 px-3 w-32 text-right">Total Harga</th>
+                                                                <th className="py-3 px-3 w-12 text-center">Aksi</th>
                                                             </tr>
                                                         </thead>
                                                         <tbody>
                                                             {laborBorongan.map((lab, idx) => (
-                                                                <tr key={lab.id} className="border-b border-slate-900 hover:bg-slate-900/40">
-                                                                    <td className="py-1.5 pr-1">
+                                                                <tr key={lab.id} className="border-b border-slate-800/50 hover:bg-slate-900/40 transition-colors">
+                                                                    <td className="py-2 px-3">
                                                                         <input 
                                                                             type="text" 
                                                                             value={lab.uraian} 
                                                                             onChange={(e) => updateLaborBorongan(idx, 'uraian', e.target.value)}
-                                                                            className="w-full bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-slate-200"
+                                                                            className="w-full bg-slate-900 border border-slate-700 rounded-md px-2.5 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                         />
                                                                     </td>
-                                                                    <td className="py-1.5 pr-1 text-center">
+                                                                    <td className="py-2 px-2 text-center">
                                                                         <input 
                                                                             type="number" 
                                                                             value={lab.volume} 
                                                                             onChange={(e) => updateLaborBorongan(idx, 'volume', e.target.value)}
-                                                                            className="w-full bg-slate-900 border border-slate-800 rounded px-1 py-1 text-xs text-slate-200 text-center"
+                                                                            className="w-full bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-slate-200 text-center focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                         />
                                                                     </td>
-                                                                    <td className="py-1.5 pr-1 text-center">
+                                                                    <td className="py-2 px-2 text-center">
                                                                         <input 
                                                                             type="text" 
                                                                             value={lab.satuan} 
                                                                             onChange={(e) => updateLaborBorongan(idx, 'satuan', e.target.value)}
-                                                                            placeholder="m³"
-                                                                            className="w-full bg-slate-900 border border-slate-800 rounded px-1 py-1 text-xs text-slate-200 text-center"
+                                                                            placeholder="m³ / m²"
+                                                                            className="w-full bg-slate-900 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-slate-200 text-center focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                         />
                                                                     </td>
-                                                                    <td className="py-1.5 pr-1 text-right">
+                                                                    <td className="py-2 px-3 text-right">
                                                                         <input 
                                                                             type="number" 
                                                                             value={lab.harga} 
                                                                             onChange={(e) => updateLaborBorongan(idx, 'harga', e.target.value)}
-                                                                            className="w-full bg-slate-900 border border-slate-800 rounded px-1 py-1 text-xs text-slate-200 text-right"
+                                                                            className="w-full bg-slate-900 border border-slate-700 rounded-md px-2.5 py-1.5 text-xs text-slate-200 text-right focus:ring-1 focus:ring-indigo-500 outline-none"
                                                                         />
                                                                     </td>
-                                                                    <td className="py-1.5 text-right font-mono font-bold text-slate-400">
+                                                                    <td className="py-2 px-3 text-right font-mono font-bold text-slate-300">
                                                                         {((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}
                                                                     </td>
-                                                                    <td className="py-1.5 text-center">
-                                                                        <button onClick={() => removeLaborBorongan(idx)} className="text-red-400 hover:text-red-300">
-                                                                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                                                                    <td className="py-2 px-3 text-center">
+                                                                        <button onClick={() => removeLaborBorongan(idx)} className="text-red-400 hover:text-red-300 hover:bg-red-950/50 p-1.5 rounded transition-colors">
+                                                                            <i data-lucide="trash-2" className="w-4 h-4"></i>
                                                                         </button>
                                                                     </td>
                                                                 </tr>
@@ -1199,350 +1337,364 @@
                             </section>
 
                             {/* DOKUMEN PREVIEW (Live Rendering & Printable Page Wrapper) */}
-                            <div 
-                                ref={previewRef}
-                                className="bg-white text-black p-8 shadow-2xl rounded-xl border border-slate-800 print:border-none print:shadow-none print:p-0 print:m-0 print:rounded-none"
-                            >
-                                
-                                {/* STRUKTUR TABEL UNTUK REPEATING KOP SURAT */}
-                                <table className="w-full border-collapse">
+                            <div className="pt-6 print:pt-0 border-t-2 border-dashed border-slate-800 print:border-none">
+                                <div className="flex items-center justify-between mb-4 print:hidden">
+                                    <h3 className="text-slate-400 text-sm font-bold flex items-center gap-2 uppercase tracking-wider">
+                                        <i data-lucide="eye" className="w-4 h-4"></i> Pratinjau Kertas A4
+                                    </h3>
+                                    <span className="text-[10px] bg-slate-800 text-slate-400 px-2.5 py-1 rounded-md font-mono border border-slate-700">Skala 100%</span>
+                                </div>
+
+                                <div 
+                                    ref={previewRef}
+                                    className="paper-preview bg-white text-black px-10 py-12 shadow-2xl rounded-sm border border-slate-200 print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-full print:rounded-none"
+                                >
                                     
-                                    {/* KOP DI-ULANG PADA SETIAP LEMBAR PRINT */}
-                                    <thead className="table-header-group">
-                                        <tr>
-                                            <td>
-                                                <div className="pb-4 border-b-2 border-slate-800 mb-6">
-                                                    {/* Baris Utama: Logo - Nama & Alamat - Logo (Semua Sejajar Horizontal) */}
-                                                    <div className="flex items-center justify-between w-full">
-                                                        
-                                                        {/* Logo Kiri */}
-                                                        <div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">
-                                                            {logoKiri ? (
-                                                                <img src={logoKiri} alt="Logo Kiri" className="max-h-full max-w-full object-contain" />
-                                                            ) : (
-                                                                <div className="w-16 h-16 border-2 border-slate-800 rounded flex items-center justify-center p-1 bg-slate-50">
-                                                                    <span className="text-xs font-black tracking-tighter text-slate-800 leading-none text-center">BCA PRO</span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-
-                                                        {/* Nama Perusahaan & Alamat Terpusat (Tanpa Jarak Jauh) */}
-                                                        <div className="flex-1 text-center px-4 flex flex-col justify-center">
-                                                            <h2 className="text-2xl font-black tracking-tight text-slate-900 leading-tight uppercase">{instansiName}</h2>
-                                                            <p className="whitespace-pre-line text-[11px] text-slate-800 leading-relaxed font-semibold mt-1.5">{instansiAddress}</p>
-                                                        </div>
-
-                                                        {/* Logo Kanan */}
-                                                        <div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">
-                                                            {logoKanan ? (
-                                                                <img src={logoKanan} alt="Logo Kanan" className="max-h-full max-w-full object-contain" />
-                                                            ) : (
-                                                                <div className="w-16 h-16 border-2 border-slate-800 rounded-full flex items-center justify-center p-1 bg-slate-50">
-                                                                    <span className="text-[10px] font-black text-slate-700">ENG</span>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </thead>
-
-                                    {/* ISI UTAMA DOKUMEN SPK */}
-                                    <tbody className="table-row-group">
-                                        <tr>
-                                            <td>
-                                                <div className="space-y-6 pt-2">
-                                                    
-                                                    <div className="text-center space-y-1">
-                                                        <h1 className="text-base font-black tracking-wider uppercase text-slate-900 underline">SURAT PERINTAH KERJA (SPK)</h1>
-                                                        <p className="text-xs font-mono font-bold text-slate-800">{spkNumber ? `No. ${spkNumber}` : "No. - "}</p>
-                                                    </div>
-
-                                                    {/* SECTION A: DATA PROYEK */}
-                                                    <div className="space-y-2">
-                                                        <h4 className="text-xs font-bold text-slate-900 border-b border-slate-400 pb-1 uppercase tracking-wide">A. Data Proyek</h4>
-                                                        
-                                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-1.5 text-xs text-slate-800 pl-2">
-                                                            <div className="flex">
-                                                                <span className="w-32 font-medium">a. Nama Proyek</span>
-                                                                <span className="w-3 text-center">:</span>
-                                                                <span className="flex-1 font-bold">{selectedProyekIdx !== "" ? DAFTAR_PROYEK[selectedProyekIdx]?.nama : "-"}</span>
-                                                            </div>
+                                    {/* STRUKTUR TABEL UNTUK REPEATING KOP SURAT */}
+                                    <table className="w-full border-collapse">
+                                        
+                                        {/* KOP DI-ULANG PADA SETIAP LEMBAR PRINT */}
+                                        <thead className="table-header-group">
+                                            <tr>
+                                                <td>
+                                                    <div className="pb-4 border-b-2 border-slate-900 mb-6">
+                                                        {/* Baris Utama: Logo - Nama & Alamat - Logo (Semua Sejajar Horizontal) */}
+                                                        <div className="flex items-center justify-between w-full gap-4">
                                                             
-                                                            <div className="flex">
-                                                                <span className="w-32 font-medium">b. Lokasi Proyek</span>
-                                                                <span className="w-3 text-center">:</span>
-                                                                <span className="flex-1">{selectedProyekIdx !== "" ? DAFTAR_PROYEK[selectedProyekIdx]?.lokasi : "-"}</span>
+                                                            {/* Logo Kiri */}
+                                                            <div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">
+                                                                {logoKiri ? (
+                                                                    <img src={logoKiri} alt="Logo Kiri" className="max-h-full max-w-full object-contain" />
+                                                                ) : (
+                                                                    <div className="w-16 h-16 border-2 border-slate-800 rounded flex items-center justify-center p-1 bg-slate-50">
+                                                                        <span className="text-[10px] font-black tracking-tighter text-slate-800 leading-none text-center">LOGOKIRI</span>
+                                                                    </div>
+                                                                )}
                                                             </div>
 
-                                                            <div className="flex">
-                                                                <span className="w-32 font-medium">c. Pemberi Tugas</span>
-                                                                <span className="w-3 text-center">:</span>
-                                                                <span className="flex-1 font-bold">{pemberiTugas || "-"}</span>
+                                                            {/* Nama Perusahaan & Alamat Terpusat (Tanpa Jarak Jauh) */}
+                                                            <div className="flex-1 text-center flex flex-col justify-center">
+                                                                <h2 className="text-2xl font-black tracking-tight text-slate-950 leading-tight uppercase">{instansiName}</h2>
+                                                                <p className="whitespace-pre-line text-[11px] text-slate-800 leading-relaxed font-semibold mt-1.5">{instansiAddress}</p>
                                                             </div>
 
-                                                            <div className="flex">
-                                                                <span className="w-32 font-medium">d. Penanggung Jawab</span>
-                                                                <span className="w-3 text-center">:</span>
-                                                                <span className="flex-1 font-bold">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"}</span>
+                                                            {/* Logo Kanan */}
+                                                            <div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">
+                                                                {logoKanan ? (
+                                                                    <img src={logoKanan} alt="Logo Kanan" className="max-h-full max-w-full object-contain" />
+                                                                ) : (
+                                                                    <div className="w-16 h-16 border-2 border-slate-800 rounded-full flex items-center justify-center p-1 bg-slate-50">
+                                                                        <span className="text-[10px] font-black tracking-tighter text-slate-800 leading-none text-center">LOGOKANAN</span>
+                                                                    </div>
+                                                                )}
                                                             </div>
-
-                                                            <div className="flex">
-                                                                <span className="w-32 font-medium">e. Jabatan</span>
-                                                                <span className="w-3 text-center">:</span>
-                                                                <span className="flex-1">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.jabatan : "-"}</span>
-                                                            </div>
-
-                                                            <div className="flex">
-                                                                <span className="w-32 font-medium">f. Periode Pelaksanaan</span>
-                                                                <span className="w-3 text-center">:</span>
-                                                                <span className="flex-1">
-                                                                    {startDate ? new Date(startDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : "-"} s/d {endDate ? new Date(endDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : "-"}
-                                                                </span>
-                                                            </div>
-
-                                                            {endDate && startDate && (
-                                                                <div className="flex col-span-2 bg-slate-50 p-2 rounded border border-slate-200 mt-1">
-                                                                    <span className="w-32 font-medium">g. Durasi Pekerjaan</span>
-                                                                    <span className="w-3 text-center">:</span>
-                                                                    <span className="flex-1 font-bold text-slate-900">{durasiHari} Hari Kerja (Hari Minggu tidak dihitung)</span>
-                                                                </div>
-                                                            )}
                                                         </div>
                                                     </div>
+                                                </td>
+                                            </tr>
+                                        </thead>
 
-                                                    {/* SECTION B: RUANG LINGKUP PEKERJAAN */}
-                                                    <div className="space-y-2">
-                                                        <h4 className="text-xs font-bold text-slate-900 border-b border-slate-400 pb-1 uppercase tracking-wide">B. Ruang Lingkup Pekerjaan</h4>
+                                        {/* ISI UTAMA DOKUMEN SPK */}
+                                        <tbody className="table-row-group">
+                                            <tr>
+                                                <td>
+                                                    <div className="space-y-6 pt-2">
                                                         
-                                                        {ruangLingkup.length === 0 ? (
-                                                            <div className="p-3 border border-slate-300 rounded text-[11px] text-slate-500 italic text-center">
-                                                                Daftar ruang lingkup pekerjaan belum ditambahkan.
-                                                            </div>
-                                                        ) : (
-                                                            <div className="overflow-hidden border border-slate-800 rounded">
-                                                                <table className="w-full text-left text-[11px] border-collapse">
-                                                                    <thead>
-                                                                        <tr className="bg-slate-50 border-b border-slate-800 text-slate-900 font-bold">
-                                                                            <th className="py-2 px-3 border-r border-slate-300 w-12 text-center">No.</th>
-                                                                            <th className="py-2 px-3 border-r border-slate-300">Uraian Pekerjaan</th>
-                                                                            <th className="py-2 px-3 border-r border-slate-300 w-24 text-center">Volume</th>
-                                                                            <th className="py-2 px-3 w-24 text-center">Satuan</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {ruangLingkup.map((item, parentIdx) => (
-                                                                            <React.Fragment key={item.id}>
-                                                                                <tr className="border-b border-slate-300 font-bold bg-slate-50/40">
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-300 text-center font-mono">{parentIdx + 1}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-300 text-slate-900">{item.uraian || `Pekerjaan Utama ${parentIdx+1}`}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-300 text-center">{item.volume || "-"}</td>
-                                                                                    <td className="py-1.5 px-3 text-center">{item.satuan || "-"}</td>
-                                                                                </tr>
-                                                                                
-                                                                                {item.subs && item.subs.map((sub, subIdx) => (
-                                                                                    <tr key={sub.id} className="border-b border-slate-200 text-slate-700 italic">
-                                                                                        <td className="py-1.5 px-3 border-r border-slate-300 text-right text-[10px] font-mono pr-4">{parentIdx + 1}.{subIdx + 1}</td>
-                                                                                        <td className="py-1.5 px-6 border-r border-slate-300 text-slate-600">- {sub.uraian || `Sub Pekerjaan ${subIdx+1}`}</td>
-                                                                                        <td className="py-1.5 px-3 border-r border-slate-300 text-center">{sub.volume || "-"}</td>
-                                                                                        <td className="py-1.5 px-3 text-center">{sub.satuan || "-"}</td>
-                                                                                    </tr>
-                                                                                ))}
-                                                                            </React.Fragment>
-                                                                        ))}
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                                        <div className="text-center space-y-1.5 mb-8">
+                                                            <h1 className="text-base font-black tracking-widest uppercase text-slate-950 underline underline-offset-4 decoration-2">Surat Perintah Kerja</h1>
+                                                            <p className="text-xs font-mono font-bold text-slate-700">{spkNumber ? `Nomor: ${spkNumber}` : "Nomor: [Belum Tergenerate]"}</p>
+                                                        </div>
 
-                                                    {/* SECTION C: BIAYA MATERIAL */}
-                                                    <div className="space-y-2">
-                                                        <h4 className="text-xs font-bold text-slate-900 border-b border-slate-400 pb-1 uppercase tracking-wide">C. Rincian Biaya Material</h4>
-                                                        
-                                                        {materials.length === 0 ? (
-                                                            <div className="p-3 border border-slate-300 rounded text-[11px] text-slate-500 italic text-center">
-                                                                Daftar biaya material belum ditambahkan.
-                                                            </div>
-                                                        ) : (
-                                                            <div className="overflow-hidden border border-slate-800 rounded">
-                                                                <table className="w-full text-left text-[11px] border-collapse">
-                                                                    <thead>
-                                                                        <tr className="bg-slate-50 border-b border-slate-800 text-slate-900 font-bold">
-                                                                            <th className="py-2 px-3 border-r border-slate-300 w-12 text-center">No.</th>
-                                                                            <th className="py-2 px-3 border-r border-slate-300">Nama Material</th>
-                                                                            <th className="py-2 px-3 border-r border-slate-300 w-16 text-center">Qty</th>
-                                                                            <th className="py-2 px-3 border-r border-slate-300 w-16 text-center">Satuan</th>
-                                                                            <th className="py-2 px-3 border-r border-slate-300 w-28 text-right">Harga Satuan (Rp)</th>
-                                                                            <th className="py-2 px-3 w-28 text-right">Total Harga (Rp)</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {materials.map((mat, idx) => (
-                                                                            <tr key={mat.id} className="border-b border-slate-300 hover:bg-slate-50">
-                                                                                <td className="py-1.5 px-3 border-r border-slate-300 text-center font-mono">{idx + 1}</td>
-                                                                                <td className="py-1.5 px-3 border-r border-slate-300 text-slate-800">{mat.nama || `Material #${idx+1}`}</td>
-                                                                                <td className="py-1.5 px-3 border-r border-slate-300 text-center">{mat.qty || "-"}</td>
-                                                                                <td className="py-1.5 px-3 border-r border-slate-300 text-center">{mat.satuan || "-"}</td>
-                                                                                <td className="py-1.5 px-3 border-r border-slate-300 text-right font-mono">{(Number(mat.harga)||0).toLocaleString('id-ID')}</td>
-                                                                                <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(mat.qty)||0) * (Number(mat.harga)||0)).toLocaleString('id-ID')}</td>
-                                                                            </tr>
-                                                                        ))}
-                                                                        <tr className="bg-slate-100 font-bold border-t border-slate-400 text-slate-950">
-                                                                            <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-300">Sub-Total Biaya Material:</td>
-                                                                            <td className="py-2 px-3 text-right font-mono text-xs">Rp. {totalMaterial.toLocaleString('id-ID')}</td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                                        {/* SECTION A: DATA PROYEK */}
+                                                        <div className="space-y-2.5 print-avoid-break">
+                                                            <h4 className="text-xs font-bold text-slate-900 border-b-2 border-slate-800 pb-1 uppercase tracking-wide">A. Informasi Pekerjaan</h4>
+                                                            
+                                                            <div className="grid grid-cols-1 gap-y-2 text-xs text-slate-800 pl-2">
+                                                                <div className="flex">
+                                                                    <span className="w-40 font-semibold">1. Nama Proyek</span>
+                                                                    <span className="w-4 text-center">:</span>
+                                                                    <span className="flex-1 font-bold">{selectedProyekIdx !== "" ? DAFTAR_PROYEK[selectedProyekIdx]?.nama : "-"}</span>
+                                                                </div>
+                                                                
+                                                                <div className="flex">
+                                                                    <span className="w-40 font-semibold">2. Lokasi Proyek</span>
+                                                                    <span className="w-4 text-center">:</span>
+                                                                    <span className="flex-1">{selectedProyekIdx !== "" ? DAFTAR_PROYEK[selectedProyekIdx]?.lokasi : "-"}</span>
+                                                                </div>
 
-                                                    {/* SECTION D: BIAYA TENAGA KERJA */}
-                                                    <div className="space-y-2">
-                                                        <h4 className="text-xs font-bold text-slate-900 border-b border-slate-400 pb-1 uppercase tracking-wide">
-                                                            D. Rincian Biaya Tenaga Kerja ({laborType === 'harian' ? 'Harian' : 'Borongan'})
-                                                        </h4>
-                                                        
-                                                        <div className="overflow-hidden border border-slate-800 rounded">
-                                                            {laborType === 'harian' ? (
-                                                                <table className="w-full text-left text-[11px] border-collapse">
-                                                                    <thead>
-                                                                        <tr className="bg-slate-50 border-b border-slate-800 text-slate-900 font-bold">
-                                                                            <th className="py-2 px-3 border-r border-slate-300 w-12 text-center">No.</th>
-                                                                            <th className="py-2 px-3 border-r border-slate-300">Golongan Tenaga Kerja</th>
-                                                                            <th className="py-2 px-3 border-r border-slate-300 w-24 text-center">Satuan</th>
-                                                                            <th className="py-2 px-3 border-r border-slate-300 w-24 text-center">Volume (Hari)</th>
-                                                                            <th className="py-2 px-3 border-r border-slate-300 w-28 text-right">Harga Satuan (Rp)</th>
-                                                                            <th className="py-2 px-3 w-28 text-right">Total Harga (Rp)</th>
-                                                                        </tr>
-                                                                    </thead>
-                                                                    <tbody>
-                                                                        {laborHarian.map((lab, idx) => (
-                                                                            <tr key={lab.id} className="border-b border-slate-300 hover:bg-slate-50">
-                                                                                <td className="py-1.5 px-3 border-r border-slate-300 text-center font-mono">{idx + 1}</td>
-                                                                                <td className="py-1.5 px-3 border-r border-slate-300 text-slate-800 font-medium">{lab.tenaga || `Tenaga #${idx+1}`}</td>
-                                                                                <td className="py-1.5 px-3 border-r border-slate-300 text-center">{lab.satuan}</td>
-                                                                                <td className="py-1.5 px-3 border-r border-slate-300 text-center">{lab.volume || "-"}</td>
-                                                                                <td className="py-1.5 px-3 border-r border-slate-300 text-right font-mono">{(Number(lab.harga)||0).toLocaleString('id-ID')}</td>
-                                                                                <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}</td>
-                                                                            </tr>
-                                                                        ))}
-                                                                        <tr className="bg-slate-100 font-bold border-t border-slate-400 text-slate-950">
-                                                                            <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-300">Sub-Total Biaya Tenaga Kerja:</td>
-                                                                            <td className="py-2 px-3 text-right font-mono text-xs">Rp. {totalLabor.toLocaleString('id-ID')}</td>
-                                                                        </tr>
-                                                                    </tbody>
-                                                                </table>
-                                                            ) : (
-                                                                laborBorongan.length === 0 ? (
-                                                                    <div className="p-3 border-t border-slate-300 text-[11px] text-slate-500 italic text-center">
-                                                                        Daftar biaya tenaga borongan belum ditambahkan.
+                                                                <div className="flex">
+                                                                    <span className="w-40 font-semibold">3. Pemberi Tugas</span>
+                                                                    <span className="w-4 text-center">:</span>
+                                                                    <span className="flex-1 font-bold uppercase">{pemberiTugas || "-"}</span>
+                                                                </div>
+
+                                                                <div className="flex">
+                                                                    <span className="w-40 font-semibold">4. Penanggung Jawab</span>
+                                                                    <span className="w-4 text-center">:</span>
+                                                                    <span className="flex-1 font-bold">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"} <span className="font-normal italic">({selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.jabatan : "-"})</span></span>
+                                                                </div>
+
+                                                                <div className="flex">
+                                                                    <span className="w-40 font-semibold">5. Waktu Pelaksanaan</span>
+                                                                    <span className="w-4 text-center">:</span>
+                                                                    <span className="flex-1 font-semibold">
+                                                                        {startDate ? new Date(startDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : "-"} <span className="font-normal mx-1">s/d</span> {endDate ? new Date(endDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : "-"}
+                                                                    </span>
+                                                                </div>
+
+                                                                {endDate && startDate && (
+                                                                    <div className="flex mt-1">
+                                                                        <span className="w-40 font-semibold"></span>
+                                                                        <span className="w-4 text-center"></span>
+                                                                        <span className="flex-1 text-[11px] font-bold text-slate-900 italic bg-slate-100 px-2 py-1 rounded inline-block w-fit">Durasi: {durasiHari} Hari Aktif Kerja</span>
                                                                     </div>
-                                                                ) : (
+                                                                )}
+                                                            </div>
+                                                        </div>
+
+                                                        {/* SECTION B: RUANG LINGKUP PEKERJAAN (Mencegah pecah di tengah halaman) */}
+                                                        <div className="space-y-2.5 print-avoid-break">
+                                                            <h4 className="text-xs font-bold text-slate-900 border-b-2 border-slate-800 pb-1 uppercase tracking-wide">B. Ruang Lingkup Pekerjaan</h4>
+                                                            
+                                                            {ruangLingkup.length === 0 ? (
+                                                                <div className="p-4 border border-dashed border-slate-300 rounded text-[11px] text-slate-500 italic text-center">
+                                                                    [ Data ruang lingkup belum diisi ]
+                                                                </div>
+                                                            ) : (
+                                                                <div className="overflow-hidden border border-slate-950">
                                                                     <table className="w-full text-left text-[11px] border-collapse">
                                                                         <thead>
-                                                                            <tr className="bg-slate-50 border-b border-slate-800 text-slate-900 font-bold">
-                                                                                <th className="py-2 px-3 border-r border-slate-300 w-12 text-center">No.</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-300">Uraian Pekerjaan Borongan</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-300 w-24 text-center">Volume</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-300 w-24 text-center">Satuan</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-300 w-28 text-right">Harga Satuan (Rp)</th>
-                                                                                <th className="py-2 px-3 w-28 text-right">Total Harga (Rp)</th>
+                                                                            <tr className="bg-slate-100 border-b border-slate-950 text-slate-955 font-bold">
+                                                                                <th className="py-2 px-3 border-r border-slate-955 w-12 text-center">No.</th>
+                                                                                <th className="py-2 px-3 border-r border-slate-955">Uraian Jenis Pekerjaan</th>
+                                                                                <th className="py-2 px-3 border-r border-slate-955 w-24 text-center">Volume</th>
+                                                                                <th className="py-2 px-3 w-24 text-center">Satuan</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
-                                                                            {laborBorongan.map((lab, idx) => (
-                                                                                <tr key={lab.id} className="border-b border-slate-300 hover:bg-slate-50">
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-300 text-center font-mono">{idx + 1}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-300 text-slate-800">{lab.uraian || `Borongan #${idx+1}`}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-300 text-center">{lab.volume || "-"}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-300 text-center">{lab.satuan || "-"}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-300 text-right font-mono">{(Number(lab.harga)||0).toLocaleString('id-ID')}</td>
-                                                                                    <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}</td>
+                                                                            {ruangLingkup.map((item, parentIdx) => (
+                                                                                <React.Fragment key={item.id}>
+                                                                                    <tr className="border-b border-slate-950 font-bold bg-slate-50">
+                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-center font-mono">{parentIdx + 1}</td>
+                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-slate-955 uppercase">{item.uraian || `Pekerjaan Utama ${parentIdx+1}`}</td>
+                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-center">{item.volume || "-"}</td>
+                                                                                        <td className="py-1.5 px-3 text-center">{item.satuan || "-"}</td>
+                                                                                    </tr>
+                                                                                    
+                                                                                    {item.subs && item.subs.map((sub, subIdx) => (
+                                                                                        <tr key={sub.id} className="border-b border-slate-300 text-slate-800">
+                                                                                            <td className="py-1.5 px-3 border-r border-slate-955 text-right text-[10px] font-mono pr-4">{parentIdx + 1}.{subIdx + 1}</td>
+                                                                                            <td className="py-1.5 px-6 border-r border-slate-955">- {sub.uraian || `Sub Pekerjaan ${subIdx+1}`}</td>
+                                                                                            <td className="py-1.5 px-3 border-r border-slate-955 text-center font-medium">{sub.volume || "-"}</td>
+                                                                                            <td className="py-1.5 px-3 text-center font-medium">{sub.satuan || "-"}</td>
+                                                                                        </tr>
+                                                                                    ))}
+                                                                                </React.Fragment>
+                                                                            ))}
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* SECTION C: BIAYA MATERIAL (Mencegah pecah di tengah halaman) */}
+                                                        <div className="space-y-2.5 print-avoid-break">
+                                                            <h4 className="text-xs font-bold text-slate-900 border-b-2 border-slate-800 pb-1 uppercase tracking-wide">C. Anggaran Biaya Material</h4>
+                                                            
+                                                            {materials.length === 0 ? (
+                                                                <div className="p-4 border border-dashed border-slate-300 rounded text-[11px] text-slate-500 italic text-center">
+                                                                    [ Data material belum diisi ]
+                                                                </div>
+                                                            ) : (
+                                                                <div className="overflow-hidden border border-slate-950">
+                                                                    <table className="w-full text-left text-[11px] border-collapse">
+                                                                        <thead>
+                                                                            <tr className="bg-slate-100 border-b border-slate-950 text-slate-955 font-bold">
+                                                                                <th className="py-2 px-3 border-r border-slate-955 w-12 text-center">No.</th>
+                                                                                <th className="py-2 px-3 border-r border-slate-955">Nama/Jenis Material</th>
+                                                                                <th className="py-2 px-3 border-r border-slate-955 w-16 text-center">Qty</th>
+                                                                                <th className="py-2 px-3 border-r border-slate-955 w-16 text-center">Sat</th>
+                                                                                <th className="py-2 px-3 border-r border-slate-955 w-28 text-right">Harga Sat (Rp)</th>
+                                                                                <th className="py-2 px-3 w-28 text-right">Jumlah (Rp)</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {materials.map((mat, idx) => (
+                                                                                <tr key={mat.id} className="border-b border-slate-300 text-slate-900">
+                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center font-mono">{idx + 1}</td>
+                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 font-medium">{mat.nama || `Material #${idx+1}`}</td>
+                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center">{mat.qty || "-"}</td>
+                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center">{mat.satuan || "-"}</td>
+                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-right font-mono">{(Number(mat.harga)||0).toLocaleString('id-ID')}</td>
+                                                                                    <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(mat.qty)||0) * (Number(mat.harga)||0)).toLocaleString('id-ID')}</td>
                                                                                 </tr>
                                                                             ))}
-                                                                            <tr className="bg-slate-100 font-bold border-t border-slate-400 text-slate-950">
-                                                                                <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-300">Sub-Total Biaya Tenaga Kerja:</td>
-                                                                                <td className="py-2 px-3 text-right font-mono text-xs">Rp. {totalLabor.toLocaleString('id-ID')}</td>
+                                                                            <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-950">
+                                                                                <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-955 uppercase text-[10px]">Sub-Total Biaya Material:</td>
+                                                                                <td className="py-2 px-3 text-right font-mono text-xs">{(totalMaterial).toLocaleString('id-ID')}</td>
                                                                             </tr>
                                                                         </tbody>
                                                                     </table>
-                                                                )
+                                                                </div>
                                                             )}
                                                         </div>
-                                                    </div>
 
-                                                    {/* GRAND TOTAL */}
-                                                    <div className="bg-slate-900 text-white p-3.5 rounded border border-slate-950 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 print:bg-slate-100 print:text-black print:border-slate-400">
-                                                        <div>
-                                                            <h3 className="text-xs font-bold uppercase tracking-wider text-slate-300 print:text-slate-800">Grand Total Pengeluaran Pekerjaan</h3>
-                                                            <p className="text-[10px] text-slate-400 print:text-slate-600 mt-0.5">Akumulasi Biaya Material + Biaya Tenaga Kerja</p>
+                                                        {/* SECTION D: BIAYA TENAGA KERJA (Mencegah pecah di tengah halaman) */}
+                                                        <div className="space-y-2.5 print-avoid-break">
+                                                            <h4 className="text-xs font-bold text-slate-900 border-b-2 border-slate-800 pb-1 uppercase tracking-wide">
+                                                                D. Anggaran Biaya Tenaga Kerja <span className="font-normal italic capitalize">({laborType})</span>
+                                                            </h4>
+                                                            
+                                                            <div className="overflow-hidden border border-slate-950">
+                                                                {laborType === 'harian' ? (
+                                                                    <table className="w-full text-left text-[11px] border-collapse">
+                                                                        <thead>
+                                                                            <tr className="bg-slate-100 border-b border-slate-950 text-slate-955 font-bold">
+                                                                                <th className="py-2 px-3 border-r border-slate-955 w-12 text-center">No.</th>
+                                                                                <th className="py-2 px-3 border-r border-slate-955">Golongan Tenaga Kerja</th>
+                                                                                <th className="py-2 px-3 border-r border-slate-955 w-24 text-center">Satuan</th>
+                                                                                <th className="py-2 px-3 border-r border-slate-955 w-24 text-center">Vol (Hari)</th>
+                                                                                <th className="py-2 px-3 border-r border-slate-955 w-28 text-right">Harga Sat (Rp)</th>
+                                                                                <th className="py-2 px-3 w-28 text-right">Jumlah (Rp)</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {laborHarian.map((lab, idx) => (
+                                                                                <tr key={lab.id} className="border-b border-slate-300 text-slate-900">
+                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center font-mono">{idx + 1}</td>
+                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 font-medium">{lab.tenaga || `Tenaga #${idx+1}`}</td>
+                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center">{lab.satuan}</td>
+                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center">{lab.volume || "-"}</td>
+                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-right font-mono">{(Number(lab.harga)||0).toLocaleString('id-ID')}</td>
+                                                                                    <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}</td>
+                                                                                </tr>
+                                                                            ))}
+                                                                            <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-950">
+                                                                                <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-955 uppercase text-[10px]">Sub-Total Biaya Tenaga Kerja:</td>
+                                                                                <td className="py-2 px-3 text-right font-mono text-xs">{(totalLabor).toLocaleString('id-ID')}</td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                ) : (
+                                                                    laborBorongan.length === 0 ? (
+                                                                        <div className="p-4 text-[11px] text-slate-500 italic text-center bg-slate-50">
+                                                                            [ Data tenaga borongan belum diisi ]
+                                                                        </div>
+                                                                    ) : (
+                                                                        <table className="w-full text-left text-[11px] border-collapse">
+                                                                            <thead>
+                                                                                <tr className="bg-slate-100 border-b border-slate-950 text-slate-955 font-bold">
+                                                                                    <th className="py-2 px-3 border-r border-slate-955 w-12 text-center">No.</th>
+                                                                                    <th className="py-2 px-3 border-r border-slate-955">Uraian Borongan</th>
+                                                                                    <th className="py-2 px-3 border-r border-slate-955 w-20 text-center">Vol</th>
+                                                                                    <th className="py-2 px-3 border-r border-slate-955 w-20 text-center">Sat</th>
+                                                                                    <th className="py-2 px-3 border-r border-slate-955 w-28 text-right">Harga Sat (Rp)</th>
+                                                                                    <th className="py-2 px-3 w-28 text-right">Jumlah (Rp)</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                {laborBorongan.map((lab, idx) => (
+                                                                                    <tr key={lab.id} className="border-b border-slate-300 text-slate-900">
+                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-center font-mono">{idx + 1}</td>
+                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 font-medium">{lab.uraian || `Borongan #${idx+1}`}</td>
+                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-center">{lab.volume || "-"}</td>
+                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-center">{lab.satuan || "-"}</td>
+                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-right font-mono">{(Number(lab.harga)||0).toLocaleString('id-ID')}</td>
+                                                                                        <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}</td>
+                                                                                    </tr>
+                                                                                ))}
+                                                                                <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-950">
+                                                                                    <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-955 uppercase text-[10px]">Sub-Total Biaya Tenaga Kerja:</td>
+                                                                                    <td className="py-2 px-3 text-right font-mono text-xs">{(totalLabor).toLocaleString('id-ID')}</td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    )
+                                                                )}
+                                                            </div>
                                                         </div>
-                                                        <div className="text-right">
-                                                            <span className="text-sm font-bold text-slate-400 print:text-slate-700 mr-2">Total Akhir:</span>
-                                                            <span className="text-lg font-black font-mono tracking-wide text-sky-400 print:text-slate-900">
-                                                                Rp. {grandTotal.toLocaleString('id-ID')}
-                                                            </span>
-                                                        </div>
-                                                    </div>
 
-                                                    {/* PENANDATANGANAN - SEKARANG MENGGUNAKAN print:grid-cols-4 */}
-                                                    <div className="pt-8 space-y-4 print:pt-6">
-                                                        <div className="grid grid-cols-2 md:grid-cols-4 print:grid-cols-4 gap-4 text-[11px] text-center">
-                                                            <div className="flex flex-col justify-between h-32 p-2 border border-dashed border-slate-300 rounded print:border-none">
-                                                                <span className="font-bold text-slate-900 uppercase tracking-tight">Pemberi Tugas</span>
-                                                                <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan & Stempel</div>
-                                                                <div>
-                                                                    <span className="font-black underline text-slate-950 block">{pemberiTugas}</span>
-                                                                    <span className="text-[10px] text-slate-500 block">Direktur</span>
-                                                                </div>
+                                                        {/* GRAND TOTAL */}
+                                                        <div className="bg-slate-100 p-4 border-2 border-slate-950 mt-4 flex flex-row items-center justify-between print-avoid-break">
+                                                            <div className="uppercase">
+                                                                <h3 className="text-sm font-black text-slate-950 tracking-wider">Total Anggaran SPK</h3>
+                                                                <p className="text-[10px] text-slate-700 font-bold mt-0.5">(Material + Tenaga Kerja)</p>
                                                             </div>
-
-                                                            <div className="flex flex-col justify-between h-32 p-2 border border-dashed border-slate-300 rounded print:border-none">
-                                                                <span className="font-bold text-slate-900 uppercase tracking-tight">Keuangan</span>
-                                                                <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan & Stempel</div>
-                                                                <div>
-                                                                    <span className="font-black underline text-slate-950 block">{keuanganName}</span>
-                                                                    <span className="text-[10px] text-slate-500 block">Staff Finance</span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="flex flex-col justify-between h-32 p-2 border border-dashed border-slate-300 rounded print:border-none">
-                                                                <span className="font-bold text-slate-900 uppercase tracking-tight">Penanggung Jawab</span>
-                                                                <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan & Stempel</div>
-                                                                <div>
-                                                                    <span className="font-black underline text-slate-950 block">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"}</span>
-                                                                    <span className="text-[10px] text-slate-500 block truncate" title={selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.jabatan : ""}>
-                                                                        {selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.jabatan : "-"}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="flex flex-col justify-between h-32 p-2 border border-dashed border-slate-300 rounded print:border-none">
-                                                                <span className="font-bold text-slate-900 uppercase tracking-tight">Kepala Kantor</span>
-                                                                <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan & Stempel</div>
-                                                                <div>
-                                                                    <span className="font-black underline text-slate-950 block">{kepalaKantorName}</span>
-                                                                    <span className="text-[10px] text-slate-500 block">Branch Manager</span>
-                                                                </div>
+                                                            <div className="text-right">
+                                                                <span className="text-lg font-black font-mono tracking-tight text-slate-955">
+                                                                    Rp {grandTotal.toLocaleString('id-ID')}
+                                                                </span>
                                                             </div>
                                                         </div>
+
+                                                        {/* PENANDATANGANAN - MENGGUNAKAN print-avoid-break DAN print-cols-4 */}
+                                                        <div className="pt-10 pb-6 print-avoid-break">
+                                                            <div className="grid grid-cols-2 md:grid-cols-4 print:grid-cols-4 print-cols-4 gap-4 text-[11px] text-center">
+                                                                
+                                                                {/* 1. Pemberi Tugas */}
+                                                                <div className="flex flex-col justify-between h-[140px] p-2 relative">
+                                                                    <span className="font-bold text-slate-900 uppercase tracking-tight">Pemberi Tugas</span>
+                                                                    <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan & Stempel</div>
+                                                                    <div>
+                                                                        <span className="font-black underline underline-offset-2 text-slate-950 block">{pemberiTugas}</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* 2. Keuangan */}
+                                                                <div className="flex flex-col justify-between h-[140px] p-2 relative">
+                                                                    <span className="font-bold text-slate-900 uppercase tracking-tight">Mengetahui</span>
+                                                                    <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
+                                                                    <div>
+                                                                        <span className="font-black underline underline-offset-2 text-slate-950 block">{keuanganName}</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* 3. Penanggung Jawab (Digital Signature Support) */}
+                                                                <div className="flex flex-col justify-between h-[140px] p-2 relative">
+                                                                    <span className="font-bold text-slate-900 uppercase tracking-tight">Penerima Tugas</span>
+                                                                    
+                                                                    {pjSignatureImage ? (
+                                                                        <div className="my-auto flex items-center justify-center h-20 w-full overflow-hidden absolute inset-0 top-1/2 -translate-y-1/2 z-0">
+                                                                            <img 
+                                                                                src={pjSignatureImage} 
+                                                                                alt="Tanda Tangan" 
+                                                                                className="signature-img max-h-full object-contain mix-blend-multiply opacity-90" 
+                                                                            />
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
+                                                                    )}
+                                                                    
+                                                                    <div className="relative z-10">
+                                                                        <span className="font-black underline underline-offset-2 text-slate-950 block">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"}</span>
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* 4. Kepala Kantor */}
+                                                                <div className="flex flex-col justify-between h-[140px] p-2 relative">
+                                                                    <span className="font-bold text-slate-900 uppercase tracking-tight">Menyetujui</span>
+                                                                    <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
+                                                                    <div>
+                                                                        <span className="font-black underline underline-offset-2 text-slate-950 block">{kepalaKantorName}</span>
+                                                                    </div>
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+
                                                     </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
 
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
+                                </div>
                             </div>
                         </main>
                     </div>
 
-                    <footer className="text-center text-xs text-slate-500 mt-12 print:hidden">
-                        <p>© 2026 PT Bangun Cinta Alam. Sistem Penomoran SPK Otomatis.</p>
+                    <footer className="text-center text-xs text-slate-600 mt-16 print:hidden font-medium">
+                        <p>© 2026 PT Bangun Cinta Alam. All Rights Reserved.</p>
                     </footer>
                 </div>
             );
