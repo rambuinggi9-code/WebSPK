@@ -30,7 +30,6 @@
                 display: none !important;
             }
             @page {
-                /* MARGIN ATAS SUDAH DIPERKECIL MENJADI 10mm SESUAI REQUEST */
                 margin: 10mm 15mm 20mm 15mm;
             }
             thead {
@@ -86,7 +85,7 @@
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans antialiased pb-12 print:p-0 print:bg-white print:text-black">
+<body class="bg-slate-955 text-slate-100 font-sans antialiased pb-12 print:p-0 print:bg-white print:text-black">
 
     <div id="root"></div>
 
@@ -159,7 +158,7 @@
             laborBorongan: [], 
             keuanganName: "Sita Dita C",
             kepalaKantorName: "Fika Faradila C",
-            pjSignatureImage: null // Gambar tanda tangan digital default kosong
+            pjSignatureImage: null
         };
 
         function App() {
@@ -273,16 +272,11 @@
 
             const handlePrint = () => {
                 const originalTitle = document.title;
-                // Mengganti semua karakter garis miring (/) dengan underscore (_)
                 const safeSpkNumber = spkNumber ? spkNumber.replace(/\//g, '_') : 'Draf_Baru';
                 
-                // Ubah title document sesaat menjadi format SPK_068_BCA-SPK_V_GPK-2026
                 document.title = `SPK_${safeSpkNumber}`;
-                
-                // Panggil dialog print browser
                 window.print();
                 
-                // Kembalikan title dokumen seperti semula setelah delay
                 setTimeout(() => {
                     document.title = originalTitle;
                 }, 2000);
@@ -576,7 +570,6 @@
                                     {activeSpkId ? "Update SPK" : "Simpan SPK"}
                                 </button>
 
-                                {}
                                 <button 
                                     onClick={handlePrint}
                                     className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-lg shadow-indigo-900/30 transition-all active:scale-95 text-xs"
@@ -1162,7 +1155,7 @@
                                         </div>
                                         
                                         {/* Switcher Tipe Tenaga Kerja */}
-                                        <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 shrink-0">
+                                        <div className="flex bg-slate-955 p-1 rounded-xl border border-slate-800 shrink-0">
                                             <button 
                                                 onClick={() => setLaborType('harian')}
                                                 className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${laborType === 'harian' ? 'bg-indigo-600 text-white shadow' : 'text-slate-400 hover:text-slate-200'}`}
@@ -1357,7 +1350,7 @@
                                         <thead className="table-header-group">
                                             <tr>
                                                 <td>
-                                                    <div className="pb-4 border-b-2 border-slate-900 mb-6">
+                                                    <div className="pb-3">
                                                         {/* Baris Utama: Logo - Nama & Alamat - Logo (Semua Sejajar Horizontal) */}
                                                         <div className="flex items-center justify-between w-full gap-4">
                                                             
@@ -1390,6 +1383,9 @@
                                                             </div>
                                                         </div>
                                                     </div>
+                                                    {/* Garis Ganda Kop Surat */}
+                                                    <div className="w-full border-b border-slate-900 mb-[2px]"></div>
+                                                    <div className="w-full border-b-[3px] border-slate-900 mb-6"></div>
                                                 </td>
                                             </tr>
                                         </thead>
@@ -1400,9 +1396,14 @@
                                                 <td>
                                                     <div className="space-y-6 pt-2">
                                                         
+                                                        {/* Judul dengan Underline Klasik (Border Bawah) */}
                                                         <div className="text-center space-y-1.5 mb-8">
-                                                            <h1 className="text-base font-black tracking-widest uppercase text-slate-950 underline underline-offset-4 decoration-2">Surat Perintah Kerja</h1>
-                                                            <p className="text-xs font-mono font-bold text-slate-700">{spkNumber ? `Nomor: ${spkNumber}` : "Nomor: [Belum Tergenerate]"}</p>
+                                                            <h1 className="text-base font-black tracking-widest uppercase text-slate-955 inline-block border-b-2 border-slate-955 pb-0.5 mb-1">
+                                                                Surat Perintah Kerja
+                                                            </h1>
+                                                            <p className="text-xs font-mono font-bold text-slate-700 block">
+                                                                {spkNumber ? `Nomor: ${spkNumber}` : "Nomor: [Belum Tergenerate]"}
+                                                            </p>
                                                         </div>
 
                                                         {/* SECTION A: DATA PROYEK */}
@@ -1529,7 +1530,7 @@
                                                                                     <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(mat.qty)||0) * (Number(mat.harga)||0)).toLocaleString('id-ID')}</td>
                                                                                 </tr>
                                                                             ))}
-                                                                            <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-950">
+                                                                            <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-955">
                                                                                 <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-955 uppercase text-[10px]">Sub-Total Biaya Material:</td>
                                                                                 <td className="py-2 px-3 text-right font-mono text-xs">{(totalMaterial).toLocaleString('id-ID')}</td>
                                                                             </tr>
@@ -1569,7 +1570,7 @@
                                                                                     <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}</td>
                                                                                 </tr>
                                                                             ))}
-                                                                            <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-950">
+                                                                            <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-955">
                                                                                 <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-955 uppercase text-[10px]">Sub-Total Biaya Tenaga Kerja:</td>
                                                                                 <td className="py-2 px-3 text-right font-mono text-xs">{(totalLabor).toLocaleString('id-ID')}</td>
                                                                             </tr>
@@ -1603,7 +1604,7 @@
                                                                                         <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}</td>
                                                                                     </tr>
                                                                                 ))}
-                                                                                <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-950">
+                                                                                <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-955">
                                                                                     <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-955 uppercase text-[10px]">Sub-Total Biaya Tenaga Kerja:</td>
                                                                                     <td className="py-2 px-3 text-right font-mono text-xs">{(totalLabor).toLocaleString('id-ID')}</td>
                                                                                 </tr>
@@ -1627,58 +1628,79 @@
                                                             </div>
                                                         </div>
 
-                                                        {/* PENANDATANGANAN - MENGGUNAKAN print-avoid-break DAN print-cols-4 */}
-                                                        <div className="pt-10 pb-6 print-avoid-break">
-                                                            <div className="grid grid-cols-2 md:grid-cols-4 print:grid-cols-4 print-cols-4 gap-4 text-[11px] text-center">
-                                                                
-                                                                {/* 1. Pemberi Tugas */}
-                                                                <div className="flex flex-col justify-between h-[140px] p-2 relative">
-                                                                    <span className="font-bold text-slate-900 uppercase tracking-tight">Pemberi Tugas</span>
-                                                                    <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan & Stempel</div>
-                                                                    <div>
-                                                                        <span className="font-black underline underline-offset-2 text-slate-950 block">{pemberiTugas}</span>
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* 2. Keuangan */}
-                                                                <div className="flex flex-col justify-between h-[140px] p-2 relative">
-                                                                    <span className="font-bold text-slate-900 uppercase tracking-tight">Mengetahui</span>
-                                                                    <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
-                                                                    <div>
-                                                                        <span className="font-black underline underline-offset-2 text-slate-950 block">{keuanganName}</span>
-                                                                    </div>
-                                                                </div>
-
-                                                                {/* 3. Penanggung Jawab (Digital Signature Support) */}
-                                                                <div className="flex flex-col justify-between h-[140px] p-2 relative">
-                                                                    <span className="font-bold text-slate-900 uppercase tracking-tight">Penerima Tugas</span>
+                                                        {/* SECTION E: PENGESAHAN & PENANDATANGANAN */}
+                                                        <div className="space-y-2.5 print-avoid-break mt-6">
+                                                            <h4 className="text-xs font-bold text-slate-900 border-b-2 border-slate-800 pb-1 uppercase tracking-wide">
+                                                                E. Pengesahan & Penandatanganan
+                                                            </h4>
+                                                            
+                                                            <div className="pt-4 pb-6">
+                                                                <div className="grid grid-cols-2 md:grid-cols-4 print:grid-cols-4 print-cols-4 gap-4 text-[11px] text-center">
                                                                     
-                                                                    {pjSignatureImage ? (
-                                                                        <div className="my-auto flex items-center justify-center h-20 w-full overflow-hidden absolute inset-0 top-1/2 -translate-y-1/2 z-0">
-                                                                            <img 
-                                                                                src={pjSignatureImage} 
-                                                                                alt="Tanda Tangan" 
-                                                                                className="signature-img max-h-full object-contain mix-blend-multiply opacity-90" 
-                                                                            />
+                                                                    {/* 1. Pemberi Tugas */}
+                                                                    <div className="flex flex-col justify-between h-[140px] p-2 relative">
+                                                                        <span className="font-bold text-slate-900 uppercase tracking-tight">Pemberi Tugas</span>
+                                                                        <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan & Stempel</div>
+                                                                        <div>
+                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{pemberiTugas}</span>
                                                                         </div>
-                                                                    ) : (
+                                                                    </div>
+
+                                                                    {/* 2. Keuangan */}
+                                                                    <div className="flex flex-col justify-between h-[140px] p-2 relative">
+                                                                        <span className="font-bold text-slate-900 uppercase tracking-tight">Mengetahui</span>
                                                                         <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
-                                                                    )}
-                                                                    
-                                                                    <div className="relative z-10">
-                                                                        <span className="font-black underline underline-offset-2 text-slate-950 block">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"}</span>
+                                                                        <div>
+                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{keuanganName}</span>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
 
-                                                                {/* 4. Kepala Kantor */}
-                                                                <div className="flex flex-col justify-between h-[140px] p-2 relative">
-                                                                    <span className="font-bold text-slate-900 uppercase tracking-tight">Menyetujui</span>
-                                                                    <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
-                                                                    <div>
-                                                                        <span className="font-black underline underline-offset-2 text-slate-950 block">{kepalaKantorName}</span>
+                                                                    {/* 3. Penanggung Jawab (Dengan Upload TTD in-place) */}
+                                                                    <div className="flex flex-col justify-between h-[140px] p-2 relative group">
+                                                                        <span className="font-bold text-slate-900 uppercase tracking-tight">Penerima Tugas</span>
+                                                                        
+                                                                        {pjSignatureImage ? (
+                                                                            <div className="my-auto flex items-center justify-center h-20 w-full overflow-hidden absolute inset-0 top-1/2 -translate-y-1/2 z-0">
+                                                                                <img 
+                                                                                    src={pjSignatureImage} 
+                                                                                    alt="Tanda Tangan" 
+                                                                                    className="signature-img max-h-full object-contain mix-blend-multiply opacity-90" 
+                                                                                />
+                                                                                {/* Overlay Ubah TTD (Sembunyi saat Print) */}
+                                                                                <label className="absolute inset-0 bg-white/85 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded border border-indigo-200">
+                                                                                    <i data-lucide="upload-cloud" className="w-4 h-4 text-indigo-600 mb-1"></i>
+                                                                                    <span className="text-[9px] font-bold text-indigo-700">Ubah TTD</span>
+                                                                                    <input type="file" accept="image/*" className="hidden" onChange={handlePjSignatureUpload} />
+                                                                                </label>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="my-auto relative z-10 w-full flex justify-center">
+                                                                                {/* Tombol Upload (Sembunyi saat Print) */}
+                                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-24 h-12 border border-dashed border-indigo-400 rounded bg-indigo-50 hover:bg-indigo-100 transition-colors">
+                                                                                    <i data-lucide="upload" className="w-3.5 h-3.5 text-indigo-500 mb-0.5"></i>
+                                                                                    <span className="text-[8px] text-indigo-600 font-bold text-center leading-tight">Upload TTD Digital</span>
+                                                                                    <input type="file" accept="image/*" className="hidden" onChange={handlePjSignatureUpload} />
+                                                                                </label>
+                                                                                {/* Teks Dummy Tanda Tangan (Hanya Tampil di Print jika TTD kosong) */}
+                                                                                <div className="hidden print:block text-[10px] text-slate-400 italic">Tanda Tangan</div>
+                                                                            </div>
+                                                                        )}
+                                                                        
+                                                                        <div className="relative z-10">
+                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"}</span>
+                                                                        </div>
                                                                     </div>
-                                                                </div>
 
+                                                                    {/* 4. Kepala Kantor */}
+                                                                    <div className="flex flex-col justify-between h-[140px] p-2 relative">
+                                                                        <span className="font-bold text-slate-900 uppercase tracking-tight">Menyetujui</span>
+                                                                        <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
+                                                                        <div>
+                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{kepalaKantorName}</span>
+                                                                        </div>
+                                                                    </div>
+
+                                                                </div>
                                                             </div>
                                                         </div>
 
