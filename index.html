@@ -71,7 +71,7 @@
                 break-inside: avoid !important;
             }
             img.signature-img {
-                max-height: 55px !important;
+                max-height: 60px !important;
                 width: auto !important;
                 margin: 0 auto;
             }
@@ -183,45 +183,35 @@
             }).format(angka || 0);
         };
 
-        // Helper untuk mendapatkan nama Hari Indonesia dari nilai datepicker
-        const getIndonesianDay = (dateString) => {
-            if (!dateString) return "";
-            const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
-            const date = new Date(dateString);
-            return days[date.getDay()] || "";
+        // Algoritma Terbilang Rupiah
+        const terbilang = (angka) => {
+            const a = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
+            if (angka === 0) return "nol";
+            if (angka < 12) return a[angka];
+            if (angka < 20) return a[angka - 10] + " belas";
+            if (angka < 100) return a[Math.floor(angka / 10)] + " puluh " + a[angka % 10];
+            if (angka < 200) return "seratus " + terbilang(angka - 100);
+            if (angka < 1000) return a[Math.floor(angka / 100)] + " ratus " + terbilang(angka % 100);
+            if (angka < 2000) return "seribu " + terbilang(angka - 1000);
+            if (angka < 1000000) return terbilang(Math.floor(angka / 1000)) + " ribu " + terbilang(angka % 1000);
+            if (angka < 1000000000) return terbilang(Math.floor(angka / 1000000)) + " juta " + terbilang(angka % 1000000);
+            if (angka < 1000000000000) return terbilang(Math.floor(angka / 1000000000)) + " milyar " + terbilang(angka % 1000000000);
+            return "";
         };
 
-        // Helper format tanggal Indonesia lengkap
-        const formatIndonesianDate = (dateString) => {
-            if (!dateString) return "";
-            const months = [
-                "Januari", "Februari", "Maret", "April", "Mei", "Juni",
-                "Juli", "Agustus", "September", "Oktober", "November", "Desember"
-            ];
-            const date = new Date(dateString);
+        const formatTerbilangRupiah = (angka) => {
+            if (!angka || isNaN(angka)) return "";
+            let result = terbilang(parseInt(angka)).trim();
+            result = result.replace(/\s+/g, ' '); // Hapus spasi ganda
+            return result + " rupiah";
+        };
+
+        // Helper Format Tanggal Indonesia
+        const formatDateIndo = (dateStr) => {
+            if(!dateStr) return "";
+            const date = new Date(dateStr);
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
             return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
-        };
-
-        // Konversi Angka ke Terbilang Bahasa Indonesia
-        const angkaToTerbilang = (num) => {
-            const nominal = Math.floor(Number(num) || 0);
-            if (nominal === 0) return "";
-            const words = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
-            
-            const convert = (n) => {
-                if (n < 12) return words[n];
-                if (n < 20) return convert(n - 10) + " belas";
-                if (n < 100) return convert(Math.floor(n / 10)) + " puluh " + convert(n % 10);
-                if (n < 200) return "seratus " + convert(n - 100);
-                if (n < 1000) return convert(Math.floor(n / 100)) + " ratus " + convert(n % 100);
-                if (n < 2000) return "seribu " + convert(n - 1000);
-                if (n < 1000000) return convert(Math.floor(n / 1000)) + " ribu " + convert(n % 1000);
-                if (n < 1000000000) return convert(Math.floor(n / 1000000)) + " juta " + convert(n % 1000000);
-                if (n < 1000000000000) return convert(Math.floor(n / 1000000000)) + " milyar " + convert(n % 1000000000);
-                return "";
-            };
-            
-            return (convert(nominal) + " rupiah").trim().replace(/\s+/g, ' ');
         };
 
         // Helper untuk mengubah angka waktu (hari) menjadi terbilang sederhana
@@ -237,7 +227,7 @@
             } else if (num < 100) {
                 return words[Math.floor(num / 10)] + " puluh " + (words[num % 10] || "").trim();
             } else {
-                return ""; 
+                return ""; // Dibatasi puluhan untuk kebutuhan durasi hari
             }
         };
 
@@ -311,34 +301,31 @@
             });
             const [t30ActiveSpkId, setT30ActiveSpkId] = useState(null);
 
-            const [t30TanggalPembuatanRaw, setT30TanggalPembuatanRaw] = useState("");
             const [t30HariPembuatan, setT30HariPembuatan] = useState("");
             const [t30TanggalPembuatan, setT30TanggalPembuatan] = useState("");
             const [t30NamaPemborong, setT30NamaPemborong] = useState("");
-            const [t30NoHpPemborong, setT30NoHpPemborong] = useState("");
+            const [t30HpPemborong, setT30HpPemborong] = useState("");
             const [t30AlamatPemborong, setT30AlamatPemborong] = useState("");
             const [t30LokasiPekerjaanDetail, setT30LokasiPekerjaanDetail] = useState("Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)");
-            const [t30NilaiBorongan, setT30NilaiBorongan] = useState("10800000");
-            const [t30NilaiBoronganTerbilang, setT30NilaiBoronganTerbilang] = useState("sepuluh juta delapan ratus ribu rupiah");
+            const [t30NilaiBorongan, setT30NilaiBorongan] = useState("");
+            const [t30NilaiBoronganTerbilang, setT30NilaiBoronganTerbilang] = useState("");
             const [t30WaktuPelaksanaan, setT30WaktuPelaksanaan] = useState("30");
             const [t30WaktuToleransi, setT30WaktuToleransi] = useState("10");
             const [t30TotalWaktuPelaksanaan, setT30TotalWaktuPelaksanaan] = useState("40");
-            const [t30DendaKeterlambatan, setT30DendaKeterlambatan] = useState("1080000");
-            const [t30DendaKeterlambatanTerbilang, setT30DendaKeterlambatanTerbilang] = useState("satu juta delapan puluh ribu rupiah");
+            const [t30DendaKeterlambatan, setT30DendaKeterlambatan] = useState("");
+            const [t30DendaKeterlambatanTerbilang, setT30DendaKeterlambatanTerbilang] = useState("");
             const [t30JamGudangPagiMulai, setT30JamGudangPagiMulai] = useState("07.30");
             const [t30JamGudangPagiSelesai, setT30JamGudangPagiSelesai] = useState("08.00");
             const [t30JamGudangSiangMulai, setT30JamGudangSiangMulai] = useState("12.30");
             const [t30JamGudangSiangSelesai, setT30JamGudangSiangSelesai] = useState("13.00");
             const [t30TempatDitetapkan, setT30TempatDitetapkan] = useState("Malang");
-            const [t30TanggalDitetapkanRaw, setT30TanggalDitetapkanRaw] = useState("");
             const [t30TanggalDitetapkan, setT30TanggalDitetapkan] = useState("");
 
-            // Kop dan Otorisasi Tipe 30
+            // Kop Tipe 30
             const [t30InstansiName, setT30InstansiName] = useState("PT. BANGUN CINTA ALAM");
             const [t30InstansiAddress, setT30InstansiAddress] = useState("Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com");
             const [t30LogoKiri, setT30LogoKiri] = useState(null);
             const [t30LogoKanan, setT30LogoKanan] = useState(null);
-            const [t30PjSignatureImage, setT30PjSignatureImage] = useState(null);
 
             // State Notifikasi popup global
             const [notification, setNotification] = useState(null);
@@ -372,36 +359,39 @@
                 }
             });
 
-            // Efek Otomatisasi Tanggal Pembuatan Tipe 30
+            // ==========================================
+            // OTOMATISASI EFEK KHUSUS SPK TIPE 30
+            // ==========================================
+
+            // Ekstrak Hari berdasarkan Tanggal Pembuatan Tipe 30
             useEffect(() => {
-                if (t30TanggalPembuatanRaw) {
-                    setT30HariPembuatan(getIndonesianDay(t30TanggalPembuatanRaw));
-                    setT30TanggalPembuatan(formatIndonesianDate(t30TanggalPembuatanRaw));
+                if (t30TanggalPembuatan) {
+                    const date = new Date(t30TanggalPembuatan);
+                    if (!isNaN(date.getTime())) {
+                        const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+                        setT30HariPembuatan(days[date.getDay()]);
+                    }
                 } else {
                     setT30HariPembuatan("");
-                    setT30TanggalPembuatan("");
                 }
-            }, [t30TanggalPembuatanRaw]);
+            }, [t30TanggalPembuatan]);
 
-            // Efek Otomatisasi Tanggal Penetapan Tipe 30
+            // Kalkulasi Denda (10%) & Terbilang Rupiah secara Otomatis untuk Tipe 30
             useEffect(() => {
-                if (t30TanggalDitetapkanRaw) {
-                    setT30TanggalDitetapkan(formatIndonesianDate(t30TanggalDitetapkanRaw));
+                if (t30NilaiBorongan && !isNaN(t30NilaiBorongan)) {
+                    const val = parseInt(t30NilaiBorongan);
+                    setT30NilaiBoronganTerbilang(formatTerbilangRupiah(val));
+                    
+                    const denda = val * 0.1;
+                    setT30DendaKeterlambatan(denda.toString());
+                    setT30DendaKeterlambatanTerbilang(formatTerbilangRupiah(denda));
                 } else {
-                    setT30TanggalDitetapkan("");
+                    setT30NilaiBoronganTerbilang("");
+                    setT30DendaKeterlambatan("");
+                    setT30DendaKeterlambatanTerbilang("");
                 }
-            }, [t30TanggalDitetapkanRaw]);
-
-            // Efek Otomatisasi Nilai Borongan, Denda (10%), dan Terbilang
-            useEffect(() => {
-                const numericBorongan = Number(t30NilaiBorongan) || 0;
-                setT30NilaiBoronganTerbilang(angkaToTerbilang(numericBorongan));
-                
-                // Hitung otomatis denda keterlambatan 10%
-                const calculatedDenda = Math.round(numericBorongan * 0.1);
-                setT30DendaKeterlambatan(calculatedDenda.toString());
-                setT30DendaKeterlambatanTerbilang(angkaToTerbilang(calculatedDenda));
             }, [t30NilaiBorongan]);
+
 
             // Generate Nomor SPK secara otomatis (Hanya untuk UMUM)
             useEffect(() => {
@@ -715,26 +705,24 @@
             // HANDLER UNTUK SPK BORONGAN (TIPE 30)
             // ==========================================
             const handleT30ResetData = () => {
-                setT30TanggalPembuatanRaw("");
                 setT30HariPembuatan("");
                 setT30TanggalPembuatan("");
                 setT30NamaPemborong("");
-                setT30NoHpPemborong("");
+                setT30HpPemborong("");
                 setT30AlamatPemborong("");
                 setT30LokasiPekerjaanDetail("Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)");
-                setT30NilaiBorongan("10800000");
-                setT30NilaiBoronganTerbilang("sepuluh juta delapan ratus ribu rupiah");
+                setT30NilaiBorongan("");
+                setT30NilaiBoronganTerbilang("");
                 setT30WaktuPelaksanaan("30");
                 setT30WaktuToleransi("10");
                 setT30TotalWaktuPelaksanaan("40");
-                setT30DendaKeterlambatan("1080000");
-                setT30DendaKeterlambatanTerbilang("satu juta delapan puluh ribu rupiah");
+                setT30DendaKeterlambatan("");
+                setT30DendaKeterlambatanTerbilang("");
                 setT30JamGudangPagiMulai("07.30");
                 setT30JamGudangPagiSelesai("08.00");
                 setT30JamGudangSiangMulai("12.30");
                 setT30JamGudangSiangSelesai("13.00");
                 setT30TempatDitetapkan("Malang");
-                setT30TanggalDitetapkanRaw("");
                 setT30TanggalDitetapkan("");
 
                 setT30InstansiName("PT. BANGUN CINTA ALAM");
@@ -764,11 +752,10 @@
 
                 const dataSpk = {
                     id: t30ActiveSpkId || Date.now().toString(),
-                    t30TanggalPembuatanRaw,
                     t30HariPembuatan,
                     t30TanggalPembuatan,
                     t30NamaPemborong,
-                    t30NoHpPemborong,
+                    t30HpPemborong,
                     t30AlamatPemborong,
                     t30LokasiPekerjaanDetail,
                     t30NilaiBorongan,
@@ -783,13 +770,11 @@
                     t30JamGudangSiangMulai,
                     t30JamGudangSiangSelesai,
                     t30TempatDitetapkan,
-                    t30TanggalDitetapkanRaw,
                     t30TanggalDitetapkan,
                     t30InstansiName,
                     t30InstansiAddress,
                     t30LogoKiri,
                     t30LogoKanan,
-                    t30PjSignatureImage,
                     lastUpdated: new Date().toLocaleString('id-ID')
                 };
 
@@ -807,11 +792,10 @@
                 const target = t30DaftarSpk.find(item => item.id === id);
                 if (target) {
                     setT30ActiveSpkId(target.id);
-                    setT30TanggalPembuatanRaw(target.t30TanggalPembuatanRaw || "");
                     setT30HariPembuatan(target.t30HariPembuatan || "");
                     setT30TanggalPembuatan(target.t30TanggalPembuatan || "");
                     setT30NamaPemborong(target.t30NamaPemborong || "");
-                    setT30NoHpPemborong(target.t30NoHpPemborong || "");
+                    setT30HpPemborong(target.t30HpPemborong || "");
                     setT30AlamatPemborong(target.t30AlamatPemborong || "");
                     setT30LokasiPekerjaanDetail(target.t30LokasiPekerjaanDetail || "");
                     setT30NilaiBorongan(target.t30NilaiBorongan || "");
@@ -826,14 +810,12 @@
                     setT30JamGudangSiangMulai(target.t30JamGudangSiangMulai || "");
                     setT30JamGudangSiangSelesai(target.t30JamGudangSiangSelesai || "");
                     setT30TempatDitetapkan(target.t30TempatDitetapkan || "");
-                    setT30TanggalDitetapkanRaw(target.t30TanggalDitetapkanRaw || "");
                     setT30TanggalDitetapkan(target.t30TanggalDitetapkan || "");
                     
                     setT30InstansiName(target.t30InstansiName || "PT. BANGUN CINTA ALAM");
                     setT30InstansiAddress(target.t30InstansiAddress || "Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com");
                     setT30LogoKiri(target.t30LogoKiri || null);
                     setT30LogoKanan(target.t30LogoKanan || null);
-                    setT30PjSignatureImage(target.t30PjSignatureImage || null);
 
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                     showNotification(`Memuat dokumen SPK untuk: ${target.t30NamaPemborong}`);
@@ -861,30 +843,9 @@
                 }
             };
 
-            const handleT30PjSignatureUpload = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    if (!file.type.startsWith('image/')) {
-                        showNotification("Harap upload file gambar (PNG/JPG/SVG)!", "error");
-                        return;
-                    }
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        setT30PjSignatureImage(reader.result);
-                        showNotification("Tanda tangan digital PJ berhasil diunggah.");
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-
             const clearT30Logo = (target) => {
                 if (target === 'kiri') setT30LogoKiri(null);
                 if (target === 'kanan') setT30LogoKanan(null);
-            };
-
-            const clearT30PjSignature = () => {
-                setT30PjSignatureImage(null);
-                showNotification("Tanda tangan digital PJ telah dihapus.", "info");
             };
 
             /* =========================================
@@ -1129,31 +1090,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                {/* TANDA TANGAN TIPE 30 */}
-                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-5 transition-colors duration-300">
-                                    <div className="flex items-center gap-2 mb-2 border-b border-slate-100 dark:border-slate-800/80 pb-4">
-                                        <i data-lucide="pen-tool" className="w-5 h-5 text-teal-600 dark:text-teal-400"></i>
-                                        <h2 className="font-bold text-slate-800 dark:text-slate-100">Otorisasi Perusahaan</h2>
-                                    </div>
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                                            <i data-lucide="image-plus" className="w-3.5 h-3.5"></i> Tanda Tangan Perusahaan
-                                        </label>
-                                        {t30PjSignatureImage ? (
-                                            <div className="relative group p-3 bg-white rounded-xl border border-slate-200 dark:border-slate-300 flex items-center justify-center h-28 overflow-hidden shadow-sm">
-                                                <img src={t30PjSignatureImage} alt="Tanda Tangan PJ" className="max-h-full max-w-full object-contain" />
-                                                <button onClick={clearT30PjSignature} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-xl transition-opacity duration-200 backdrop-blur-sm"><i data-lucide="trash-2" className="w-6 h-6 mb-2 text-red-400"></i><span className="text-xs font-bold tracking-wide">Hapus Tanda Tangan</span></button>
-                                            </div>
-                                        ) : (
-                                            <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-teal-400 hover:bg-teal-50 dark:hover:bg-slate-955 rounded-xl transition-all group bg-slate-50 dark:bg-slate-950/50">
-                                                <div className="p-2 bg-white dark:bg-slate-800 border shadow-sm rounded-full mb-2 group-hover:bg-teal-100 transition-colors"><i data-lucide="upload-cloud" className="w-5 h-5 text-slate-400 group-hover:text-teal-600"></i></div>
-                                                <span className="text-xs text-slate-600 dark:text-slate-300 group-hover:text-teal-700 font-medium">Unggah Scan Tanda Tangan</span>
-                                                <input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload} />
-                                            </label>
-                                        )}
-                                    </div>
-                                </div>
                             </aside>
 
                             {/* RIGHT COLUMN: INTERACTIVE EDITOR & LIVE PREVIEW PRINT AREA TIPE 30 */}
@@ -1166,48 +1102,36 @@
                                         <h2 className="font-bold text-slate-800 dark:text-slate-100 text-lg">Editor Isi SPK Tipe 30</h2>
                                     </div>
 
-                                    {}
                                     {/* Informasi Pembuka */}
                                     <div className="space-y-4">
                                         <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 border-l-4 border-teal-500 pl-3">Informasi Pembuka</h3>
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
-                                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Tanggal Pembuatan</label>
-                                                <input type="date" value={t30TanggalPembuatanRaw} onChange={(e) => setT30TanggalPembuatanRaw(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none"/>
+                                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal Pembuatan</label>
+                                                <input type="date" value={t30TanggalPembuatan} onChange={(e) => setT30TanggalPembuatan(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none custom-scrollbar"/>
                                             </div>
                                             <div>
-                                                <div className="grid grid-cols-2 gap-2">
-                                                    <div>
-                                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Hari (Otomatis)</label>
-                                                        <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-600 dark:text-slate-400 font-bold h-[42px] flex items-center">
-                                                            {t30HariPembuatan || "-"}
-                                                        </div>
-                                                    </div>
-                                                    <div>
-                                                        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Tanggal (Otomatis)</label>
-                                                        <div className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-600 dark:text-slate-400 font-semibold h-[42px] flex items-center truncate">
-                                                            {t30TanggalPembuatan || "-"}
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Hari Pembuatan (Otomatis)</label>
+                                                <input type="text" value={t30HariPembuatan} readOnly className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-500 dark:text-slate-400 shadow-inner outline-none cursor-not-allowed" placeholder="Pilih tanggal di samping"/>
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Pemborong</label>
                                                 <input type="text" value={t30NamaPemborong} onChange={(e) => setT30NamaPemborong(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Nama Lengkap Pemborong"/>
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">No. Hp Pemborong</label>
-                                                <input type="text" value={t30NoHpPemborong} onChange={(e) => setT30NoHpPemborong(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Contoh: 08123456789"/>
-                                            </div>
-                                            <div>
-                                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Alamat Pemborong</label>
-                                                <input type="text" value={t30AlamatPemborong} onChange={(e) => setT30AlamatPemborong(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Alamat Lengkap"/>
+                                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">No. HP Pemborong</label>
+                                                <input type="text" value={t30HpPemborong} onChange={(e) => setT30HpPemborong(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Misal: 0812..."/>
                                             </div>
                                         </div>
                                         
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Alamat Pemborong</label>
+                                            <input type="text" value={t30AlamatPemborong} onChange={(e) => setT30AlamatPemborong(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Alamat Lengkap"/>
+                                        </div>
+
                                         <div>
                                             <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Detail Lokasi Pekerjaan</label>
                                             <input type="text" value={t30LokasiPekerjaanDetail} onChange={(e) => setT30LokasiPekerjaanDetail(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Contoh: Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)"/>
@@ -1218,24 +1142,24 @@
                                     <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                                         <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 border-l-4 border-teal-500 pl-3">Poin-poin Ketentuan Kontrak</h3>
                                         
-                                        <div className="p-4 bg-slate-50 dark:bg-slate-955 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
+                                        <div className="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
                                             <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400">1. Nilai Borongan</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
                                                     <label className="block text-[10px] font-medium text-slate-500 mb-1">Nominal (Angka)</label>
                                                     <div className="relative">
                                                         <span className="absolute left-3 top-2.5 text-sm text-slate-500">Rp</span>
-                                                        <input type="number" value={t30NilaiBorongan} onChange={(e) => setT30NilaiBorongan(e.target.value)} className="w-full pl-8 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500/30 outline-none"/>
+                                                        <input type="number" value={t30NilaiBorongan} onChange={(e) => setT30NilaiBorongan(e.target.value)} className="w-full pl-8 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Cth: 10800000"/>
                                                     </div>
                                                 </div>
                                                 <div>
                                                     <label className="block text-[10px] font-medium text-slate-500 mb-1">Terbilang (Otomatis)</label>
-                                                    <input type="text" readOnly value={t30NilaiBoronganTerbilang} className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-500 outline-none cursor-not-allowed"/>
+                                                    <input type="text" value={t30NilaiBoronganTerbilang} readOnly className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-600 dark:text-slate-400 outline-none cursor-not-allowed" placeholder="Otomatis terisi..."/>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="p-4 bg-slate-50 dark:bg-slate-955 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
+                                        <div className="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
                                             <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400">2. Waktu Pelaksanaan</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div>
@@ -1253,24 +1177,24 @@
                                             </div>
                                         </div>
 
-                                        <div className="p-4 bg-slate-50 dark:bg-slate-955 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
-                                            <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400">3. Denda Keterlambatan (Otomatis 10% dari Nilai Borongan)</h4>
+                                        <div className="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
+                                            <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400">3. Denda Keterlambatan (Otomatis 10%)</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                                 <div>
-                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Nominal Denda (Auto 10%)</label>
+                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Nominal Denda</label>
                                                     <div className="relative">
                                                         <span className="absolute left-3 top-2.5 text-sm text-slate-500">Rp</span>
-                                                        <input type="text" readOnly value={Number(t30DendaKeterlambatan).toLocaleString('id-ID')} className="w-full pl-8 bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-600 dark:text-slate-400 outline-none cursor-not-allowed font-bold"/>
+                                                        <input type="number" value={t30DendaKeterlambatan} readOnly className="w-full pl-8 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-600 dark:text-slate-400 outline-none cursor-not-allowed"/>
                                                     </div>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Terbilang (Auto 10%)</label>
-                                                    <input type="text" readOnly value={t30DendaKeterlambatanTerbilang} className="w-full bg-slate-100 dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-500 outline-none cursor-not-allowed"/>
+                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Terbilang (Otomatis)</label>
+                                                    <input type="text" value={t30DendaKeterlambatanTerbilang} readOnly className="w-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-slate-600 dark:text-slate-400 outline-none cursor-not-allowed" placeholder="Otomatis..."/>
                                                 </div>
                                             </div>
                                         </div>
                                         
-                                        <div className="p-4 bg-slate-50 dark:bg-slate-955 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
+                                        <div className="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
                                             <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400">6. Jam Operasional Gudang</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                                 <div className="space-y-2">
@@ -1302,8 +1226,8 @@
                                                 <input type="text" value={t30TempatDitetapkan} onChange={(e) => setT30TempatDitetapkan(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none"/>
                                             </div>
                                             <div>
-                                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Pilih Tanggal Penetapan</label>
-                                                <input type="date" value={t30TanggalDitetapkanRaw} onChange={(e) => setT30TanggalDitetapkanRaw(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none"/>
+                                                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal Penetapan</label>
+                                                <input type="date" value={t30TanggalDitetapkan} onChange={(e) => setT30TanggalDitetapkan(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none custom-scrollbar"/>
                                             </div>
                                         </div>
                                     </div>
@@ -1353,7 +1277,7 @@
                                                             </div>
                                                             <div className="text-[11pt] text-slate-900 leading-relaxed text-justify">
                                                                 <p>
-                                                                    Pada hari {t30HariPembuatan ? <span className="font-bold">{t30HariPembuatan}</span> : "__________"}, tanggal {t30TanggalPembuatan ? <span className="font-bold">{t30TanggalPembuatan}</span> : "__________"}, berdasarkan kebutuhan pelaksanaan pembangunan rumah pada Proyek Lembah Bunder Regency serta untuk menjamin kelancaran dan ketertiban pelaksanaan pekerjaan sesuai dengan spesifikasi dan desain yang telah disepakati, maka Perusahaan dengan ini menunjuk dan memberikan tugas kepada:
+                                                                    Pada hari {t30HariPembuatan ? <span className="font-bold">{t30HariPembuatan}</span> : "__________"}, tanggal {t30TanggalPembuatan ? <span className="font-bold">{formatDateIndo(t30TanggalPembuatan)}</span> : "__________"}, berdasarkan kebutuhan pelaksanaan pembangunan rumah pada Proyek Lembah Bunder Regency serta untuk menjamin kelancaran dan ketertiban pelaksanaan pekerjaan sesuai dengan spesifikasi dan desain yang telah disepakati, maka Perusahaan dengan ini menunjuk dan memberikan tugas kepada:
                                                                 </p>
                                                                 <table className="ml-4 my-3 w-full">
                                                                     <tbody>
@@ -1365,7 +1289,7 @@
                                                                         <tr>
                                                                             <td className="align-top pt-1">No. HP</td>
                                                                             <td className="align-top pt-1">:</td>
-                                                                            <td className="font-bold pt-1">{t30NoHpPemborong || "____________________________"}</td>
+                                                                            <td className="font-bold pt-1">{t30HpPemborong || "____________________________"}</td>
                                                                         </tr>
                                                                         <tr>
                                                                             <td className="align-top pt-1">Alamat</td>
@@ -1378,84 +1302,63 @@
                                                                     Selanjutnya disebut sebagai <strong>Pemborong/Pelaksana Pekerjaan</strong>, untuk melaksanakan pembangunan rumah di <strong>{t30LokasiPekerjaanDetail}</strong> sesuai dengan gambar kerja dan desain yang telah disetujui bersama, dengan ketentuan sebagai berikut:
                                                                 </p>
                                                                 <ol className="list-decimal pl-6 space-y-3 mt-4">
-                                                                    <li className="pl-1">
+                                                                    <li className="pl-1 print-avoid-break">
                                                                         Nilai borongan pekerjaan ditetapkan sebesar <strong>{formatRupiah(t30NilaiBorongan)} ({t30NilaiBoronganTerbilang || ".............................."}).</strong>
                                                                     </li>
-                                                                    <li className="pl-1">
+                                                                    <li className="pl-1 print-avoid-break">
                                                                         Jangka waktu pelaksanaan pekerjaan adalah <strong>{t30WaktuPelaksanaan || "30"} ({terbilangAngka(t30WaktuPelaksanaan) || "tiga puluh"})</strong> hari kalender sejak diterbitkannya Surat Perintah Kerja (SPK), dengan masa toleransi keterlambatan selama <strong>{t30WaktuToleransi || "10"} ({terbilangAngka(t30WaktuToleransi) || "sepuluh"})</strong> hari kalender, sehingga total waktu pelaksanaan maksimal adalah <strong>{t30TotalWaktuPelaksanaan || "40"} ({terbilangAngka(t30TotalWaktuPelaksanaan) || "empat puluh"})</strong> hari kalender. Jangka waktu tersebut tidak dapat diubah, kecuali terdapat pekerjaan tambahan yang diperintahkan secara tertulis oleh Perusahaan dan dinyatakan secara tegas adanya penambahan waktu penyelesaian.
                                                                     </li>
-                                                                    <li className="pl-1">
+                                                                    <li className="pl-1 print-avoid-break">
                                                                         Apabila Pemborong tidak dapat menyelesaikan pekerjaan sampai dengan berakhirnya batas waktu pelaksanaan sebagaimana dimaksud pada angka 2, maka Pemborong dikenakan denda keterlambatan sebesar <strong>{formatRupiah(t30DendaKeterlambatan)} ({t30DendaKeterlambatanTerbilang || ".............................."}).</strong>
                                                                     </li>
-                                                                    <li className="pl-1">
+                                                                    <li className="pl-1 print-avoid-break">
                                                                         Dalam hal terjadi keterlambatan penyediaan material yang menjadi tanggung jawab Perusahaan, maka jangka waktu pelaksanaan pekerjaan akan diperpanjang sesuai dengan lamanya keterlambatan penyediaan material tersebut.
                                                                     </li>
-                                                                    <li className="pl-1">
+                                                                    <li className="pl-1 print-avoid-break">
                                                                         Setelah Surat Perintah Kerja ini ditandatangani, tidak diperkenankan adanya penambahan bangunan atau perubahan pekerjaan, kecuali atas persetujuan tertulis dari Perusahaan.
                                                                     </li>
-                                                                    <li className="pl-1">
+                                                                    <li className="pl-1 print-avoid-break">
                                                                         Pengambilan material di gudang hanya dapat dilakukan pada pukul <strong>{t30JamGudangPagiMulai || "07.30"}–{t30JamGudangPagiSelesai || "08.00"} WIB</strong> dan <strong>{t30JamGudangSiangMulai || "12.30"}–{t30JamGudangSiangSelesai || "13.00"} WIB.</strong>
                                                                     </li>
-                                                                    <li className="pl-1">
+                                                                    <li className="pl-1 print-avoid-break">
                                                                         Apabila Pemborong melakukan penambahan, perubahan, atau pekerjaan di luar desain dan spesifikasi yang telah disetujui tanpa sepengetahuan dan persetujuan Perusahaan, maka Perusahaan berhak memutuskan hubungan kerja atau kontrak secara sepihak tanpa kewajiban memberikan kompensasi kepada Pemborong.
                                                                     </li>
                                                                 </ol>
-                                                                <p className="mt-4">
+                                                                <p className="mt-4 print-avoid-break">
                                                                     Demikian Surat Perintah Kerja ini dibuat untuk dipahami dan dilaksanakan dengan sebaik-baiknya serta penuh tanggung jawab oleh pihak yang ditunjuk.
                                                                 </p>
                                                             </div>
                                                             
-                                                            {}
-                                                            {/* TTD Section Tipe 30 (5 Kolom Tanda Tangan) */}
-                                                            <div className="mt-8 text-[10pt] text-slate-900 print-avoid-break">
-                                                                <div className="mb-6">
+                                                            {/* TTD Section Tipe 30 (Baru - 5 Penanggung Jawab) */}
+                                                            <div className="mt-8 text-[11pt] text-slate-900 print-avoid-break">
+                                                                <div>
                                                                     Ditetapkan di : {t30TempatDitetapkan || "____________________"}<br/>
-                                                                    Tanggal : {t30TanggalDitetapkan || "_________________________"}
+                                                                    Tanggal : {t30TanggalDitetapkan ? formatDateIndo(t30TanggalDitetapkan) : "_________________________"}
                                                                 </div>
                                                                 
-                                                                {/* Row 1: Pemberi Tugas, Penanggung Jawab, Pemborong */}
-                                                                <div className="grid grid-cols-3 gap-4 text-center">
-                                                                    <div className="flex flex-col justify-between h-[120px] p-1 relative border border-transparent">
-                                                                        <span className="font-bold text-slate-900">Pemberi Tugas</span>
-                                                                        <div className="my-auto text-[8px] text-slate-300 italic print:text-transparent">Tanda Tangan & Stempel</div>
-                                                                        <div>
-                                                                            <span className="font-bold underline underline-offset-2 block">Farizal Zainur Rozikin</span>
-                                                                        </div>
+                                                                <div className="grid grid-cols-3 gap-6 text-center mt-8">
+                                                                    <div className="flex flex-col items-center">
+                                                                        <p className="font-bold mb-16">Pemberi Tugas,</p>
+                                                                        <p className="font-bold underline underline-offset-2">Farizal Zainur Rozikin</p>
                                                                     </div>
-                                                                    
-                                                                    <div className="flex flex-col justify-between h-[120px] p-1 relative border border-transparent">
-                                                                        <span className="font-bold text-slate-900">Penanggung Jawab</span>
-                                                                        <div className="my-auto text-[8px] text-slate-300 italic print:text-transparent">Tanda Tangan</div>
-                                                                        <div>
-                                                                            <span className="font-bold underline underline-offset-2 block">Busro Khufidon</span>
-                                                                        </div>
+                                                                    <div className="flex flex-col items-center">
+                                                                        <p className="font-bold mb-16">Pemborong,</p>
+                                                                        <p className="font-bold underline underline-offset-2">{t30NamaPemborong || "( .................................... )"}</p>
                                                                     </div>
-
-                                                                    <div className="flex flex-col justify-between h-[120px] p-1 relative border border-transparent">
-                                                                        <span className="font-bold text-slate-900">Pemborong</span>
-                                                                        <div className="my-auto text-[8px] text-slate-300 italic print:text-transparent">Tanda Tangan</div>
-                                                                        <div>
-                                                                            <span className="font-bold underline underline-offset-2 block truncate">{t30NamaPemborong || "........................................"}</span>
-                                                                        </div>
+                                                                    <div className="flex flex-col items-center">
+                                                                        <p className="font-bold mb-16">Penanggung Jawab,</p>
+                                                                        <p className="font-bold underline underline-offset-2">Busro Khufidon</p>
                                                                     </div>
                                                                 </div>
-
-                                                                {/* Row 2: Keuangan, Kepala Kantor */}
-                                                                <div className="grid grid-cols-2 gap-8 text-center mt-6 max-w-[70%] mx-auto">
-                                                                    <div className="flex flex-col justify-between h-[120px] p-1 relative border border-transparent">
-                                                                        <span className="font-bold text-slate-900">Keuangan</span>
-                                                                        <div className="my-auto text-[8px] text-slate-300 italic print:text-transparent">Tanda Tangan</div>
-                                                                        <div>
-                                                                            <span className="font-bold underline underline-offset-2 block">Sita Dita C</span>
-                                                                        </div>
+                                                                
+                                                                <div className="grid grid-cols-2 gap-6 text-center mt-10 max-w-2xl mx-auto">
+                                                                    <div className="flex flex-col items-center">
+                                                                        <p className="font-bold mb-14">Mengetahui,<br/>Keuangan</p>
+                                                                        <p className="font-bold underline underline-offset-2">Sita Dita Cahyani</p>
                                                                     </div>
-
-                                                                    <div className="flex flex-col justify-between h-[120px] p-1 relative border border-transparent">
-                                                                        <span className="font-bold text-slate-900">Kepala Kantor</span>
-                                                                        <div className="my-auto text-[8px] text-slate-300 italic print:text-transparent">Tanda Tangan & Stempel</div>
-                                                                        <div>
-                                                                            <span className="font-bold underline underline-offset-2 block">Fika Fardila C</span>
-                                                                        </div>
+                                                                    <div className="flex flex-col items-center">
+                                                                        <p className="font-bold mb-14">Menyetujui,<br/>Kepala Kantor</p>
+                                                                        <p className="font-bold underline underline-offset-2">Fika Fardila Cahyanti</p>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1526,7 +1429,7 @@
                                 {/* Tombol Tema */}
                                 <button 
                                     onClick={toggleTheme}
-                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition-all text-xs shadow-sm"
+                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition-all text-xs shadow-sm"
                                     title="Ganti Tema Warna"
                                 >
                                     {theme === 'light' ? (
@@ -1664,13 +1567,13 @@
                                             rows="3"
                                             value={instansiAddress} 
                                             onChange={(e) => setInstansiAddress(e.target.value)}
-                                            className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 focus:border-blue-500 dark:focus:border-indigo-500 transition-all resize-none"
+                                            className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 focus:border-blue-500 dark:focus:border-indigo-500 transition-all resize-none"
                                         />
                                     </div>
 
                                     {/* Upload Logo Kiri & Kanan */}
                                     <div className="grid grid-cols-2 gap-4 pt-2">
-                                        <div className="p-3 bg-slate-50 dark:bg-slate-955/50 border border-slate-200 dark:border-slate-800 rounded-xl">
+                                        <div className="p-3 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl">
                                             <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-3 text-center">Logo Kiri</span>
                                             {logoKiri ? (
                                                 <div className="relative group aspect-square max-h-24 mx-auto bg-white rounded-lg flex items-center justify-center p-2 shadow-sm border border-slate-200">
@@ -1691,7 +1594,7 @@
                                             )}
                                         </div>
 
-                                        <div className="p-3 bg-slate-50 dark:bg-slate-955/50 border border-slate-200 dark:border-slate-800 rounded-xl">
+                                        <div className="p-3 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl">
                                             <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-3 text-center">Logo Kanan</span>
                                             {logoKanan ? (
                                                 <div className="relative group aspect-square max-h-24 mx-auto bg-white rounded-lg flex items-center justify-center p-2 shadow-sm border border-slate-200">
@@ -1762,7 +1665,7 @@
                                             </button>
                                         </div>
                                     ) : (
-                                        <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-400 dark:hover:border-indigo-500/50 hover:bg-blue-50 dark:hover:bg-slate-950 rounded-xl transition-all group bg-slate-50 dark:bg-slate-955/50">
+                                        <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-400 dark:hover:border-indigo-500/50 hover:bg-blue-50 dark:hover:bg-slate-950 rounded-xl transition-all group bg-slate-50 dark:bg-slate-950/50">
                                             <div className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-transparent shadow-sm rounded-full mb-2 group-hover:bg-blue-100 dark:group-hover:bg-indigo-900/50 group-hover:border-blue-200 transition-colors">
                                                 <i data-lucide="upload-cloud" className="w-5 h-5 text-slate-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-indigo-400"></i>
                                             </div>
@@ -1844,7 +1747,7 @@
                                         <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Lokasi Proyek (Otomatis)</label>
                                         <div className="bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-600 dark:text-slate-400 flex items-center gap-2 h-[42px] shadow-sm">
                                             <i data-lucide="map-pin" className="w-4 h-4 text-blue-500/70 dark:text-indigo-500/70"></i>
-                                            <span className="truncate">{selectedProyekIdx !== "" ? DAFTAR_PROYEK[selectedProyekIdx]?.lokasi : "-"}</span>
+                                            <span className="truncate">{selectedProyekIdx !== "" ? DAFTAR_PROYEK[selectedProyekIdx]?.lokasi : "Pilih proyek terlebih dahulu"}</span>
                                         </div>
                                     </div>
 
@@ -2032,7 +1935,7 @@
                                                                 />
                                                                 <button 
                                                                     onClick={() => removeSubPekerjaan(parentIdx, subIdx)}
-                                                                    className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-955/50 transition-colors p-1.5 rounded shrink-0"
+                                                                    className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-950/50 transition-colors p-1.5 rounded shrink-0"
                                                                 >
                                                                     <i data-lucide="x" className="w-4 h-4"></i>
                                                                 </button>
@@ -2126,7 +2029,7 @@
                                                                 {((Number(mat.qty)||0) * (Number(mat.harga)||0)).toLocaleString('id-ID')}
                                                             </td>
                                                             <td className="py-2 px-3 text-center">
-                                                                <button onClick={() => removeMaterial(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-955/50 p-1.5 rounded transition-colors">
+                                                                <button onClick={() => removeMaterial(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-950/50 p-1.5 rounded transition-colors">
                                                                     <i data-lucide="trash-2" className="w-4 h-4"></i>
                                                                 </button>
                                                             </td>
@@ -2225,7 +2128,7 @@
                                                                     {((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}
                                                                 </td>
                                                                 <td className="py-2 px-3 text-center">
-                                                                    <button onClick={() => removeLaborHarian(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-955/50 p-1.5 rounded transition-colors">
+                                                                    <button onClick={() => removeLaborHarian(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-950/50 p-1.5 rounded transition-colors">
                                                                         <i data-lucide="trash-2" className="w-4 h-4"></i>
                                                                     </button>
                                                                 </td>
@@ -2306,7 +2209,7 @@
                                                                         {((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}
                                                                     </td>
                                                                     <td className="py-2 px-3 text-center">
-                                                                        <button onClick={() => removeLaborBorongan(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-955/50 p-1.5 rounded transition-colors">
+                                                                        <button onClick={() => removeLaborBorongan(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-950/50 p-1.5 rounded transition-colors">
                                                                             <i data-lucide="trash-2" className="w-4 h-4"></i>
                                                                         </button>
                                                                     </td>
@@ -2359,7 +2262,7 @@
 
                                                             {/* Nama Perusahaan & Alamat Terpusat (Tanpa Jarak Jauh) */}
                                                             <div className="flex-1 text-center flex flex-col justify-center">
-                                                                <h2 className="text-2xl font-black tracking-tight text-slate-955 leading-tight uppercase">{instansiName}</h2>
+                                                                <h2 className="text-2xl font-black tracking-tight text-slate-950 leading-tight uppercase">{instansiName}</h2>
                                                                 <p className="whitespace-pre-line text-[11px] text-slate-800 leading-relaxed font-semibold mt-1.5">{instansiAddress}</p>
                                                             </div>
 
@@ -2562,7 +2465,7 @@
                                                                                     <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}</td>
                                                                                 </tr>
                                                                             ))}
-                                                                            <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-955">
+                                                                            <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-950">
                                                                                 <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-955 uppercase text-[10px]">Sub-Total Biaya Tenaga Kerja:</td>
                                                                                 <td className="py-2 px-3 text-right font-mono text-xs">{(totalLabor).toLocaleString('id-ID')}</td>
                                                                             </tr>
@@ -2596,7 +2499,7 @@
                                                                                         <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}</td>
                                                                                     </tr>
                                                                                 ))}
-                                                                                <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-955">
+                                                                                <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-950">
                                                                                     <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-955 uppercase text-[10px]">Sub-Total Biaya Tenaga Kerja:</td>
                                                                                     <td className="py-2 px-3 text-right font-mono text-xs">{(totalLabor).toLocaleString('id-ID')}</td>
                                                                                 </tr>
@@ -2610,7 +2513,7 @@
                                                         {/* GRAND TOTAL */}
                                                         <div className="bg-slate-100 p-4 border-2 border-slate-950 mt-4 flex flex-row items-center justify-between print-avoid-break">
                                                             <div className="uppercase">
-                                                                <h3 className="text-sm font-black text-slate-955 tracking-wider">Total Anggaran SPK</h3>
+                                                                <h3 className="text-sm font-black text-slate-950 tracking-wider">Total Anggaran SPK</h3>
                                                                 <p className="text-[10px] text-slate-700 font-bold mt-0.5">(Material + Tenaga Kerja)</p>
                                                             </div>
                                                             <div className="text-right">
@@ -2634,7 +2537,7 @@
                                                                         <span className="font-bold text-slate-900 uppercase tracking-tight">Pemberi Tugas</span>
                                                                         <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan & Stempel</div>
                                                                         <div>
-                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{pemberiTugas}</span>
+                                                                            <span className="font-black underline underline-offset-2 text-slate-950 block">{pemberiTugas}</span>
                                                                         </div>
                                                                     </div>
 
@@ -2643,7 +2546,7 @@
                                                                         <span className="font-bold text-slate-900 uppercase tracking-tight">Mengetahui</span>
                                                                         <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
                                                                         <div>
-                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{keuanganName}</span>
+                                                                            <span className="font-black underline underline-offset-2 text-slate-950 block">{keuanganName}</span>
                                                                         </div>
                                                                     </div>
 
@@ -2679,7 +2582,7 @@
                                                                         )}
                                                                         
                                                                         <div className="relative z-10">
-                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"}</span>
+                                                                            <span className="font-black underline underline-offset-2 text-slate-950 block">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"}</span>
                                                                         </div>
                                                                     </div>
 
@@ -2688,7 +2591,7 @@
                                                                         <span className="font-bold text-slate-900 uppercase tracking-tight">Menyetujui</span>
                                                                         <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
                                                                         <div>
-                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{kepalaKantorName}</span>
+                                                                            <span className="font-black underline underline-offset-2 text-slate-950 block">{kepalaKantorName}</span>
                                                                         </div>
                                                                     </div>
 
