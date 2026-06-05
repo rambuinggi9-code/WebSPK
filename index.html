@@ -320,6 +320,7 @@
             const [t30JamGudangSiangSelesai, setT30JamGudangSiangSelesai] = useState("13.00");
             const [t30TempatDitetapkan, setT30TempatDitetapkan] = useState("Malang");
             const [t30TanggalDitetapkan, setT30TanggalDitetapkan] = useState("");
+            const [t30LampiranImage, setT30LampiranImage] = useState(null); // Lampiran Image State
 
             // Kop Tipe 30
             const [t30InstansiName, setT30InstansiName] = useState("PT. BANGUN CINTA ALAM");
@@ -724,6 +725,7 @@
                 setT30JamGudangSiangSelesai("13.00");
                 setT30TempatDitetapkan("Malang");
                 setT30TanggalDitetapkan("");
+                setT30LampiranImage(null);
 
                 setT30InstansiName("PT. BANGUN CINTA ALAM");
                 setT30InstansiAddress("Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com");
@@ -775,6 +777,7 @@
                     t30InstansiAddress,
                     t30LogoKiri,
                     t30LogoKanan,
+                    t30LampiranImage,
                     lastUpdated: new Date().toLocaleString('id-ID')
                 };
 
@@ -811,6 +814,7 @@
                     setT30JamGudangSiangSelesai(target.t30JamGudangSiangSelesai || "");
                     setT30TempatDitetapkan(target.t30TempatDitetapkan || "");
                     setT30TanggalDitetapkan(target.t30TanggalDitetapkan || "");
+                    setT30LampiranImage(target.t30LampiranImage || null);
                     
                     setT30InstansiName(target.t30InstansiName || "PT. BANGUN CINTA ALAM");
                     setT30InstansiAddress(target.t30InstansiAddress || "Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com");
@@ -1057,7 +1061,7 @@
                                             <textarea rows="3" value={t30InstansiAddress} onChange={(e) => setT30InstansiAddress(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-teal-500/30 transition-all resize-none"/>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4 pt-2">
-                                            <div className="p-3 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl">
+                                            <div className="p-3 bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl">
                                                 <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-3 text-center">Logo Kiri</span>
                                                 {t30LogoKiri ? (
                                                     <div className="relative group aspect-square max-h-24 mx-auto bg-white rounded-lg flex items-center justify-center p-2 shadow-sm border border-slate-200">
@@ -1072,7 +1076,7 @@
                                                     </label>
                                                 )}
                                             </div>
-                                            <div className="p-3 bg-slate-50 dark:bg-slate-950/50 border border-slate-200 dark:border-slate-800 rounded-xl">
+                                            <div className="p-3 bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl">
                                                 <span className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-3 text-center">Logo Kanan</span>
                                                 {t30LogoKanan ? (
                                                     <div className="relative group aspect-square max-h-24 mx-auto bg-white rounded-lg flex items-center justify-center p-2 shadow-sm border border-slate-200">
@@ -1159,7 +1163,7 @@
                                             </div>
                                         </div>
 
-                                        <div className="p-4 bg-slate-50 dark:bg-slate-950/50 rounded-xl border border-slate-200 dark:border-slate-800 space-y-3">
+                                        <div className="p-4 bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 space-y-3">
                                             <h4 className="text-xs font-bold text-slate-600 dark:text-slate-400">2. Waktu Pelaksanaan</h4>
                                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                                 <div>
@@ -1231,6 +1235,53 @@
                                             </div>
                                         </div>
                                     </div>
+
+                                    {/* Lampiran Generator (Opsional) */}
+                                    <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800/80">
+                                        <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300 border-l-4 border-teal-500 pl-3">Lampiran SPK (Opsional)</h3>
+                                        <div className="p-4 bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 space-y-3 rounded-xl">
+                                            <label className="block text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-1 flex items-center gap-2">
+                                                <i data-lucide="image-plus" className="w-3.5 h-3.5"></i>
+                                                Unggah Gambar Lampiran (Denah Kerja / Gambar Teknis)
+                                            </label>
+                                            {t30LampiranImage ? (
+                                                <div className="relative group p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center h-48 overflow-hidden shadow-sm">
+                                                    <img src={t30LampiranImage} alt="Lampiran" className="max-h-full max-w-full object-contain" />
+                                                    <button 
+                                                        onClick={() => { setT30LampiranImage(null); showNotification("Lampiran berhasil dihapus.", "info"); }}
+                                                        className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-xl transition-opacity duration-200 backdrop-blur-sm"
+                                                    >
+                                                        <i data-lucide="trash-2" className="w-6 h-6 mb-2 text-red-400"></i>
+                                                        <span className="text-xs font-bold tracking-wide">Hapus Lampiran</span>
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <label className="cursor-pointer flex flex-col items-center justify-center h-32 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-teal-400 hover:bg-teal-50 dark:hover:bg-slate-900 rounded-xl transition-all group bg-white dark:bg-transparent">
+                                                    <div className="p-2 bg-white dark:bg-slate-800 border shadow-sm rounded-full mb-2 group-hover:bg-teal-100 transition-colors">
+                                                        <i data-lucide="upload-cloud" className="w-5 h-5 text-slate-400 group-hover:text-teal-600"></i>
+                                                    </div>
+                                                    <span className="text-xs text-slate-600 dark:text-slate-300 group-hover:text-teal-700 font-medium">Unggah Gambar Lampiran</span>
+                                                    <input 
+                                                        type="file" 
+                                                        accept="image/*" 
+                                                        className="hidden" 
+                                                        onChange={(e) => {
+                                                            const file = e.target.files[0];
+                                                            if (file) {
+                                                                const reader = new FileReader();
+                                                                reader.onloadend = () => {
+                                                                    setT30LampiranImage(reader.result);
+                                                                    showNotification("Lampiran berhasil diunggah.");
+                                                                };
+                                                                reader.readAsDataURL(file);
+                                                            }
+                                                        }} 
+                                                    />
+                                                </label>
+                                            )}
+                                        </div>
+                                    </div>
+
                                 </div>
 
                                 {/* ==========================================
@@ -1347,7 +1398,7 @@
                                                                     </div>
                                                                     <div className="flex flex-col items-center">
                                                                         <p className="font-bold mb-16">Penanggung Jawab,</p>
-                                                                        <p className="font-bold underline underline-offset-2">Busro Khufidon</p>
+                                                                        <p className="font-bold underline underline-offset-2">Supardi</p>
                                                                     </div>
                                                                 </div>
                                                                 
@@ -1362,6 +1413,19 @@
                                                                     </div>
                                                                 </div>
                                                             </div>
+
+                                                            {/* Halaman Lampiran (Ditampilkan jika gambar lampiran diunggah) */}
+                                                            {t30LampiranImage && (
+                                                                <div className="pt-8 border-t border-dashed border-slate-300 mt-12 break-before-page print:break-before-page" style={{ pageBreakBefore: 'always' }}>
+                                                                    <div className="text-center mb-6">
+                                                                        <h2 className="text-base font-black tracking-widest uppercase text-slate-950 underline underline-offset-4">LAMPIRAN SPK</h2>
+                                                                    </div>
+                                                                    <div className="flex justify-center items-center p-4 border border-slate-200 bg-slate-50/50 rounded-xl max-w-full">
+                                                                        <img src={t30LampiranImage} alt="Lampiran SPK" className="max-h-[220mm] object-contain shadow-md rounded" />
+                                                                    </div>
+                                                                </div>
+                                                            )}
+
                                                         </div>
                                                     </td>
                                                 </tr>
@@ -1567,7 +1631,7 @@
                                             rows="3"
                                             value={instansiAddress} 
                                             onChange={(e) => setInstansiAddress(e.target.value)}
-                                            className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 focus:border-blue-500 dark:focus:border-indigo-500 transition-all resize-none"
+                                            className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 focus:border-blue-500 dark:focus:border-indigo-500 transition-all resize-none"
                                         />
                                     </div>
 
@@ -1665,7 +1729,7 @@
                                             </button>
                                         </div>
                                     ) : (
-                                        <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-400 dark:hover:border-indigo-500/50 hover:bg-blue-50 dark:hover:bg-slate-950 rounded-xl transition-all group bg-slate-50 dark:bg-slate-950/50">
+                                        <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-blue-400 dark:hover:border-indigo-500/50 hover:bg-blue-50 dark:hover:bg-slate-950 rounded-xl transition-all group bg-slate-50 dark:bg-slate-955">
                                             <div className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-transparent shadow-sm rounded-full mb-2 group-hover:bg-blue-100 dark:group-hover:bg-indigo-900/50 group-hover:border-blue-200 transition-colors">
                                                 <i data-lucide="upload-cloud" className="w-5 h-5 text-slate-400 dark:text-slate-400 group-hover:text-blue-600 dark:group-hover:text-indigo-400"></i>
                                             </div>
@@ -1796,7 +1860,7 @@
                                             <input 
                                                 type="date" 
                                                 value={endDate} 
-                                                onChange={(e) => setEndDate(e.target.value)}
+                                                onChange={(e) => setTypeDate(e.target.value)}
                                                 className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-800 dark:text-slate-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30 dark:focus:ring-indigo-500/50 focus:border-blue-500 dark:focus:border-indigo-500 custom-scrollbar"
                                             />
                                         </div>
@@ -1935,7 +1999,7 @@
                                                                 />
                                                                 <button 
                                                                     onClick={() => removeSubPekerjaan(parentIdx, subIdx)}
-                                                                    className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-950/50 transition-colors p-1.5 rounded shrink-0"
+                                                                    className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-955 transition-colors p-1.5 rounded shrink-0"
                                                                 >
                                                                     <i data-lucide="x" className="w-4 h-4"></i>
                                                                 </button>
@@ -1976,7 +2040,7 @@
                                     )}
 
                                     {materials.length > 0 && (
-                                        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm">
+                                        <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 shadow-sm">
                                             <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
                                                 <thead>
                                                     <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider text-[10px]">
@@ -2029,7 +2093,7 @@
                                                                 {((Number(mat.qty)||0) * (Number(mat.harga)||0)).toLocaleString('id-ID')}
                                                             </td>
                                                             <td className="py-2 px-3 text-center">
-                                                                <button onClick={() => removeMaterial(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-950/50 p-1.5 rounded transition-colors">
+                                                                <button onClick={() => removeMaterial(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-955 p-1.5 rounded transition-colors">
                                                                     <i data-lucide="trash-2" className="w-4 h-4"></i>
                                                                 </button>
                                                             </td>
@@ -2050,7 +2114,7 @@
                                         </div>
                                         
                                         {/* Switcher Tipe Tenaga Kerja */}
-                                        <div className="flex bg-slate-100 dark:bg-slate-950 p-1 rounded-xl border border-slate-200 dark:border-slate-800 shrink-0 shadow-inner">
+                                        <div className="flex bg-slate-100 dark:bg-slate-955 p-1 rounded-xl border border-slate-200 dark:border-slate-800 shrink-0 shadow-inner">
                                             <button 
                                                 onClick={() => setLaborType('harian')}
                                                 className={`px-4 py-1.5 text-xs font-bold rounded-lg transition-all ${laborType === 'harian' ? 'bg-white dark:bg-indigo-600 text-blue-600 dark:text-white shadow-sm border border-slate-200 dark:border-transparent' : 'text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'}`}
@@ -2077,7 +2141,7 @@
                                                     <i data-lucide="plus" className="w-4 h-4"></i> Tambah Tenaga Harian
                                                 </button>
                                             </div>
-                                            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm">
+                                            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 shadow-sm">
                                                 <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
                                                     <thead>
                                                         <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider text-[10px]">
@@ -2128,7 +2192,7 @@
                                                                     {((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}
                                                                 </td>
                                                                 <td className="py-2 px-3 text-center">
-                                                                    <button onClick={() => removeLaborHarian(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-950/50 p-1.5 rounded transition-colors">
+                                                                    <button onClick={() => removeLaborHarian(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-955 p-1.5 rounded transition-colors">
                                                                         <i data-lucide="trash-2" className="w-4 h-4"></i>
                                                                     </button>
                                                                 </td>
@@ -2157,7 +2221,7 @@
                                             )}
 
                                             {laborBorongan.length > 0 && (
-                                                <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 shadow-sm">
+                                                <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-955 shadow-sm">
                                                     <table className="w-full text-left text-xs text-slate-700 dark:text-slate-300">
                                                         <thead>
                                                             <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase font-bold tracking-wider text-[10px]">
@@ -2209,7 +2273,7 @@
                                                                         {((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}
                                                                     </td>
                                                                     <td className="py-2 px-3 text-center">
-                                                                        <button onClick={() => removeLaborBorongan(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-950/50 p-1.5 rounded transition-colors">
+                                                                        <button onClick={() => removeLaborBorongan(idx)} className="text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:text-red-300 dark:hover:bg-red-955 p-1.5 rounded transition-colors">
                                                                             <i data-lucide="trash-2" className="w-4 h-4"></i>
                                                                         </button>
                                                                     </td>
@@ -2262,7 +2326,7 @@
 
                                                             {/* Nama Perusahaan & Alamat Terpusat (Tanpa Jarak Jauh) */}
                                                             <div className="flex-1 text-center flex flex-col justify-center">
-                                                                <h2 className="text-2xl font-black tracking-tight text-slate-950 leading-tight uppercase">{instansiName}</h2>
+                                                                <h2 className="text-2xl font-black tracking-tight text-slate-955 leading-tight uppercase">{instansiName}</h2>
                                                                 <p className="whitespace-pre-line text-[11px] text-slate-800 leading-relaxed font-semibold mt-1.5">{instansiAddress}</p>
                                                             </div>
 
@@ -2293,7 +2357,7 @@
                                                         
                                                         {/* Judul tanpa Underline Sesuai Request */}
                                                         <div className="text-center space-y-1.5 mb-8">
-                                                            <h1 className="text-base font-black tracking-widest uppercase text-slate-950 inline-block mb-1">
+                                                            <h1 className="text-base font-black tracking-widest uppercase text-slate-955 inline-block mb-1">
                                                                 Surat Perintah Kerja
                                                             </h1>
                                                             <p className="text-xs font-mono font-bold text-slate-700 block">
@@ -2537,7 +2601,7 @@
                                                                         <span className="font-bold text-slate-900 uppercase tracking-tight">Pemberi Tugas</span>
                                                                         <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan & Stempel</div>
                                                                         <div>
-                                                                            <span className="font-black underline underline-offset-2 text-slate-950 block">{pemberiTugas}</span>
+                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{pemberiTugas}</span>
                                                                         </div>
                                                                     </div>
 
@@ -2546,7 +2610,7 @@
                                                                         <span className="font-bold text-slate-900 uppercase tracking-tight">Mengetahui</span>
                                                                         <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
                                                                         <div>
-                                                                            <span className="font-black underline underline-offset-2 text-slate-950 block">{keuanganName}</span>
+                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{keuanganName}</span>
                                                                         </div>
                                                                     </div>
 
@@ -2582,7 +2646,7 @@
                                                                         )}
                                                                         
                                                                         <div className="relative z-10">
-                                                                            <span className="font-black underline underline-offset-2 text-slate-950 block">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"}</span>
+                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"}</span>
                                                                         </div>
                                                                     </div>
 
@@ -2591,7 +2655,7 @@
                                                                         <span className="font-bold text-slate-900 uppercase tracking-tight">Menyetujui</span>
                                                                         <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
                                                                         <div>
-                                                                            <span className="font-black underline underline-offset-2 text-slate-950 block">{kepalaKantorName}</span>
+                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{kepalaKantorName}</span>
                                                                         </div>
                                                                     </div>
 
