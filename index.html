@@ -75,10 +75,26 @@
                 width: auto !important;
                 margin: 0 auto;
             }
+            /* Memaksa layout grid saat print agar TTD tetap sejajar */
+            .print-cols-2 {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 0.5rem !important;
+            }
+            .print-cols-3 {
+                display: grid !important;
+                grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+                gap: 0.5rem !important;
+            }
             .print-cols-4 {
                 display: grid !important;
                 grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
-                gap: 1rem !important;
+                gap: 0.5rem !important;
+            }
+            .print-cols-5 {
+                display: grid !important;
+                grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+                gap: 0.5rem !important;
             }
         }
         
@@ -246,8 +262,8 @@
                 { id: "2", tenaga: "Kuli", satuan: "Hari/Orang", volume: "", harga: "" }
             ],
             laborBorongan: [], 
-            keuanganName: "Sita Dita C",
-            kepalaKantorName: "Fika Faradila C",
+            keuanganName: "Sita Dita Cahyani",
+            kepalaKantorName: "Fika Faradila Cahyanti",
             pjSignatureImage: null
         };
 
@@ -361,7 +377,7 @@
             });
 
             // ==========================================
-            // OTOMATISASI EFEK KHUSUS SPK TIPE 30
+            // OTOMATISASI EFEK KHUSUS SPK TIPE 30 & UMUM
             // ==========================================
 
             // Ekstrak Hari berdasarkan Tanggal Pembuatan Tipe 30
@@ -428,6 +444,12 @@
                     previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     showNotification("Menampilkan Pratinjau Dokumen SPK.", "info");
                 }
+            };
+            
+            // FUNGSI NAVIGASI AMAN (Mencegah Blank Page)
+            const handleNavigate = (view) => {
+                setActiveView(view);
+                window.scrollTo({ top: 0, behavior: 'instant' });
             };
 
             // ==========================================
@@ -857,7 +879,7 @@
                ========================================= */
             if (activeView === 'home') {
                 return (
-                    <div className="min-h-screen flex flex-col transition-colors duration-300 relative">
+                    <div key="view-home" className="min-h-screen flex flex-col transition-colors duration-300 relative">
                         
                         {/* THEME TOGGLE (Absolute Top Right) */}
                         <div className="absolute top-6 right-6">
@@ -893,7 +915,7 @@
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                                 {/* KARTU MENU 1: SPK UMUM */}
                                 <div 
-                                    onClick={() => setActiveView('spk_umum')}
+                                    onClick={() => handleNavigate('spk_umum')}
                                     className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-8 cursor-pointer hover:border-blue-500 dark:hover:border-indigo-500 hover:shadow-2xl hover:shadow-blue-900/10 transition-all duration-300 relative overflow-hidden"
                                 >
                                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -914,7 +936,7 @@
 
                                 {/* KARTU MENU 2: SPK TIPE 30 */}
                                 <div 
-                                    onClick={() => setActiveView('spk_tipe30')}
+                                    onClick={() => handleNavigate('spk_tipe30')}
                                     className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-8 cursor-pointer hover:border-teal-500 dark:hover:border-teal-500 hover:shadow-2xl hover:shadow-teal-900/10 transition-all duration-300 relative overflow-hidden"
                                 >
                                     <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
@@ -944,7 +966,7 @@
                ========================================= */
             if (activeView === 'spk_tipe30') {
                 return (
-                    <div className="min-h-screen transition-colors duration-300">
+                    <div key="view-tipe30" className="min-h-screen transition-colors duration-300">
                         
                         {/* NOTIFIKASI POPUP */}
                         {notification && (
@@ -964,7 +986,7 @@
                                 
                                 <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
                                     <button 
-                                        onClick={() => setActiveView('home')}
+                                        onClick={() => handleNavigate('home')}
                                         className="flex items-center justify-center p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-teal-50 dark:hover:bg-teal-900/30 text-slate-600 dark:text-slate-400 hover:text-teal-600 dark:hover:text-teal-400 border border-transparent hover:border-teal-200 dark:hover:border-teal-500/30 rounded-xl transition-all shadow-sm group shrink-0"
                                         title="Kembali ke Menu Utama"
                                     >
@@ -1227,11 +1249,11 @@
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Ditetapkan di</label>
-                                                <input type="text" value={t30TempatDitetapkan} onChange={(e) => setT30TempatDitetapkan(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none"/>
+                                                <input type="text" value={t30TempatDitetapkan} onChange={(e) => setT30TempatDitetapkan(e.target.value)} className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none"/>
                                             </div>
                                             <div>
                                                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal Penetapan</label>
-                                                <input type="date" value={t30TanggalDitetapkan} onChange={(e) => setT30TanggalDitetapkan(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none custom-scrollbar"/>
+                                                <input type="date" value={t30TanggalDitetapkan} onChange={(e) => setT30TanggalDitetapkan(e.target.value)} className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none custom-scrollbar"/>
                                             </div>
                                         </div>
                                     </div>
@@ -1380,36 +1402,38 @@
                                                                 </p>
                                                             </div>
                                                             
-                                                            {/* TTD Section Tipe 30 (Baru - 5 Penanggung Jawab) */}
+                                                            {/* TTD Section Tipe 30 (2 Baris - 3 Atas, 2 Bawah) */}
                                                             <div className="mt-8 text-[11pt] text-slate-900 print-avoid-break">
                                                                 <div>
                                                                     Ditetapkan di : {t30TempatDitetapkan || "____________________"}<br/>
                                                                     Tanggal : {t30TanggalDitetapkan ? formatDateIndo(t30TanggalDitetapkan) : "_________________________"}
                                                                 </div>
                                                                 
-                                                                <div className="grid grid-cols-3 gap-6 text-center mt-8">
+                                                                {/* Baris Atas - 3 Kolom */}
+                                                                <div className="grid grid-cols-3 gap-4 text-center mt-10 max-w-full mx-auto print-cols-3 text-[10pt] items-end mb-10">
                                                                     <div className="flex flex-col items-center">
-                                                                        <p className="font-bold mb-16">Pemberi Tugas,</p>
-                                                                        <p className="font-bold underline underline-offset-2">Farizal Zainur Rozikin</p>
+                                                                        <p className="font-bold mb-16 min-h-[2.5rem]">Pemborong,</p>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap">{t30NamaPemborong || "( ........................ )"}</p>
                                                                     </div>
                                                                     <div className="flex flex-col items-center">
-                                                                        <p className="font-bold mb-16">Pemborong,</p>
-                                                                        <p className="font-bold underline underline-offset-2">{t30NamaPemborong || "( .................................... )"}</p>
+                                                                        <p className="font-bold mb-16 min-h-[2.5rem]">Penanggungjawab,</p>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap">Supardi</p>
                                                                     </div>
                                                                     <div className="flex flex-col items-center">
-                                                                        <p className="font-bold mb-16">Penanggung Jawab,</p>
-                                                                        <p className="font-bold underline underline-offset-2">Supardi</p>
+                                                                        <p className="font-bold mb-16 min-h-[2.5rem]">Pemberi Tugas,</p>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap">Farizal Zainur Rozikin</p>
                                                                     </div>
                                                                 </div>
                                                                 
-                                                                <div className="grid grid-cols-2 gap-6 text-center mt-10 max-w-2xl mx-auto">
+                                                                {/* Baris Bawah - 2 Kolom (Ditengah) */}
+                                                                <div className="grid grid-cols-2 gap-4 text-center w-3/4 mx-auto print-cols-2 text-[10pt] items-end">
                                                                     <div className="flex flex-col items-center">
-                                                                        <p className="font-bold mb-14">Mengetahui,<br/>Keuangan</p>
-                                                                        <p className="font-bold underline underline-offset-2">Sita Dita Cahyani</p>
+                                                                        <p className="font-bold mb-16 min-h-[2.5rem] leading-tight">Mengetahui,<br/>Keuangan</p>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap">Sita Dita Cahyani</p>
                                                                     </div>
                                                                     <div className="flex flex-col items-center">
-                                                                        <p className="font-bold mb-14">Menyetujui,<br/>Kepala Kantor</p>
-                                                                        <p className="font-bold underline underline-offset-2">Fika Fardila Cahyanti</p>
+                                                                        <p className="font-bold mb-16 min-h-[2.5rem] leading-tight">Menyetujui,<br/>Kepala Kantor</p>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap">Fika Faradila Cahyanti</p>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1441,10 +1465,9 @@
 
             /* =========================================
                RENDERER: HALAMAN UTAMA SPK GENERATOR (UMUM)
-               [TIDAK DIUBAH SAMA SEKALI, SESUAI PERMINTAAN]
                ========================================= */
             return (
-                <div className="min-h-screen transition-colors duration-300">
+                <div key="view-umum" className="min-h-screen transition-colors duration-300">
                     
                     {/* NOTIFIKASI POPUP */}
                     {notification && (
@@ -1464,23 +1487,17 @@
                             
                             {/* KIRI: Tombol Home & Info Judul */}
                             <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
-                                
-                                {/* Tombol Menu Utama (Home) - SEKARANG TRIGGER STATE BUKAN LINK */}
                                 <button 
-                                    onClick={() => setActiveView('home')}
+                                    onClick={() => handleNavigate('home')}
                                     className="flex items-center justify-center p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-indigo-900/30 text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-indigo-400 border border-transparent hover:border-blue-200 dark:hover:border-indigo-500/30 rounded-xl transition-all shadow-sm group shrink-0"
                                     title="Kembali ke Menu Utama"
                                 >
                                     <i data-lucide="home" className="w-5 h-5 group-hover:-translate-y-0.5 transition-transform"></i>
                                 </button>
-
-                                {/* Garis Pemisah (Divider) */}
                                 <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 hidden sm:block shrink-0"></div>
-
                                 <div className="p-3 bg-blue-50 dark:bg-indigo-600/10 rounded-xl text-blue-600 dark:text-indigo-400 border border-blue-100 dark:border-indigo-500/20 shadow-inner shrink-0 hidden sm:block">
                                     <i data-lucide="building-2" className="w-6 h-6"></i>
                                 </div>
-                                
                                 <div className="flex-1 min-w-0">
                                     <h1 className="font-extrabold text-lg tracking-wide text-slate-900 dark:text-white truncate">SPK GENERATOR & DATABASE</h1>
                                     <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5 truncate">PT Bangun Cinta Alam • Sistem Manajemen Proyek</p>
@@ -1489,52 +1506,21 @@
                             
                             {/* KANAN: AKSI KONTROL UTAMA */}
                             <div className="flex items-center gap-3 flex-wrap w-full md:w-auto mt-2 md:mt-0">
-                                
-                                {/* Tombol Tema */}
-                                <button 
-                                    onClick={toggleTheme}
-                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition-all text-xs shadow-sm"
-                                    title="Ganti Tema Warna"
-                                >
-                                    {theme === 'light' ? (
-                                        <><i data-lucide="moon" className="w-4 h-4 text-slate-600"></i> Mode Gelap</>
-                                    ) : (
-                                        <><i data-lucide="sun" className="w-4 h-4 text-amber-400"></i> Mode Terang</>
-                                    )}
+                                <button onClick={toggleTheme} className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition-all text-xs shadow-sm" title="Ganti Tema Warna">
+                                    {theme === 'light' ? <><i data-lucide="moon" className="w-4 h-4 text-slate-600"></i> Mode Gelap</> : <><i data-lucide="sun" className="w-4 h-4 text-amber-400"></i> Mode Terang</>}
                                 </button>
-
                                 <div className="w-px h-6 bg-slate-300 dark:bg-slate-700 hidden md:block"></div>
-
-                                <button 
-                                    onClick={handleResetData}
-                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition-all text-xs shadow-sm"
-                                >
-                                    <i data-lucide="rotate-ccw" className="w-4 h-4 text-slate-400"></i>
-                                    Reset Data
+                                <button onClick={handleResetData} className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition-all text-xs shadow-sm">
+                                    <i data-lucide="rotate-ccw" className="w-4 h-4 text-slate-400"></i> Reset Data
                                 </button>
-                                
-                                <button 
-                                    onClick={handlePreviewScroll}
-                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition-all text-xs shadow-sm"
-                                >
-                                    <i data-lucide="eye" className="w-4 h-4 text-blue-500 dark:text-indigo-400"></i>
-                                    Pratinjau
+                                <button onClick={handlePreviewScroll} className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition-all text-xs shadow-sm">
+                                    <i data-lucide="eye" className="w-4 h-4 text-blue-500 dark:text-indigo-400"></i> Pratinjau
                                 </button>
-
-                                <button 
-                                    onClick={handleSaveSpk}
-                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-blue-600 dark:bg-emerald-600 hover:bg-blue-700 dark:hover:bg-emerald-500 text-white font-semibold px-4 py-2.5 rounded-xl transition-all text-xs shadow-md shadow-blue-600/20 dark:shadow-emerald-900/20"
-                                >
-                                    <i data-lucide="save" className="w-4 h-4"></i>
-                                    {activeSpkId ? "Update SPK" : "Simpan SPK"}
+                                <button onClick={handleSaveSpk} className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-blue-600 dark:bg-emerald-600 hover:bg-blue-700 dark:hover:bg-emerald-500 text-white font-semibold px-4 py-2.5 rounded-xl transition-all text-xs shadow-md shadow-blue-600/20 dark:shadow-emerald-900/20">
+                                    <i data-lucide="save" className="w-4 h-4"></i> {activeSpkId ? "Update SPK" : "Simpan SPK"}
                                 </button>
-
-                                <button 
-                                    onClick={handlePrint}
-                                    className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-sky-600 dark:from-indigo-600 dark:to-blue-600 hover:from-blue-700 hover:to-sky-700 dark:hover:from-indigo-500 dark:hover:to-blue-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-md shadow-blue-600/20 dark:shadow-indigo-900/30 transition-all active:scale-95 text-xs"
-                                >
-                                    <i data-lucide="printer" className="w-4 h-4"></i>
-                                    Cetak
+                                <button onClick={handlePrint} className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-gradient-to-r from-blue-600 to-sky-600 dark:from-indigo-600 dark:to-blue-600 hover:from-blue-700 hover:to-sky-700 dark:hover:from-indigo-500 dark:hover:to-blue-500 text-white font-semibold px-6 py-2.5 rounded-xl shadow-md shadow-blue-600/20 dark:shadow-indigo-900/30 transition-all active:scale-95 text-xs">
+                                    <i data-lucide="printer" className="w-4 h-4"></i> Cetak
                                 </button>
                             </div>
                         </div>
@@ -2288,344 +2274,235 @@
                                 </div>
                             </section>
 
-                            {/* DOKUMEN PREVIEW (Live Rendering & Printable Page Wrapper) */}
+                            {/* ==========================================
+                                AREA PREVIEW & CETAK UMUM (KERTAS A4)
+                                ========================================== */}
                             <div className="pt-6 print:pt-0 border-t-2 border-dashed border-slate-300 dark:border-slate-800 print:border-none">
                                 <div className="flex items-center justify-between mb-4 print:hidden">
                                     <h3 className="text-slate-500 dark:text-slate-400 text-sm font-bold flex items-center gap-2 uppercase tracking-wider">
-                                        <i data-lucide="eye" className="w-4 h-4 text-blue-500 dark:text-indigo-400"></i> Pratinjau Kertas A4
+                                        <i data-lucide="eye" className="w-4 h-4 text-blue-500"></i> Pratinjau Kertas A4 (SPK Umum)
                                     </h3>
                                     <span className="text-[10px] bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 px-2.5 py-1 rounded-md font-mono border border-slate-300 dark:border-slate-700">Skala 100%</span>
                                 </div>
-
-                                <div 
-                                    ref={previewRef}
-                                    className="paper-preview px-10 py-12 print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-full print:rounded-none"
-                                >
-                                    
-                                    {/* STRUKTUR TABEL UNTUK REPEATING KOP SURAT */}
+                                
+                                <div ref={previewRef} className="paper-preview px-10 py-12 print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-full print:rounded-none">
                                     <table className="w-full border-collapse">
-                                        
-                                        {/* KOP DI-ULANG PADA SETIAP LEMBAR PRINT */}
                                         <thead className="table-header-group">
                                             <tr>
                                                 <td>
                                                     <div className="pb-3">
-                                                        {/* Baris Utama: Logo - Nama & Alamat - Logo (Semua Sejajar Horizontal) */}
                                                         <div className="flex items-center justify-between w-full gap-4">
-                                                            
-                                                            {/* Logo Kiri */}
                                                             <div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">
-                                                                {logoKiri ? (
-                                                                    <img src={logoKiri} alt="Logo Kiri" className="max-h-full max-w-full object-contain" />
-                                                                ) : (
-                                                                    <div className="w-16 h-16 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50">
-                                                                        <span className="text-[10px] font-black tracking-tighter text-slate-400 leading-none text-center">LOGOKIRI</span>
-                                                                    </div>
-                                                                )}
+                                                                {logoKiri ? <img src={logoKiri} alt="Logo" className="max-h-full max-w-full object-contain" /> : <div className="w-16 h-16 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKIRI</span></div>}
                                                             </div>
-
-                                                            {/* Nama Perusahaan & Alamat Terpusat (Tanpa Jarak Jauh) */}
                                                             <div className="flex-1 text-center flex flex-col justify-center">
-                                                                <h2 className="text-2xl font-black tracking-tight text-slate-955 leading-tight uppercase">{instansiName}</h2>
+                                                                <h2 className="text-2xl font-black tracking-tight text-slate-950 leading-tight uppercase">{instansiName}</h2>
                                                                 <p className="whitespace-pre-line text-[11px] text-slate-800 leading-relaxed font-semibold mt-1.5">{instansiAddress}</p>
                                                             </div>
-
-                                                            {/* Logo Kanan */}
                                                             <div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">
-                                                                {logoKanan ? (
-                                                                    <img src={logoKanan} alt="Logo Kanan" className="max-h-full max-w-full object-contain" />
-                                                                ) : (
-                                                                    <div className="w-16 h-16 border-2 border-slate-300 rounded-full flex items-center justify-center p-1 bg-slate-50">
-                                                                        <span className="text-[10px] font-black tracking-tighter text-slate-400 leading-none text-center">LOGOKANAN</span>
-                                                                    </div>
-                                                                )}
+                                                                {logoKanan ? <img src={logoKanan} alt="Logo" className="max-h-full max-w-full object-contain" /> : <div className="w-16 h-16 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKANAN</span></div>}
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    {/* Garis Ganda Kop Surat */}
                                                     <div className="w-full border-b border-slate-900 mb-[2px]"></div>
                                                     <div className="w-full border-b-[3px] border-slate-900 mb-6"></div>
                                                 </td>
                                             </tr>
                                         </thead>
-
-                                        {/* ISI UTAMA DOKUMEN SPK */}
                                         <tbody className="table-row-group">
                                             <tr>
                                                 <td>
-                                                    <div className="space-y-6 pt-2">
-                                                        
-                                                        {/* Judul tanpa Underline Sesuai Request */}
-                                                        <div className="text-center space-y-1.5 mb-8">
-                                                            <h1 className="text-base font-black tracking-widest uppercase text-slate-955 inline-block mb-1">
-                                                                Surat Perintah Kerja
-                                                            </h1>
-                                                            <p className="text-xs font-mono font-bold text-slate-700 block">
-                                                                {spkNumber ? `Nomor: ${spkNumber}` : "Nomor: [Belum Tergenerate]"}
-                                                            </p>
+                                                    <div className="space-y-5 pt-2 text-[11pt] text-slate-950">
+                                                        <div className="text-center mb-6">
+                                                            <h1 className="text-base font-black tracking-widest uppercase underline underline-offset-4 mb-1">SURAT PERINTAH KERJA</h1>
+                                                            <p className="font-semibold font-mono tracking-wide">NO : {spkNumber || "...................................................."}</p>
                                                         </div>
 
-                                                        {/* SECTION A: DATA PROYEK */}
-                                                        <div className="space-y-2.5 print-avoid-break">
-                                                            <h4 className="text-xs font-bold text-slate-900 border-b-2 border-slate-800 pb-1 uppercase tracking-wide">A. Informasi Pekerjaan</h4>
-                                                            
-                                                            <div className="grid grid-cols-1 gap-y-2 text-xs text-slate-800 pl-2">
-                                                                <div className="flex">
-                                                                    <span className="w-40 font-semibold">1. Nama Proyek</span>
-                                                                    <span className="w-4 text-center">:</span>
-                                                                    <span className="flex-1 font-bold">{selectedProyekIdx !== "" ? DAFTAR_PROYEK[selectedProyekIdx]?.nama : "-"}</span>
-                                                                </div>
-                                                                
-                                                                <div className="flex">
-                                                                    <span className="w-40 font-semibold">2. Lokasi Proyek</span>
-                                                                    <span className="w-4 text-center">:</span>
-                                                                    <span className="flex-1">{selectedProyekIdx !== "" ? DAFTAR_PROYEK[selectedProyekIdx]?.lokasi : "-"}</span>
-                                                                </div>
+                                                        <div className="text-justify leading-relaxed">
+                                                            <p className="mb-2">Yang bertanda tangan dibawah ini :</p>
+                                                            <table className="ml-4 my-2 w-full">
+                                                                <tbody>
+                                                                    <tr><td className="w-32 align-top">Nama</td><td className="w-4 align-top">:</td><td className="font-bold">{pemberiTugas || "............................................"}</td></tr>
+                                                                    <tr><td className="align-top pt-1">Jabatan</td><td className="align-top pt-1">:</td><td className="pt-1">Pemberi Tugas</td></tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <p className="mb-2">Memberikan Perintah Kerja / Tugas kepada :</p>
+                                                            <table className="ml-4 my-2 w-full">
+                                                                <tbody>
+                                                                    <tr><td className="w-32 align-top">Nama</td><td className="w-4 align-top">:</td><td className="font-bold">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx].nama : "............................................"}</td></tr>
+                                                                    <tr><td className="align-top pt-1">Jabatan</td><td className="align-top pt-1">:</td><td className="pt-1">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx].jabatan : "............................................"}</td></tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
 
-                                                                <div className="flex">
-                                                                    <span className="w-40 font-semibold">3. Pemberi Tugas</span>
-                                                                    <span className="w-4 text-center">:</span>
-                                                                    <span className="flex-1 font-bold uppercase">{pemberiTugas || "-"}</span>
-                                                                </div>
-
-                                                                <div className="flex">
-                                                                    <span className="w-40 font-semibold">4. Penanggung Jawab</span>
-                                                                    <span className="w-4 text-center">:</span>
-                                                                    <span className="flex-1 font-bold">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"} <span className="font-normal italic">({selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.jabatan : "-"})</span></span>
-                                                                </div>
-
-                                                                <div className="flex">
-                                                                    <span className="w-40 font-semibold">5. Waktu Pelaksanaan</span>
-                                                                    <span className="w-4 text-center">:</span>
-                                                                    <span className="flex-1 font-semibold">
-                                                                        {startDate ? new Date(startDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : "-"} <span className="font-normal mx-1">s/d</span> {endDate ? new Date(endDate).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) : "-"}
-                                                                    </span>
-                                                                </div>
-
-                                                                {endDate && startDate && (
-                                                                    <div className="flex mt-1">
-                                                                        <span className="w-40 font-semibold"></span>
-                                                                        <span className="w-4 text-center"></span>
-                                                                        <span className="flex-1 text-[11px] font-bold text-slate-900 italic bg-slate-100 px-2 py-1 rounded inline-block w-fit">Durasi: {durasiHari} Hari Aktif Kerja</span>
-                                                                    </div>
-                                                                )}
+                                                        <div className="space-y-4">
+                                                            {/* SECTION A: DATA PEKERJAAN */}
+                                                            <div>
+                                                                <p className="font-bold border-b-2 border-slate-800 pb-1 mb-3 uppercase tracking-wider text-sm">A. Data Pekerjaan</p>
+                                                                <table className="w-full mb-3 text-[11pt]">
+                                                                    <tbody>
+                                                                        <tr><td className="w-40 py-1">Proyek / Lokasi</td><td>: <strong>{selectedProyekIdx !== "" ? DAFTAR_PROYEK[selectedProyekIdx].nama : "............................................"}</strong></td></tr>
+                                                                        <tr><td className="py-1">Waktu Pelaksanaan</td><td>: {startDate ? formatDateIndo(startDate) : "............."} <strong>s/d</strong> {endDate ? formatDateIndo(endDate) : "............."}</td></tr>
+                                                                    </tbody>
+                                                                </table>
                                                             </div>
-                                                        </div>
 
-                                                        {/* SECTION B: RUANG LINGKUP PEKERJAAN (Mencegah pecah di tengah halaman) */}
-                                                        <div className="space-y-2.5 print-avoid-break">
-                                                            <h4 className="text-xs font-bold text-slate-900 border-b-2 border-slate-800 pb-1 uppercase tracking-wide">B. Ruang Lingkup Pekerjaan</h4>
-                                                            
-                                                            {ruangLingkup.length === 0 ? (
-                                                                <div className="p-4 border border-dashed border-slate-300 rounded text-[11px] text-slate-500 italic text-center">
-                                                                    [ Data ruang lingkup belum diisi ]
-                                                                </div>
-                                                            ) : (
-                                                                <div className="overflow-hidden border border-slate-950">
-                                                                    <table className="w-full text-left text-[11px] border-collapse">
+                                                            {/* SECTION B: RUANG LINGKUP PEKERJAAN */}
+                                                            <div className="print-avoid-break mt-4">
+                                                                <p className="font-bold border-b-2 border-slate-800 pb-1 mb-3 uppercase tracking-wider text-sm">B. Ruang Lingkup Pekerjaan</p>
+                                                                {ruangLingkup.length > 0 ? (
+                                                                    <table className="w-full border-collapse border border-slate-900 text-[10pt]">
                                                                         <thead>
-                                                                            <tr className="bg-slate-100 border-b border-slate-950 text-slate-955 font-bold">
-                                                                                <th className="py-2 px-3 border-r border-slate-955 w-12 text-center">No.</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-955">Uraian Jenis Pekerjaan</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-955 w-24 text-center">Volume</th>
-                                                                                <th className="py-2 px-3 w-24 text-center">Satuan</th>
+                                                                            <tr className="bg-slate-100">
+                                                                                <th className="border border-slate-900 p-1.5 w-10 text-center">No</th>
+                                                                                <th className="border border-slate-900 p-1.5 text-left">Uraian Jenis Pekerjaan</th>
+                                                                                <th className="border border-slate-900 p-1.5 w-16 text-center">Vol</th>
+                                                                                <th className="border border-slate-900 p-1.5 w-16 text-center">Sat</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
                                                                             {ruangLingkup.map((item, parentIdx) => (
                                                                                 <React.Fragment key={item.id}>
-                                                                                    <tr className="border-b border-slate-950 font-bold bg-slate-50">
-                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-center font-mono">{parentIdx + 1}</td>
-                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-slate-955 uppercase">{item.uraian || `Pekerjaan Utama ${parentIdx+1}`}</td>
-                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-center">{item.volume || "-"}</td>
-                                                                                        <td className="py-1.5 px-3 text-center">{item.satuan || "-"}</td>
+                                                                                    <tr className="bg-slate-50 font-bold">
+                                                                                        <td className="border border-slate-900 p-1.5 text-center">{parentIdx + 1}</td>
+                                                                                        <td className="border border-slate-900 p-1.5 uppercase">{item.uraian}</td>
+                                                                                        <td className="border border-slate-900 p-1.5 text-center">{item.volume}</td>
+                                                                                        <td className="border border-slate-900 p-1.5 text-center">{item.satuan}</td>
                                                                                     </tr>
-                                                                                    
                                                                                     {item.subs && item.subs.map((sub, subIdx) => (
-                                                                                        <tr key={sub.id} className="border-b border-slate-300 text-slate-800 bg-white">
-                                                                                            <td className="py-1.5 px-3 border-r border-slate-955 text-right text-[10px] font-mono pr-4">{parentIdx + 1}.{subIdx + 1}</td>
-                                                                                            <td className="py-1.5 px-6 border-r border-slate-955">- {sub.uraian || `Sub Pekerjaan ${subIdx+1}`}</td>
-                                                                                            <td className="py-1.5 px-3 border-r border-slate-955 text-center font-medium">{sub.volume || "-"}</td>
-                                                                                            <td className="py-1.5 px-3 text-center font-medium">{sub.satuan || "-"}</td>
+                                                                                        <tr key={sub.id}>
+                                                                                            <td className="border border-slate-900 p-1.5 text-right text-[9pt] pr-2">{parentIdx + 1}.{subIdx + 1}</td>
+                                                                                            <td className="border border-slate-900 p-1.5">- {sub.uraian}</td>
+                                                                                            <td className="border border-slate-900 p-1.5 text-center">{sub.volume}</td>
+                                                                                            <td className="border border-slate-900 p-1.5 text-center">{sub.satuan}</td>
                                                                                         </tr>
                                                                                     ))}
                                                                                 </React.Fragment>
                                                                             ))}
                                                                         </tbody>
                                                                     </table>
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                                                ) : (
+                                                                    <div className="py-2 text-slate-400 italic text-sm">-- Ruang lingkup belum diisi --</div>
+                                                                )}
+                                                            </div>
 
-                                                        {/* SECTION C: BIAYA MATERIAL (Mencegah pecah di tengah halaman) */}
-                                                        <div className="space-y-2.5 print-avoid-break">
-                                                            <h4 className="text-xs font-bold text-slate-900 border-b-2 border-slate-800 pb-1 uppercase tracking-wide">C. Anggaran Biaya Material</h4>
-                                                            
-                                                            {materials.length === 0 ? (
-                                                                <div className="p-4 border border-dashed border-slate-300 rounded text-[11px] text-slate-500 italic text-center">
-                                                                    [ Data material belum diisi ]
-                                                                </div>
-                                                            ) : (
-                                                                <div className="overflow-hidden border border-slate-950">
-                                                                    <table className="w-full text-left text-[11px] border-collapse bg-white">
+                                                            {/* SECTION C: KEBUTUHAN MATERIAL */}
+                                                            <div className="print-avoid-break mt-4">
+                                                                <p className="font-bold border-b-2 border-slate-800 pb-1 mb-3 uppercase tracking-wider text-sm">C. Kebutuhan Material</p>
+                                                                {materials.length > 0 ? (
+                                                                    <table className="w-full border-collapse border border-slate-900 text-[10pt]">
                                                                         <thead>
-                                                                            <tr className="bg-slate-100 border-b border-slate-950 text-slate-955 font-bold">
-                                                                                <th className="py-2 px-3 border-r border-slate-955 w-12 text-center">No.</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-955">Nama/Jenis Material</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-955 w-16 text-center">Qty</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-955 w-16 text-center">Sat</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-955 w-28 text-right">Harga Sat (Rp)</th>
-                                                                                <th className="py-2 px-3 w-28 text-right">Jumlah (Rp)</th>
+                                                                            <tr className="bg-slate-100">
+                                                                                <th className="border border-slate-900 p-1.5 w-10 text-center">No</th>
+                                                                                <th className="border border-slate-900 p-1.5 text-left">Nama Material</th>
+                                                                                <th className="border border-slate-900 p-1.5 w-16 text-center">Qty</th>
+                                                                                <th className="border border-slate-900 p-1.5 w-16 text-center">Sat</th>
+                                                                                <th className="border border-slate-900 p-1.5 w-28 text-right">Harga (Rp)</th>
+                                                                                <th className="border border-slate-900 p-1.5 w-32 text-right">Jumlah (Rp)</th>
                                                                             </tr>
                                                                         </thead>
                                                                         <tbody>
-                                                                            {materials.map((mat, idx) => (
-                                                                                <tr key={mat.id} className="border-b border-slate-300 text-slate-900">
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center font-mono">{idx + 1}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 font-medium">{mat.nama || `Material #${idx+1}`}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center">{mat.qty || "-"}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center">{mat.satuan || "-"}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-right font-mono">{(Number(mat.harga)||0).toLocaleString('id-ID')}</td>
-                                                                                    <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(mat.qty)||0) * (Number(mat.harga)||0)).toLocaleString('id-ID')}</td>
+                                                                            {materials.map((m, i) => (
+                                                                                <tr key={m.id}>
+                                                                                    <td className="border border-slate-900 p-1.5 text-center">{i + 1}</td>
+                                                                                    <td className="border border-slate-900 p-1.5">{m.nama}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-center">{m.qty}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-center">{m.satuan}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-right">{formatRupiah(m.harga).replace('Rp', '')}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-right">{formatRupiah(m.qty * m.harga).replace('Rp', '')}</td>
                                                                                 </tr>
                                                                             ))}
-                                                                            <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-950">
-                                                                                <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-955 uppercase text-[10px]">Sub-Total Biaya Material:</td>
-                                                                                <td className="py-2 px-3 text-right font-mono text-xs">{(totalMaterial).toLocaleString('id-ID')}</td>
-                                                                            </tr>
-                                                                        </tbody>
-                                                                    </table>
-                                                                </div>
-                                                            )}
-                                                        </div>
-
-                                                        {/* SECTION D: BIAYA TENAGA KERJA (Mencegah pecah di tengah halaman) */}
-                                                        <div className="space-y-2.5 print-avoid-break">
-                                                            <h4 className="text-xs font-bold text-slate-900 border-b-2 border-slate-800 pb-1 uppercase tracking-wide">
-                                                                D. Anggaran Biaya Tenaga Kerja <span className="font-normal italic capitalize">({laborType})</span>
-                                                            </h4>
-                                                            
-                                                            <div className="overflow-hidden border border-slate-950">
-                                                                {laborType === 'harian' ? (
-                                                                    <table className="w-full text-left text-[11px] border-collapse bg-white">
-                                                                        <thead>
-                                                                            <tr className="bg-slate-100 border-b border-slate-950 text-slate-955 font-bold">
-                                                                                <th className="py-2 px-3 border-r border-slate-955 w-12 text-center">No.</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-955">Golongan Tenaga Kerja</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-955 w-24 text-center">Satuan</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-955 w-24 text-center">Vol (Hari)</th>
-                                                                                <th className="py-2 px-3 border-r border-slate-955 w-28 text-right">Harga Sat (Rp)</th>
-                                                                                <th className="py-2 px-3 w-28 text-right">Jumlah (Rp)</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            {laborHarian.map((lab, idx) => (
-                                                                                <tr key={lab.id} className="border-b border-slate-300 text-slate-900">
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center font-mono">{idx + 1}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 font-medium">{lab.tenaga || `Tenaga #${idx+1}`}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center">{lab.satuan}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-center">{lab.volume || "-"}</td>
-                                                                                    <td className="py-1.5 px-3 border-r border-slate-955 text-right font-mono">{(Number(lab.harga)||0).toLocaleString('id-ID')}</td>
-                                                                                    <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}</td>
-                                                                                </tr>
-                                                                            ))}
-                                                                            <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-950">
-                                                                                <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-955 uppercase text-[10px]">Sub-Total Biaya Tenaga Kerja:</td>
-                                                                                <td className="py-2 px-3 text-right font-mono text-xs">{(totalLabor).toLocaleString('id-ID')}</td>
+                                                                            <tr>
+                                                                                <td colSpan="5" className="border border-slate-900 p-1.5 text-right font-bold bg-slate-50">SUBTOTAL MATERIAL</td>
+                                                                                <td className="border border-slate-900 p-1.5 text-right font-bold bg-slate-50">{formatRupiah(totalMaterial)}</td>
                                                                             </tr>
                                                                         </tbody>
                                                                     </table>
                                                                 ) : (
-                                                                    laborBorongan.length === 0 ? (
-                                                                        <div className="p-4 text-[11px] text-slate-500 italic text-center bg-slate-50">
-                                                                            [ Data tenaga borongan belum diisi ]
-                                                                        </div>
-                                                                    ) : (
-                                                                        <table className="w-full text-left text-[11px] border-collapse bg-white">
-                                                                            <thead>
-                                                                                <tr className="bg-slate-100 border-b border-slate-950 text-slate-955 font-bold">
-                                                                                    <th className="py-2 px-3 border-r border-slate-955 w-12 text-center">No.</th>
-                                                                                    <th className="py-2 px-3 border-r border-slate-955">Uraian Borongan</th>
-                                                                                    <th className="py-2 px-3 border-r border-slate-955 w-20 text-center">Vol</th>
-                                                                                    <th className="py-2 px-3 border-r border-slate-955 w-20 text-center">Sat</th>
-                                                                                    <th className="py-2 px-3 border-r border-slate-955 w-28 text-right">Harga Sat (Rp)</th>
-                                                                                    <th className="py-2 px-3 w-28 text-right">Jumlah (Rp)</th>
-                                                                                </tr>
-                                                                            </thead>
-                                                                            <tbody>
-                                                                                {laborBorongan.map((lab, idx) => (
-                                                                                    <tr key={lab.id} className="border-b border-slate-300 text-slate-900">
-                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-center font-mono">{idx + 1}</td>
-                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 font-medium">{lab.uraian || `Borongan #${idx+1}`}</td>
-                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-center">{lab.volume || "-"}</td>
-                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-center">{lab.satuan || "-"}</td>
-                                                                                        <td className="py-1.5 px-3 border-r border-slate-955 text-right font-mono">{(Number(lab.harga)||0).toLocaleString('id-ID')}</td>
-                                                                                        <td className="py-1.5 px-3 text-right font-mono font-bold">{((Number(lab.volume)||0) * (Number(lab.harga)||0)).toLocaleString('id-ID')}</td>
-                                                                                    </tr>
-                                                                                ))}
-                                                                                <tr className="bg-slate-200 font-bold border-t-2 border-slate-950 text-slate-950">
-                                                                                    <td colSpan="5" className="py-2 px-3 text-right border-r border-slate-955 uppercase text-[10px]">Sub-Total Biaya Tenaga Kerja:</td>
-                                                                                    <td className="py-2 px-3 text-right font-mono text-xs">{(totalLabor).toLocaleString('id-ID')}</td>
-                                                                                </tr>
-                                                                            </tbody>
-                                                                        </table>
-                                                                    )
+                                                                    <div className="py-2 text-slate-400 italic text-sm">-- Material belum diisi --</div>
                                                                 )}
                                                             </div>
-                                                        </div>
 
-                                                        {/* GRAND TOTAL */}
-                                                        <div className="bg-slate-100 p-4 border-2 border-slate-950 mt-4 flex flex-row items-center justify-between print-avoid-break">
-                                                            <div className="uppercase">
-                                                                <h3 className="text-sm font-black text-slate-950 tracking-wider">Total Anggaran SPK</h3>
-                                                                <p className="text-[10px] text-slate-700 font-bold mt-0.5">(Material + Tenaga Kerja)</p>
+                                                            {/* SECTION D: TENAGA KERJA */}
+                                                            <div className="print-avoid-break mt-4">
+                                                                <p className="font-bold border-b-2 border-slate-800 pb-1 mb-3 uppercase tracking-wider text-sm flex justify-between">
+                                                                    <span>D. Tenaga Kerja</span>
+                                                                    <span className="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-mono">Sistem: {laborType.toUpperCase()}</span>
+                                                                </p>
+                                                                {(laborType === 'harian' && laborHarian.length > 0) || (laborType === 'borongan' && laborBorongan.length > 0) ? (
+                                                                    <table className="w-full border-collapse border border-slate-900 text-[10pt]">
+                                                                        <thead>
+                                                                            <tr className="bg-slate-100">
+                                                                                <th className="border border-slate-900 p-1.5 w-10 text-center">No</th>
+                                                                                <th className="border border-slate-900 p-1.5 text-left">{laborType === 'harian' ? 'Tenaga Kerja' : 'Uraian Pekerjaan'}</th>
+                                                                                <th className="border border-slate-900 p-1.5 w-16 text-center">Vol</th>
+                                                                                <th className="border border-slate-900 p-1.5 w-20 text-center">Sat</th>
+                                                                                <th className="border border-slate-900 p-1.5 w-28 text-right">Harga (Rp)</th>
+                                                                                <th className="border border-slate-900 p-1.5 w-32 text-right">Jumlah (Rp)</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            {laborType === 'harian' ? laborHarian.map((l, i) => (
+                                                                                <tr key={l.id}>
+                                                                                    <td className="border border-slate-900 p-1.5 text-center">{i + 1}</td>
+                                                                                    <td className="border border-slate-900 p-1.5">{l.tenaga}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-center">{l.volume}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-center">{l.satuan}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-right">{formatRupiah(l.harga).replace('Rp', '')}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-right">{formatRupiah(l.volume * l.harga).replace('Rp', '')}</td>
+                                                                                </tr>
+                                                                            )) : laborBorongan.map((l, i) => (
+                                                                                <tr key={l.id}>
+                                                                                    <td className="border border-slate-900 p-1.5 text-center">{i + 1}</td>
+                                                                                    <td className="border border-slate-900 p-1.5">{l.uraian}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-center">{l.volume}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-center">{l.satuan}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-right">{formatRupiah(l.harga).replace('Rp', '')}</td>
+                                                                                    <td className="border border-slate-900 p-1.5 text-right">{formatRupiah(l.volume * l.harga).replace('Rp', '')}</td>
+                                                                                </tr>
+                                                                            ))}
+                                                                            <tr>
+                                                                                <td colSpan="5" className="border border-slate-900 p-1.5 text-right font-bold bg-slate-50">SUBTOTAL TENAGA KERJA</td>
+                                                                                <td className="border border-slate-900 p-1.5 text-right font-bold bg-slate-50">{formatRupiah(totalLabor)}</td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                ) : (
+                                                                    <div className="py-2 text-slate-400 italic text-sm">-- Tenaga kerja belum diisi --</div>
+                                                                )}
                                                             </div>
-                                                            <div className="text-right">
-                                                                <span className="text-lg font-black font-mono tracking-tight text-slate-955">
-                                                                    Rp {grandTotal.toLocaleString('id-ID')}
-                                                                </span>
-                                                            </div>
-                                                        </div>
 
-                                                        {/* SECTION E: PENGESAHAN & PENANDATANGANAN */}
-                                                        <div className="space-y-2.5 print-avoid-break mt-6">
-                                                            <h4 className="text-xs font-bold text-slate-900 border-b-2 border-slate-800 pb-1 uppercase tracking-wide">
-                                                                E. Pengesahan & Penandatanganan
-                                                            </h4>
-                                                            
-                                                            <div className="pt-4 pb-6">
-                                                                <div className="grid grid-cols-2 md:grid-cols-4 print:grid-cols-4 print-cols-4 gap-4 text-[11px] text-center">
+                                                            {/* SECTION E: TOTAL BIAYA KESELURUHAN */}
+                                                            <div className="print-avoid-break mt-6">
+                                                                <table className="w-full border-collapse border-2 border-slate-900 text-[11pt]">
+                                                                    <tbody>
+                                                                        <tr>
+                                                                            <td className="border-2 border-slate-900 p-2 font-black uppercase w-2/3">E. TOTAL BIAYA KESELURUHAN (C + D)</td>
+                                                                            <td className="border-2 border-slate-900 p-2 text-right font-black text-[13pt] bg-slate-100">{formatRupiah(grandTotal)}</td>
+                                                                        </tr>
+                                                                        <tr>
+                                                                            <td colSpan="2" className="border-2 border-slate-900 p-2 italic bg-slate-50">Terbilang: <span className="font-semibold capitalize">{formatTerbilangRupiah(grandTotal)}</span></td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+
+                                                            {/* TTD Section SPK Umum (Baru - 4 Penandatangan Sejajar) */}
+                                                            <div className="mt-8 text-[11pt] text-slate-900 print-avoid-break">
+                                                                <p className="mb-4">Demikian Surat Perintah Kerja ini dibuat untuk dilaksanakan dengan penuh tanggung jawab.</p>
+                                                                
+                                                                <div className="grid grid-cols-4 gap-4 text-center mt-10 max-w-full mx-auto print-cols-4 text-[10pt] items-end h-32">
                                                                     
-                                                                    {/* 1. Pemberi Tugas */}
-                                                                    <div className="flex flex-col justify-between h-[140px] p-2 relative">
-                                                                        <span className="font-bold text-slate-900 uppercase tracking-tight">Pemberi Tugas</span>
-                                                                        <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan & Stempel</div>
-                                                                        <div>
-                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{pemberiTugas}</span>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {/* 2. Keuangan */}
-                                                                    <div className="flex flex-col justify-between h-[140px] p-2 relative">
-                                                                        <span className="font-bold text-slate-900 uppercase tracking-tight">Mengetahui</span>
-                                                                        <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
-                                                                        <div>
-                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{keuanganName}</span>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {/* 3. Penanggung Jawab (Dengan Upload TTD in-place) */}
-                                                                    <div className="flex flex-col justify-between h-[140px] p-2 relative group">
-                                                                        <span className="font-bold text-slate-900 uppercase tracking-tight">Penerima Tugas</span>
-                                                                        
+                                                                    {/* 1. Penerima Tugas */}
+                                                                    <div className="flex flex-col justify-between h-[130px] relative group">
+                                                                        <span className="font-bold mb-auto mt-0">Penerima Tugas,</span>
                                                                         {pjSignatureImage ? (
-                                                                            <div className="my-auto flex items-center justify-center h-20 w-full overflow-hidden absolute inset-0 top-1/2 -translate-y-1/2 z-0">
+                                                                            <div className="flex items-center justify-center h-20 w-full overflow-hidden absolute inset-0 top-1/2 -translate-y-1/2 z-0">
                                                                                 <img 
                                                                                     src={pjSignatureImage} 
                                                                                     alt="Tanda Tangan" 
                                                                                     className="signature-img max-h-full object-contain mix-blend-multiply opacity-90" 
                                                                                 />
-                                                                                {/* Overlay Ubah TTD (Sembunyi saat Print) */}
                                                                                 <label className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded">
                                                                                     <i data-lucide="upload-cloud" className="w-4 h-4 text-blue-600 mb-1"></i>
                                                                                     <span className="text-[9px] font-bold text-blue-700">Ubah TTD</span>
@@ -2633,55 +2510,58 @@
                                                                                 </label>
                                                                             </div>
                                                                         ) : (
-                                                                            <div className="my-auto relative z-10 w-full flex justify-center">
-                                                                                {/* Tombol Upload (Sembunyi saat Print) */}
-                                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-24 h-12 border border-dashed border-blue-400 hover:border-blue-600 dark:border-indigo-500 rounded bg-blue-50 dark:bg-indigo-900/30 hover:bg-blue-100 dark:hover:bg-indigo-800/40 transition-colors">
-                                                                                    <i data-lucide="upload" className="w-3.5 h-3.5 text-blue-500 dark:text-indigo-400 mb-0.5"></i>
-                                                                                    <span className="text-[8px] text-blue-600 dark:text-indigo-300 font-bold text-center leading-tight">Upload TTD Digital</span>
+                                                                            <div className="relative z-10 w-full flex justify-center my-auto">
+                                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-24 h-12 border border-dashed border-blue-400 hover:border-blue-600 rounded bg-blue-50 hover:bg-blue-100 transition-colors">
+                                                                                    <i data-lucide="upload" className="w-3.5 h-3.5 text-blue-500 mb-0.5"></i>
+                                                                                    <span className="text-[8px] text-blue-600 font-bold text-center leading-tight">Upload TTD</span>
                                                                                     <input type="file" accept="image/*" className="hidden" onChange={handlePjSignatureUpload} />
                                                                                 </label>
-                                                                                {/* Teks Dummy Tanda Tangan (Hanya Tampil di Print jika TTD kosong) */}
-                                                                                <div className="hidden print:block text-[10px] text-slate-400 italic">Tanda Tangan</div>
+                                                                                <div className="hidden print:block text-[10px] text-slate-400 italic py-4">Tanda Tangan</div>
                                                                             </div>
                                                                         )}
-                                                                        
-                                                                        <div className="relative z-10">
-                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx]?.nama : "-"}</span>
+                                                                        <div className="relative z-10 mt-auto">
+                                                                            <span className="font-bold underline underline-offset-2 whitespace-nowrap block">{selectedPjIdx !== "" ? DAFTAR_PENANGGUNGJAWAB[selectedPjIdx].nama : "( ........................ )"}</span>
                                                                         </div>
                                                                     </div>
 
-                                                                    {/* 4. Kepala Kantor */}
-                                                                    <div className="flex flex-col justify-between h-[140px] p-2 relative">
-                                                                        <span className="font-bold text-slate-900 uppercase tracking-tight">Menyetujui</span>
-                                                                        <div className="my-auto text-[10px] text-slate-400 italic print:text-transparent">Tanda Tangan</div>
-                                                                        <div>
-                                                                            <span className="font-black underline underline-offset-2 text-slate-955 block">{kepalaKantorName}</span>
-                                                                        </div>
+                                                                    {/* 2. Pemberi Tugas */}
+                                                                    <div className="flex flex-col justify-between h-[130px] relative">
+                                                                        <p className="font-bold mb-auto mt-0">Pemberi Tugas,</p>
+                                                                        <div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">{pemberiTugas || "Farizal Zainur Rozikin"}</p>
+                                                                    </div>
+                                                                    
+                                                                    {/* 3. Mengetahui */}
+                                                                    <div className="flex flex-col justify-between h-[130px] relative">
+                                                                        <p className="font-bold mb-auto mt-0">Mengetahui,</p>
+                                                                        <div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">{keuanganName || "Sita Dita Cahyani"}</p>
+                                                                    </div>
+
+                                                                    {/* 4. Menyetujui */}
+                                                                    <div className="flex flex-col justify-between h-[130px] relative">
+                                                                        <p className="font-bold mb-auto mt-0">Menyetujui,</p>
+                                                                        <div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">{kepalaKantorName || "Fika Faradila Cahyanti"}</p>
                                                                     </div>
 
                                                                 </div>
                                                             </div>
-                                                        </div>
 
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>
                                         </tbody>
                                     </table>
-
                                 </div>
                             </div>
                         </main>
                     </div>
-
-                    <footer className="text-center text-xs text-slate-500 dark:text-slate-400 mt-16 print:hidden font-medium">
-                        <p>© 2026 PT Bangun Cinta Alam. All Rights Reserved.</p>
-                    </footer>
                 </div>
             );
         }
 
-        // Inisialisasi React & Rendering
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
     </script>
