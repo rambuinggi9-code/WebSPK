@@ -267,6 +267,24 @@
             pjSignatureImage: null
         };
 
+        // Peta Batas Nomor per Blok
+        const BLOK_MAPPING = {
+            A: 33, B: 12, C: 23, D: 7, E: 17, F: 20, G: 19, H: 26, I: 54, J: 55,
+            K: 32, L: 55, M: 72, N: 16, O: 18, P: 17, Q: 20, R: 18, S: 10
+        };
+
+        // Generator Nomor Blok dengan pengecualian (4->3A, 13->12A)
+        const generateNomorOptions = (huruf) => {
+            const max = BLOK_MAPPING[huruf] || 0;
+            const options = [];
+            for (let i = 1; i <= max; i++) {
+                if (i === 4) options.push("3A");
+                else if (i === 13) options.push("12A");
+                else options.push(i.toString());
+            }
+            return options;
+        };
+
         function App() {
             // Main Routing State
             const [activeView, setActiveView] = useState('home'); // 'home', 'spk_umum', 'spk_tipe30'
@@ -322,6 +340,7 @@
             const [t30NamaPemborong, setT30NamaPemborong] = useState("");
             const [t30HpPemborong, setT30HpPemborong] = useState("");
             const [t30AlamatPemborong, setT30AlamatPemborong] = useState("");
+            const [t30DetailPekerjaanOpsional, setT30DetailPekerjaanOpsional] = useState("");
             const [t30LokasiPekerjaanDetail, setT30LokasiPekerjaanDetail] = useState("Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)");
             const [t30NilaiBorongan, setT30NilaiBorongan] = useState("");
             const [t30NilaiBoronganTerbilang, setT30NilaiBoronganTerbilang] = useState("");
@@ -331,12 +350,16 @@
             const [t30DendaKeterlambatan, setT30DendaKeterlambatan] = useState("");
             const [t30DendaKeterlambatanTerbilang, setT30DendaKeterlambatanTerbilang] = useState("");
             const [t30JamGudangPagiMulai, setT30JamGudangPagiMulai] = useState("07.30");
-            const [t30JamGudangPagiSelesai, setT30JamGudangPagiSelesai] = useState("08.00");
+            const [t30JamGudangPagiSelesai, setT30JamGudangPagiSelesai] = useState("08.30");
             const [t30JamGudangSiangMulai, setT30JamGudangSiangMulai] = useState("12.30");
-            const [t30JamGudangSiangSelesai, setT30JamGudangSiangSelesai] = useState("13.00");
+            const [t30JamGudangSiangSelesai, setT30JamGudangSiangSelesai] = useState("13.30");
             const [t30TempatDitetapkan, setT30TempatDitetapkan] = useState("Malang");
             const [t30TanggalDitetapkan, setT30TanggalDitetapkan] = useState("");
             const [t30LampiranImage, setT30LampiranImage] = useState(null); // Lampiran Image State
+
+            // State Pilihan Dropdown Blok
+            const [t30BlokHuruf, setT30BlokHuruf] = useState("F");
+            const [t30BlokNomor, setT30BlokNomor] = useState("2");
 
             // Kop Tipe 30
             const [t30InstansiName, setT30InstansiName] = useState("PT. BANGUN CINTA ALAM");
@@ -409,6 +432,14 @@
                 }
             }, [t30NilaiBorongan]);
 
+            // Update String Detail Lokasi Pekerjaan saat Blok & Nomor Berubah
+            useEffect(() => {
+                let baseText = `Proyek Lembah Bunder Regency Blok ${t30BlokHuruf}-${t30BlokNomor} (Tipe 30)`;
+                if (t30DetailPekerjaanOpsional.trim() !== "") {
+                    baseText += ` - ${t30DetailPekerjaanOpsional}`;
+                }
+                setT30LokasiPekerjaanDetail(baseText);
+            }, [t30BlokHuruf, t30BlokNomor, t30DetailPekerjaanOpsional]);
 
             // Generate Nomor SPK secara otomatis (Hanya untuk UMUM)
             useEffect(() => {
@@ -733,7 +764,10 @@
                 setT30NamaPemborong("");
                 setT30HpPemborong("");
                 setT30AlamatPemborong("");
+                setT30DetailPekerjaanOpsional("");
                 setT30LokasiPekerjaanDetail("Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)");
+                setT30BlokHuruf("F");
+                setT30BlokNomor("2");
                 setT30NilaiBorongan("");
                 setT30NilaiBoronganTerbilang("");
                 setT30WaktuPelaksanaan("30");
@@ -742,9 +776,9 @@
                 setT30DendaKeterlambatan("");
                 setT30DendaKeterlambatanTerbilang("");
                 setT30JamGudangPagiMulai("07.30");
-                setT30JamGudangPagiSelesai("08.00");
+                setT30JamGudangPagiSelesai("08.30");
                 setT30JamGudangSiangMulai("12.30");
-                setT30JamGudangSiangSelesai("13.00");
+                setT30JamGudangSiangSelesai("13.30");
                 setT30TempatDitetapkan("Malang");
                 setT30TanggalDitetapkan("");
                 setT30LampiranImage(null);
@@ -781,7 +815,10 @@
                     t30NamaPemborong,
                     t30HpPemborong,
                     t30AlamatPemborong,
+                    t30DetailPekerjaanOpsional,
                     t30LokasiPekerjaanDetail,
+                    t30BlokHuruf,
+                    t30BlokNomor,
                     t30NilaiBorongan,
                     t30NilaiBoronganTerbilang,
                     t30WaktuPelaksanaan,
@@ -822,7 +859,10 @@
                     setT30NamaPemborong(target.t30NamaPemborong || "");
                     setT30HpPemborong(target.t30HpPemborong || "");
                     setT30AlamatPemborong(target.t30AlamatPemborong || "");
-                    setT30LokasiPekerjaanDetail(target.t30LokasiPekerjaanDetail || "");
+                    setT30DetailPekerjaanOpsional(target.t30DetailPekerjaanOpsional || "");
+                    setT30LokasiPekerjaanDetail(target.t30LokasiPekerjaanDetail || "Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)");
+                    setT30BlokHuruf(target.t30BlokHuruf || "F");
+                    setT30BlokNomor(target.t30BlokNomor || "2");
                     setT30NilaiBorongan(target.t30NilaiBorongan || "");
                     setT30NilaiBoronganTerbilang(target.t30NilaiBoronganTerbilang || "");
                     setT30WaktuPelaksanaan(target.t30WaktuPelaksanaan || "");
@@ -830,10 +870,10 @@
                     setT30TotalWaktuPelaksanaan(target.t30TotalWaktuPelaksanaan || "");
                     setT30DendaKeterlambatan(target.t30DendaKeterlambatan || "");
                     setT30DendaKeterlambatanTerbilang(target.t30DendaKeterlambatanTerbilang || "");
-                    setT30JamGudangPagiMulai(target.t30JamGudangPagiMulai || "");
-                    setT30JamGudangPagiSelesai(target.t30JamGudangPagiSelesai || "");
-                    setT30JamGudangSiangMulai(target.t30JamGudangSiangMulai || "");
-                    setT30JamGudangSiangSelesai(target.t30JamGudangSiangSelesai || "");
+                    setT30JamGudangPagiMulai(target.t30JamGudangPagiMulai || "07.30");
+                    setT30JamGudangPagiSelesai(target.t30JamGudangPagiSelesai || "08.30");
+                    setT30JamGudangSiangMulai(target.t30JamGudangSiangMulai || "12.30");
+                    setT30JamGudangSiangSelesai(target.t30JamGudangSiangSelesai || "13.30");
                     setT30TempatDitetapkan(target.t30TempatDitetapkan || "");
                     setT30TanggalDitetapkan(target.t30TanggalDitetapkan || "");
                     setT30LampiranImage(target.t30LampiranImage || null);
@@ -1158,9 +1198,53 @@
                                             <input type="text" value={t30AlamatPemborong} onChange={(e) => setT30AlamatPemborong(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Alamat Lengkap"/>
                                         </div>
 
-                                        <div>
-                                            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Detail Lokasi Pekerjaan</label>
-                                            <input type="text" value={t30LokasiPekerjaanDetail} onChange={(e) => setT30LokasiPekerjaanDetail(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Contoh: Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)"/>
+                                        <div className="md:col-span-2 border border-slate-200 dark:border-slate-800 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50">
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Detail Lokasi Pekerjaan (Pilih Blok & Nomor)</label>
+                                            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                                <div className="relative col-span-12 md:col-span-3">
+                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Blok Huruf</label>
+                                                    <select 
+                                                        value={t30BlokHuruf} 
+                                                        onChange={(e) => {
+                                                            setT30BlokHuruf(e.target.value);
+                                                            setT30BlokNomor("1"); // Reset nomor ke 1 setiap ganti huruf
+                                                        }}
+                                                        className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none appearance-none"
+                                                    >
+                                                        {Object.keys(BLOK_MAPPING).map(huruf => (
+                                                            <option key={huruf} value={huruf}>Blok {huruf}</option>
+                                                        ))}
+                                                    </select>
+                                                    <i data-lucide="chevron-down" className="absolute right-3.5 top-8 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                                                </div>
+                                                <div className="relative col-span-12 md:col-span-3">
+                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Nomor Unit</label>
+                                                    <select 
+                                                        value={t30BlokNomor} 
+                                                        onChange={(e) => setT30BlokNomor(e.target.value)}
+                                                        className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none appearance-none"
+                                                    >
+                                                        {generateNomorOptions(t30BlokHuruf).map(nomor => (
+                                                            <option key={nomor} value={nomor}>Nomor {nomor}</option>
+                                                        ))}
+                                                    </select>
+                                                    <i data-lucide="chevron-down" className="absolute right-3.5 top-8 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                                                </div>
+                                                <div className="col-span-12 md:col-span-6">
+                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Detail Opsional (jika bukan pekerjaan borongan unit full)</label>
+                                                    <input 
+                                                        type="text" 
+                                                        value={t30DetailPekerjaanOpsional} 
+                                                        onChange={(e) => setT30DetailPekerjaanOpsional(e.target.value)}
+                                                        className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" 
+                                                        placeholder="Contoh: Pekerjaan Pemasangan Keramik"
+                                                    />
+                                                </div>
+                                                <div className="col-span-12">
+                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Hasil Teks Pada SPK</label>
+                                                    <input type="text" value={t30LokasiPekerjaanDetail} readOnly className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-slate-600 dark:text-slate-400 shadow-inner outline-none cursor-not-allowed"/>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
@@ -1228,7 +1312,7 @@
                                                     <div className="flex items-center gap-2">
                                                         <input type="text" value={t30JamGudangPagiMulai} onChange={(e) => setT30JamGudangPagiMulai(e.target.value)} className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-center outline-none" placeholder="07.30"/>
                                                         <span>-</span>
-                                                        <input type="text" value={t30JamGudangPagiSelesai} onChange={(e) => setT30JamGudangPagiSelesai(e.target.value)} className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-center outline-none" placeholder="08.00"/>
+                                                        <input type="text" value={t30JamGudangPagiSelesai} onChange={(e) => setT30JamGudangPagiSelesai(e.target.value)} className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-center outline-none" placeholder="08.30"/>
                                                     </div>
                                                 </div>
                                                 <div className="space-y-2">
@@ -1236,7 +1320,7 @@
                                                     <div className="flex items-center gap-2">
                                                         <input type="text" value={t30JamGudangSiangMulai} onChange={(e) => setT30JamGudangSiangMulai(e.target.value)} className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-center outline-none" placeholder="12.30"/>
                                                         <span>-</span>
-                                                        <input type="text" value={t30JamGudangSiangSelesai} onChange={(e) => setT30JamGudangSiangSelesai(e.target.value)} className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-center outline-none" placeholder="13.00"/>
+                                                        <input type="text" value={t30JamGudangSiangSelesai} onChange={(e) => setT30JamGudangSiangSelesai(e.target.value)} className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm text-center outline-none" placeholder="13.30"/>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1391,7 +1475,7 @@
                                                                         Setelah Surat Perintah Kerja ini ditandatangani, tidak diperkenankan adanya penambahan bangunan atau perubahan pekerjaan, kecuali atas persetujuan tertulis dari Perusahaan.
                                                                     </li>
                                                                     <li className="pl-1 print-avoid-break">
-                                                                        Pengambilan material di gudang hanya dapat dilakukan pada pukul <strong>{t30JamGudangPagiMulai || "07.30"}–{t30JamGudangPagiSelesai || "08.00"} WIB</strong> dan <strong>{t30JamGudangSiangMulai || "12.30"}–{t30JamGudangSiangSelesai || "13.00"} WIB.</strong>
+                                                                        Pengambilan material di gudang hanya dapat dilakukan pada pukul <strong>{t30JamGudangPagiMulai || "07.30"}–{t30JamGudangPagiSelesai || "08.30"} WIB</strong> dan <strong>{t30JamGudangSiangMulai || "12.30"}–{t30JamGudangSiangSelesai || "13.30"} WIB.</strong>
                                                                     </li>
                                                                     <li className="pl-1 print-avoid-break">
                                                                         Apabila Pemborong melakukan penambahan, perubahan, atau pekerjaan di luar desain dan spesifikasi yang telah disetujui tanpa sepengetahuan dan persetujuan Perusahaan, maka Perusahaan berhak memutuskan hubungan kerja atau kontrak secara sepihak tanpa kewajiban memberikan kompensasi kepada Pemborong.
