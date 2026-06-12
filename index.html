@@ -202,21 +202,22 @@
         // Algoritma Terbilang Rupiah
         const terbilang = (angka) => {
             const a = ["", "satu", "dua", "tiga", "empat", "lima", "enam", "tujuh", "delapan", "sembilan", "sepuluh", "sebelas"];
-            if (angka === 0) return "nol";
             if (angka < 12) return a[angka];
             if (angka < 20) return a[angka - 10] + " belas";
-            if (angka < 100) return a[Math.floor(angka / 10)] + " puluh " + a[angka % 10];
+            if (angka < 100) return a[Math.floor(angka / 10)] + " puluh " + terbilang(angka % 10);
             if (angka < 200) return "seratus " + terbilang(angka - 100);
             if (angka < 1000) return a[Math.floor(angka / 100)] + " ratus " + terbilang(angka % 100);
             if (angka < 2000) return "seribu " + terbilang(angka - 1000);
             if (angka < 1000000) return terbilang(Math.floor(angka / 1000)) + " ribu " + terbilang(angka % 1000);
             if (angka < 1000000000) return terbilang(Math.floor(angka / 1000000)) + " juta " + terbilang(angka % 1000000);
             if (angka < 1000000000000) return terbilang(Math.floor(angka / 1000000000)) + " milyar " + terbilang(angka % 1000000000);
+            if (angka < 1000000000000000) return terbilang(Math.floor(angka / 1000000000000)) + " triliun " + terbilang(angka % 1000000000000);
             return "";
         };
 
         const formatTerbilangRupiah = (angka) => {
             if (!angka || isNaN(angka)) return "";
+            if (parseInt(angka) === 0) return "nol rupiah";
             let result = terbilang(parseInt(angka)).trim();
             result = result.replace(/\s+/g, ' '); // Hapus spasi ganda
             return result + " rupiah";
