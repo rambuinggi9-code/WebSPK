@@ -10,7 +10,7 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     
     <!-- Babel CDN untuk kompilasi JSX langsung di browser -->
-    <script src="https://unpkg.com/@babel/standalone@7.22.20/babel.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -231,6 +231,13 @@
             return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
         };
 
+        // Helper untuk mendapatkan tanggal hari ini dalam format YYYY-MM-DD sesuai zona waktu lokal
+        const getLocalDateString = () => {
+            const d = new Date();
+            d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+            return d.toISOString().split('T')[0];
+        };
+
         // Helper untuk mengubah angka waktu (hari) menjadi terbilang sederhana
         const terbilangAngka = (angka) => {
             const num = parseInt(angka);
@@ -355,12 +362,14 @@
             const [t30JamGudangSiangMulai, setT30JamGudangSiangMulai] = useState("12.30");
             const [t30JamGudangSiangSelesai, setT30JamGudangSiangSelesai] = useState("13.30");
             const [t30TempatDitetapkan, setT30TempatDitetapkan] = useState("Malang");
-            const [t30TanggalDitetapkan, setT30TanggalDitetapkan] = useState("");
+            const [t30TanggalDitetapkan, setT30TanggalDitetapkan] = useState(getLocalDateString());
             const [t30LampiranImage, setT30LampiranImage] = useState(null); // Lampiran Image State
+            const [t30PjSignatureImage, setT30PjSignatureImage] = useState(null); // TTD PJ Tipe 30
 
             // State Pilihan Dropdown Blok
             const [t30BlokHuruf, setT30BlokHuruf] = useState("F");
             const [t30BlokNomor, setT30BlokNomor] = useState("2");
+            const [t30MultiLokasi, setT30MultiLokasi] = useState([]);
 
             // Kop Tipe 30
             const [t30InstansiName, setT30InstansiName] = useState("PT. BANGUN CINTA ALAM");
@@ -435,12 +444,41 @@
 
             // Update String Detail Lokasi Pekerjaan saat Blok & Nomor Berubah
             useEffect(() => {
-                let baseText = `Proyek Lembah Bunder Regency Blok ${t30BlokHuruf}-${t30BlokNomor} (Tipe 30)`;
-                if (t30DetailPekerjaanOpsional.trim() !== "") {
-                    baseText += ` - ${t30DetailPekerjaanOpsional}`;
+                if (t30MultiLokasi && t30MultiLokasi.length > 0) {
+                    const unitStrings = t30MultiLokasi.map(loc => {
+                        let text = `Blok ${loc.huruf}-${loc.nomor} (Tipe 30)`;
+                        if (loc.detail && loc.detail.trim() !== "") {
+                            text += ` - ${loc.detail}`;
+                        }
+                        return text;
+                    });
+                    setT30LokasiPekerjaanDetail(`Proyek Lembah Bunder Regency ${unitStrings.join(", ")}`);
+                } else {
+                    let baseText = `Proyek Lembah Bunder Regency Blok ${t30BlokHuruf}-${t30BlokNomor} (Tipe 30)`;
+                    if (t30DetailPekerjaanOpsional.trim() !== "") {
+                        baseText += ` - ${t30DetailPekerjaanOpsional}`;
+                    }
+                    setT30LokasiPekerjaanDetail(baseText);
                 }
-                setT30LokasiPekerjaanDetail(baseText);
-            }, [t30BlokHuruf, t30BlokNomor, t30DetailPekerjaanOpsional]);
+            }, [t30MultiLokasi, t30BlokHuruf, t30BlokNomor, t30DetailPekerjaanOpsional]);
+
+            const handleAddT30Lokasi = () => {
+                const exists = t30MultiLokasi.find(l => l.huruf === t30BlokHuruf && l.nomor === t30BlokNomor);
+                if (!exists) {
+                    setT30MultiLokasi([...t30MultiLokasi, { 
+                        huruf: t30BlokHuruf, 
+                        nomor: t30BlokNomor, 
+                        detail: t30DetailPekerjaanOpsional 
+                    }]);
+                    setT30DetailPekerjaanOpsional(""); // Kosongkan input detail setelah ditambah
+                } else {
+                    showNotification(`Blok ${t30BlokHuruf}-${t30BlokNomor} sudah ditambahkan!`, "error");
+                }
+            };
+
+            const handleRemoveT30Lokasi = (index) => {
+                setT30MultiLokasi(t30MultiLokasi.filter((_, i) => i !== index));
+            };
 
             // Generate Nomor SPK secara otomatis (Hanya untuk UMUM)
             useEffect(() => {
@@ -769,6 +807,7 @@
                 setT30LokasiPekerjaanDetail("Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)");
                 setT30BlokHuruf("F");
                 setT30BlokNomor("2");
+                setT30MultiLokasi([]);
                 setT30NilaiBorongan("");
                 setT30NilaiBoronganTerbilang("");
                 setT30WaktuPelaksanaan("30");
@@ -781,8 +820,9 @@
                 setT30JamGudangSiangMulai("12.30");
                 setT30JamGudangSiangSelesai("13.30");
                 setT30TempatDitetapkan("Malang");
-                setT30TanggalDitetapkan("");
+                setT30TanggalDitetapkan(getLocalDateString());
                 setT30LampiranImage(null);
+                setT30PjSignatureImage(null);
 
                 setT30InstansiName("PT. BANGUN CINTA ALAM");
                 setT30InstansiAddress("Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com");
@@ -820,6 +860,7 @@
                     t30LokasiPekerjaanDetail,
                     t30BlokHuruf,
                     t30BlokNomor,
+                    t30MultiLokasi: t30MultiLokasi.length > 0 ? t30MultiLokasi : [{ huruf: t30BlokHuruf, nomor: t30BlokNomor, detail: t30DetailPekerjaanOpsional }],
                     t30NilaiBorongan,
                     t30NilaiBoronganTerbilang,
                     t30WaktuPelaksanaan,
@@ -833,6 +874,7 @@
                     t30JamGudangSiangSelesai,
                     t30TempatDitetapkan,
                     t30TanggalDitetapkan,
+                    t30PjSignatureImage,
                     t30InstansiName,
                     t30InstansiAddress,
                     t30LogoKiri,
@@ -864,6 +906,13 @@
                     setT30LokasiPekerjaanDetail(target.t30LokasiPekerjaanDetail || "Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)");
                     setT30BlokHuruf(target.t30BlokHuruf || "F");
                     setT30BlokNomor(target.t30BlokNomor || "2");
+                    
+                    if (target.t30MultiLokasi && target.t30MultiLokasi.length > 0) {
+                        setT30MultiLokasi(target.t30MultiLokasi);
+                    } else {
+                        setT30MultiLokasi([{ huruf: target.t30BlokHuruf || "F", nomor: target.t30BlokNomor || "2", detail: target.t30DetailPekerjaanOpsional || "" }]);
+                    }
+                    
                     setT30NilaiBorongan(target.t30NilaiBorongan || "");
                     setT30NilaiBoronganTerbilang(target.t30NilaiBoronganTerbilang || "");
                     setT30WaktuPelaksanaan(target.t30WaktuPelaksanaan || "");
@@ -876,8 +925,9 @@
                     setT30JamGudangSiangMulai(target.t30JamGudangSiangMulai || "12.30");
                     setT30JamGudangSiangSelesai(target.t30JamGudangSiangSelesai || "13.30");
                     setT30TempatDitetapkan(target.t30TempatDitetapkan || "");
-                    setT30TanggalDitetapkan(target.t30TanggalDitetapkan || "");
+                    setT30TanggalDitetapkan(target.t30TanggalDitetapkan || getLocalDateString());
                     setT30LampiranImage(target.t30LampiranImage || null);
+                    setT30PjSignatureImage(target.t30PjSignatureImage || null);
                     
                     setT30InstansiName(target.t30InstansiName || "PT. BANGUN CINTA ALAM");
                     setT30InstansiAddress(target.t30InstansiAddress || "Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com");
@@ -913,6 +963,27 @@
             const clearT30Logo = (target) => {
                 if (target === 'kiri') setT30LogoKiri(null);
                 if (target === 'kanan') setT30LogoKanan(null);
+            };
+
+            const handleT30PjSignatureUpload = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    if (!file.type.startsWith('image/')) {
+                        showNotification("Harap upload file gambar (PNG/JPG/SVG)!", "error");
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                        setT30PjSignatureImage(reader.result);
+                        showNotification("Tanda tangan digital PJ berhasil diunggah.");
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            const clearT30PjSignature = () => {
+                setT30PjSignatureImage(null);
+                showNotification("Tanda tangan digital PJ telah dihapus.", "info");
             };
 
             /* =========================================
@@ -1011,7 +1082,7 @@
                         
                         {/* NOTIFIKASI POPUP */}
                         {notification && (
-                            <div className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border transition-all animate-[slideInDown_0.3s_ease-out] ${
+                            <div className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border transition-all animate-[slideInDown_0.3s_ease-out] print:hidden ${
                                 notification.type === 'error' ? 'bg-red-50 dark:bg-red-950/90 text-red-700 dark:text-red-200 border-red-200 dark:border-red-500/50' : 
                                 notification.type === 'info' ? 'bg-blue-50 dark:bg-indigo-950/90 text-blue-700 dark:text-indigo-200 border-blue-200 dark:border-indigo-500/50' :
                                 'bg-teal-50 dark:bg-teal-950/90 text-teal-700 dark:text-teal-200 border-teal-200 dark:border-teal-500/50'
@@ -1175,7 +1246,7 @@
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal Pembuatan</label>
-                                                <input type="date" value={t30TanggalPembuatan} onChange={(e) => setT30TanggalPembuatan(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none custom-scrollbar"/>
+                                                <input type="date" value={t30TanggalPembuatan} onChange={(e) => setT30TanggalPembuatan(e.target.value)} className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none custom-scrollbar"/>
                                             </div>
                                             <div>
                                                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Hari Pembuatan (Otomatis)</label>
@@ -1186,11 +1257,11 @@
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                             <div>
                                                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Nama Pemborong</label>
-                                                <input type="text" value={t30NamaPemborong} onChange={(e) => setT30NamaPemborong(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Nama Lengkap Pemborong"/>
+                                                <input type="text" value={t30NamaPemborong} onChange={(e) => setT30NamaPemborong(e.target.value)} className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Nama Lengkap Pemborong"/>
                                             </div>
                                             <div>
                                                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">No. HP Pemborong</label>
-                                                <input type="text" value={t30HpPemborong} onChange={(e) => setT30HpPemborong(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Misal: 0812..."/>
+                                                <input type="text" value={t30HpPemborong} onChange={(e) => setT30HpPemborong(e.target.value)} className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" placeholder="Misal: 0812..."/>
                                             </div>
                                         </div>
                                         
@@ -1200,8 +1271,8 @@
                                         </div>
 
                                         <div className="md:col-span-2 border border-slate-200 dark:border-slate-800 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/50">
-                                            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Detail Lokasi Pekerjaan (Pilih Blok & Nomor)</label>
-                                            <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">Detail Lokasi Pekerjaan (Bisa Pilih Banyak Unit)</label>
+                                            <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
                                                 <div className="relative col-span-12 md:col-span-3">
                                                     <label className="block text-[10px] font-medium text-slate-500 mb-1">Blok Huruf</label>
                                                     <select 
@@ -1210,7 +1281,7 @@
                                                             setT30BlokHuruf(e.target.value);
                                                             setT30BlokNomor("1"); // Reset nomor ke 1 setiap ganti huruf
                                                         }}
-                                                        className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none appearance-none"
+                                                        className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none appearance-none"
                                                     >
                                                         {Object.keys(BLOK_MAPPING).map(huruf => (
                                                             <option key={huruf} value={huruf}>Blok {huruf}</option>
@@ -1223,7 +1294,7 @@
                                                     <select 
                                                         value={t30BlokNomor} 
                                                         onChange={(e) => setT30BlokNomor(e.target.value)}
-                                                        className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none appearance-none"
+                                                        className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none appearance-none"
                                                     >
                                                         {generateNomorOptions(t30BlokHuruf).map(nomor => (
                                                             <option key={nomor} value={nomor}>Nomor {nomor}</option>
@@ -1231,19 +1302,43 @@
                                                     </select>
                                                     <i data-lucide="chevron-down" className="absolute right-3.5 top-8 w-4 h-4 text-slate-400 pointer-events-none"></i>
                                                 </div>
-                                                <div className="col-span-12 md:col-span-6">
-                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Detail Opsional (jika bukan pekerjaan borongan unit full)</label>
+                                                <div className="col-span-12 md:col-span-2">
+                                                    <button onClick={handleAddT30Lokasi} className="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 px-3 rounded-lg text-xs shadow-sm transition-colors flex items-center justify-center gap-1.5 h-[42px]">
+                                                        <i data-lucide="plus" className="w-3.5 h-3.5"></i> Tambah Unit
+                                                    </button>
+                                                </div>
+                                                <div className="col-span-12 md:col-span-4">
+                                                    <label className="block text-[10px] font-medium text-slate-500 mb-1">Detail Opsional (Spesifik Unit Ini)</label>
                                                     <input 
                                                         type="text" 
                                                         value={t30DetailPekerjaanOpsional} 
                                                         onChange={(e) => setT30DetailPekerjaanOpsional(e.target.value)}
-                                                        className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" 
-                                                        placeholder="Contoh: Pekerjaan Pemasangan Keramik"
+                                                        className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none" 
+                                                        placeholder="Cth: Pemasangan Keramik"
                                                     />
                                                 </div>
-                                                <div className="col-span-12">
+
+                                                <div className="col-span-12 pt-2 border-t border-slate-200 dark:border-slate-700/50 mt-1">
+                                                    <label className="block text-[10px] font-medium text-slate-500 mb-2">Daftar Unit Terpilih:</label>
+                                                    <div className="flex flex-wrap gap-2">
+                                                        {t30MultiLokasi.length === 0 && <span className="text-xs text-slate-400 italic font-medium">Belum ada unit yang ditambahkan ke daftar. Menggunakan form di atas.</span>}
+                                                        {t30MultiLokasi.map((loc, idx) => (
+                                                            <div key={idx} className="bg-teal-50 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300 border border-teal-200 dark:border-teal-700 px-3 py-1.5 rounded-lg text-xs flex items-center gap-2 shadow-sm">
+                                                                <div className="flex flex-col">
+                                                                    <span className="font-bold">Blok {loc.huruf}-{loc.nomor}</span>
+                                                                    {loc.detail && <span className="text-[10px] text-teal-600 dark:text-teal-400 font-medium leading-none mt-0.5">{loc.detail}</span>}
+                                                                </div>
+                                                                <button onClick={() => handleRemoveT30Lokasi(idx)} className="text-teal-400 hover:text-red-500 dark:text-teal-500 dark:hover:text-red-400 transition-colors focus:outline-none ml-1" title="Hapus Unit">
+                                                                    <i data-lucide="x" className="w-4 h-4"></i>
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                                
+                                                <div className="col-span-12 mt-1">
                                                     <label className="block text-[10px] font-medium text-slate-500 mb-1">Hasil Teks Pada SPK</label>
-                                                    <input type="text" value={t30LokasiPekerjaanDetail} readOnly className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-slate-600 dark:text-slate-400 shadow-inner outline-none cursor-not-allowed"/>
+                                                    <input type="text" value={t30LokasiPekerjaanDetail} readOnly className="w-full bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-sm text-slate-600 dark:text-slate-400 shadow-inner outline-none cursor-not-allowed font-medium"/>
                                                 </div>
                                             </div>
                                         </div>
@@ -1339,6 +1434,36 @@
                                             <div>
                                                 <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Tanggal Penetapan</label>
                                                 <input type="date" value={t30TanggalDitetapkan} onChange={(e) => setT30TanggalDitetapkan(e.target.value)} className="w-full bg-white dark:bg-slate-955 border border-slate-300 dark:border-slate-800 rounded-xl px-3.5 py-2.5 text-sm shadow-sm focus:ring-2 focus:ring-teal-500/30 outline-none custom-scrollbar"/>
+                                            </div>
+
+                                            {/* UPLOAD TTD PJ TIPE 30 */}
+                                            <div className="md:col-span-2 pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                                                <label className="block text-[10px] font-bold text-teal-600 dark:text-teal-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                                                    <i data-lucide="pen-tool" className="w-3.5 h-3.5"></i>
+                                                    Tanda Tangan Digital Penanggung Jawab (Supardi)
+                                                </label>
+                                                
+                                                {t30PjSignatureImage ? (
+                                                    <div className="relative group p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 flex items-center justify-center h-28 overflow-hidden shadow-sm">
+                                                        <img src={t30PjSignatureImage} alt="Tanda Tangan PJ" className="max-h-full max-w-full object-contain" />
+                                                        <button 
+                                                            onClick={clearT30PjSignature}
+                                                            className="absolute inset-0 bg-slate-900/60 dark:bg-slate-900/80 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-xl transition-opacity duration-200 backdrop-blur-sm"
+                                                        >
+                                                            <i data-lucide="trash-2" className="w-6 h-6 mb-2 text-red-400"></i>
+                                                            <span className="text-xs font-bold tracking-wide">Hapus Tanda Tangan</span>
+                                                        </button>
+                                                    </div>
+                                                ) : (
+                                                    <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-teal-400 hover:bg-teal-50 dark:hover:bg-slate-900 rounded-xl transition-all group bg-white dark:bg-transparent">
+                                                        <div className="p-2 bg-white dark:bg-slate-800 border shadow-sm rounded-full mb-2 group-hover:bg-teal-100 transition-colors">
+                                                            <i data-lucide="upload-cloud" className="w-5 h-5 text-slate-400 group-hover:text-teal-600"></i>
+                                                        </div>
+                                                        <span className="text-xs text-slate-600 dark:text-slate-300 group-hover:text-teal-700 font-medium">Unggah Scan Tanda Tangan</span>
+                                                        <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-1">Disarankan PNG berlatar transparan</span>
+                                                        <input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload} />
+                                                    </label>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -1495,30 +1620,65 @@
                                                                 </div>
                                                                 
                                                                 {/* Baris Atas - 3 Kolom */}
-                                                                <div className="grid grid-cols-3 gap-4 text-center mt-10 max-w-full mx-auto print-cols-3 text-[10pt] items-end mb-10">
-                                                                    <div className="flex flex-col items-center">
-                                                                        <p className="font-bold mb-16 min-h-[2.5rem]">Pemborong,</p>
-                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap">{t30NamaPemborong || "( ........................ )"}</p>
+                                                                <div className="grid grid-cols-3 gap-4 text-center mt-10 max-w-full mx-auto print-cols-3 text-[10pt] items-end h-32 mb-10">
+                                                                    
+                                                                    {/* 1. Pemborong */}
+                                                                    <div className="flex flex-col justify-between h-[130px] relative">
+                                                                        <p className="font-bold mb-auto mt-0">Pemborong,</p>
+                                                                        <div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">{t30NamaPemborong || "( ........................ )"}</p>
                                                                     </div>
-                                                                    <div className="flex flex-col items-center">
-                                                                        <p className="font-bold mb-16 min-h-[2.5rem]">Penanggungjawab,</p>
-                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap">Supardi</p>
+
+                                                                    {/* 2. Penanggungjawab */}
+                                                                    <div className="flex flex-col justify-between h-[130px] relative group">
+                                                                        <span className="font-bold mb-auto mt-0">Penanggungjawab,</span>
+                                                                        {t30PjSignatureImage ? (
+                                                                            <div className="flex items-center justify-center h-20 w-full overflow-hidden absolute inset-0 top-1/2 -translate-y-1/2 z-0">
+                                                                                <img 
+                                                                                    src={t30PjSignatureImage} 
+                                                                                    alt="Tanda Tangan" 
+                                                                                    className="signature-img max-h-full object-contain mix-blend-multiply opacity-90" 
+                                                                                />
+                                                                                <label className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded">
+                                                                                    <i data-lucide="upload-cloud" className="w-4 h-4 text-teal-600 mb-1"></i>
+                                                                                    <span className="text-[9px] font-bold text-teal-700">Ubah TTD</span>
+                                                                                    <input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload} />
+                                                                                </label>
+                                                                            </div>
+                                                                        ) : (
+                                                                            <div className="relative z-10 w-full flex justify-center my-auto">
+                                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-24 h-12 border border-dashed border-teal-400 hover:border-teal-600 rounded bg-teal-50 hover:bg-teal-100 transition-colors">
+                                                                                    <i data-lucide="upload" className="w-3.5 h-3.5 text-teal-500 mb-0.5"></i>
+                                                                                    <span className="text-[8px] text-teal-600 font-bold text-center leading-tight">Upload TTD</span>
+                                                                                    <input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload} />
+                                                                                </label>
+                                                                                <div className="hidden print:block text-[10px] text-slate-400 italic py-4">Tanda Tangan</div>
+                                                                            </div>
+                                                                        )}
+                                                                        <div className="relative z-10 mt-auto">
+                                                                            <span className="font-bold underline underline-offset-2 whitespace-nowrap block">Supardi</span>
+                                                                        </div>
                                                                     </div>
-                                                                    <div className="flex flex-col items-center">
-                                                                        <p className="font-bold mb-16 min-h-[2.5rem]">Pemberi Tugas,</p>
-                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap">Farizal Zainur Rozikin</p>
+
+                                                                    {/* 3. Pemberi Tugas */}
+                                                                    <div className="flex flex-col justify-between h-[130px] relative">
+                                                                        <p className="font-bold mb-auto mt-0">Pemberi Tugas,</p>
+                                                                        <div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Farizal Zainur Rozikin</p>
                                                                     </div>
                                                                 </div>
                                                                 
                                                                 {/* Baris Bawah - 2 Kolom (Ditengah) */}
-                                                                <div className="grid grid-cols-2 gap-4 text-center w-3/4 mx-auto print-cols-2 text-[10pt] items-end">
-                                                                    <div className="flex flex-col items-center">
-                                                                        <p className="font-bold mb-16 min-h-[2.5rem] leading-tight">Mengetahui,<br/>Keuangan</p>
-                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap">Sita Dita Cahyani</p>
+                                                                <div className="grid grid-cols-2 gap-4 text-center w-3/4 mx-auto print-cols-2 text-[10pt] items-end h-32">
+                                                                    <div className="flex flex-col justify-between h-[130px] relative">
+                                                                        <p className="font-bold mb-auto mt-0 leading-tight">Mengetahui,<br/>Keuangan</p>
+                                                                        <div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Sita Dita Cahyani</p>
                                                                     </div>
-                                                                    <div className="flex flex-col items-center">
-                                                                        <p className="font-bold mb-16 min-h-[2.5rem] leading-tight">Menyetujui,<br/>Kepala Kantor</p>
-                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap">Fika Faradila Cahyanti</p>
+                                                                    <div className="flex flex-col justify-between h-[130px] relative">
+                                                                        <p className="font-bold mb-auto mt-0 leading-tight">Menyetujui,<br/>Kepala Kantor</p>
+                                                                        <div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div>
+                                                                        <p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Fika Faradila Cahyanti</p>
                                                                     </div>
                                                                 </div>
                                                             </div>
@@ -1556,7 +1716,7 @@
                     
                     {/* NOTIFIKASI POPUP */}
                     {notification && (
-                        <div className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border transition-all animate-[slideInDown_0.3s_ease-out] ${
+                        <div className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border transition-all animate-[slideInDown_0.3s_ease-out] print:hidden ${
                             notification.type === 'error' ? 'bg-red-50 dark:bg-red-950/90 text-red-700 dark:text-red-200 border-red-200 dark:border-red-500/50' : 
                             notification.type === 'info' ? 'bg-blue-50 dark:bg-indigo-950/90 text-blue-700 dark:text-indigo-200 border-blue-200 dark:border-indigo-500/50' :
                             'bg-emerald-50 dark:bg-emerald-950/90 text-emerald-700 dark:text-emerald-200 border-emerald-200 dark:border-emerald-500/50'
