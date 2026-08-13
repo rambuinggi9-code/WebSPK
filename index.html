@@ -2309,7 +2309,7 @@
                                                 <div className="border-b border-black mb-8"></div>
                                                 
                                                 <div className="flex">
-                                                    <span className="w-24 text-blue-800 italic underline">Gambar :</span>
+                                                    <span className="w-24 text-black italic underline">Gambar :</span>
                                                     <ol className="list-decimal list-inside text-red-700 italic">
                                                         <li>Untuk customer</li>
                                                         <li>Untuk Penagihan</li>
@@ -2321,20 +2321,17 @@
                                             
                                             {/* Right Footer (Signatures) */}
                                             <div className="w-1/2 flex flex-col items-center">
-                                                <div className="mb-4 text-blue-800 underline decoration-black underline-offset-4">{poTempatTanggal}</div>
-                                                <div className="w-full flex justify-around mt-4 text-center">
-                                                    <div className="w-40 flex flex-col items-center">
+                                                <div className="mb-4 text-black underline decoration-black underline-offset-4">{poTempatTanggal}</div>
+                                                <div className="w-full flex justify-between gap-6 px-4 mt-4 text-center">
+                                                    <div className="w-[45%] flex flex-col items-center">
                                                         <p className="underline decoration-red-500 decoration-wavy underline-offset-4 mb-20">Yang menerima,</p>
-                                                        <p className="border-b border-black w-full mb-1">{poPenerima1Nama}</p>
-                                                        <p>{poPenerima1Hp}</p>
+                                                        <p className="border-b border-black w-full pb-0.5 whitespace-nowrap overflow-hidden">{poPenerima1Nama || "\u00A0"}</p>
+                                                        <p className="pt-0.5 min-h-[1.5rem]">{poPenerima1Hp}</p>
                                                     </div>
-                                                    <div className="w-40 flex flex-col items-center">
+                                                    <div className="w-[45%] flex flex-col items-center">
                                                         <p className="underline decoration-red-500 decoration-wavy underline-offset-4 mb-20">Yang menerima,</p>
-                                                        {poPenerima2Nama ? (
-                                                            <p className="border-b border-black w-full mb-1">{poPenerima2Nama}</p>
-                                                        ) : (
-                                                            <p className="border-b border-black w-full"></p>
-                                                        )}
+                                                        <p className="border-b border-black w-full pb-0.5 whitespace-nowrap overflow-hidden">{poPenerima2Nama || "\u00A0"}</p>
+                                                        <p className="pt-0.5 min-h-[1.5rem]"></p>
                                                     </div>
                                                 </div>
                                             </div>
