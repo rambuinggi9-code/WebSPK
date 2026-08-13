@@ -55,7 +55,7 @@
                 display: none !important;
             }
             @page {
-                margin: 10mm 15mm 20mm 15mm;
+                margin: 1cm; /* Margin diubah menjadi 1cm untuk semua sisi */
             }
             thead {
                 display: table-header-group !important;
@@ -399,7 +399,7 @@
             const [poActiveId, setPoActiveId] = useState(null);
             
             const [poLogo, setPoLogo] = useState(null);
-            const [poCompanyName, setPoCompanyName] = useState("PT. WALIBAROKAH LAND");
+            const [poCompanyName, setPoCompanyName] = useState("PT WALI BAROKAH LAND");
             
             // Auto Nomor Transaksi & Proyek Pilihan
             const [poNo, setPoNo] = useState(() => {
@@ -1050,7 +1050,7 @@
                 setPoAlamat("Sidorahayu, Wagir");
                 
                 setPoLogo(null);
-                setPoCompanyName("PT. WALIBAROKAH LAND");
+                setPoCompanyName("PT WALI BAROKAH LAND");
                 setPoUntukPembayaran("Blesscon");
                 setPoTableLeft(Array.from({ length: 6 }, () => ({ noCek: "", bank: "", tanggal: "", jumlah: "" })));
                 setPoTotalLeft("");
@@ -2203,7 +2203,7 @@
                                     <div className="flex items-center justify-between mb-4 print:hidden">
                                         <h3 className="text-slate-500 text-sm font-bold flex items-center gap-2 uppercase tracking-wider"><i data-lucide="eye" className="w-4 h-4 text-orange-500"></i> Pratinjau Tanda Terima</h3>
                                     </div>
-                                    <div ref={previewRef} className="paper-preview px-12 py-12 print:shadow-none font-sans text-black" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                    <div ref={previewRef} className="paper-preview px-12 py-12 print:p-0 print:m-0 print:shadow-none print:max-w-full print:rounded-none print:border-none font-sans text-black" style={{ fontFamily: 'Arial, sans-serif' }}>
                                         
                                         {/* HEADER */}
                                         <div className="flex items-center gap-4 mb-8">
@@ -2244,29 +2244,29 @@
                                         {/* TABLES */}
                                         <div className="flex gap-4 mb-8 text-[10pt]">
                                             {/* Left Table */}
-                                            <table className="w-1/2 border-collapse border border-black">
+                                            <table className="w-1/2 border-collapse border border-black" style={{ tableLayout: 'fixed' }}>
                                                 <thead>
                                                     <tr>
-                                                        <th className="border border-black p-1 text-center font-bold">NO CEK/BG</th>
-                                                        <th className="border border-black p-1 text-center font-bold">BANK</th>
-                                                        <th className="border border-black p-1 text-center font-bold">TANGGAL</th>
-                                                        <th className="border border-black p-1 text-center font-bold">JUMLAH</th>
+                                                        <th className="border border-black p-1 text-center font-bold w-1/4">NO CEK/BG</th>
+                                                        <th className="border border-black p-1 text-center font-bold w-1/4">BANK</th>
+                                                        <th className="border border-black p-1 text-center font-bold w-1/4">TANGGAL</th>
+                                                        <th className="border border-black p-1 text-center font-bold w-1/4">JUMLAH</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody>
                                                     {poTableLeft.map((r, i) => (
                                                         <tr key={i} className="h-6">
-                                                            <td className="border border-black px-1">{r.noCek}</td>
-                                                            <td className="border border-black px-1">{r.bank}</td>
-                                                            <td className="border border-black px-1">{r.tanggal}</td>
-                                                            <td className="border border-black px-1 text-right">{r.jumlah}</td>
+                                                            <td className="border border-black px-1 break-words">{r.noCek}</td>
+                                                            <td className="border border-black px-1 break-words">{r.bank}</td>
+                                                            <td className="border border-black px-1 break-words">{r.tanggal}</td>
+                                                            <td className="border border-black px-1 text-right break-words">{r.jumlah}</td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
                                                 <tfoot>
                                                     <tr>
                                                         <td colSpan="3" className="text-center font-bold py-1">TOTAL</td>
-                                                        <td className="border border-black px-1 text-right">{poTotalLeft}</td>
+                                                        <td className="border border-black px-1 text-right break-words">{poTotalLeft}</td>
                                                     </tr>
                                                 </tfoot>
                                             </table>
