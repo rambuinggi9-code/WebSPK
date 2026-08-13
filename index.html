@@ -275,6 +275,18 @@
             pjSignatureImage: null
         };
 
+        // Daftar Proyek Khusus untuk PO
+        const DAFTAR_PROYEK_PO = [
+            { nama: "Cinta Alam Residence", alamat: "Ngenep, Karangploso", penerima: "Achmadi", hp: "0851-0011-5074" },
+            { nama: "Green Blossom Residence", alamat: "Kepuharjo, Karangploso", penerima: "Achmadi", hp: "0851-0011-5074" },
+            { nama: "Griya Pesona Kejayan", alamat: "Sumberbanteng, Kejayan", penerima: "Agus Sutanto", hp: "0857-9088-4453" },
+            { nama: "Harmoni Cluster", alamat: "Mendalanwangi, Wagir", penerima: "Supardi", hp: "0813-5805-4973" },
+            { nama: "Kantor Dawuhan", alamat: "Tegalgondo, Karangploso", penerima: "Achmadi", hp: "0851-0011-5074" },
+            { nama: "Lembah Bunder Regency", alamat: "Sidorahayu, Wagir", penerima: "Busro Khufidon", hp: "0821-4224-2120" },
+            { nama: "Sekarputih", alamat: "Junrejo, Batu", penerima: "Achmadi", hp: "0851-0011-5074" },
+            { nama: "Villa Royale Orchid", alamat: "Kepuharjo, Karangploso", penerima: "Achmadi", hp: "0851-0011-5074" }
+        ].sort((a, b) => a.nama.localeCompare(b.nama));
+
         // Peta Batas Nomor per Blok
         const BLOK_MAPPING = {
             A: 33, B: 12, C: 23, D: 7, E: 17, F: 20, G: 19, H: 26, I: 54, J: 55,
@@ -377,6 +389,62 @@
             const [t30LogoKiri, setT30LogoKiri] = useState(null);
             const [t30LogoKanan, setT30LogoKanan] = useState(null);
 
+            // ==========================================
+            // STATE KHUSUS UNTUK PO BATA RINGAN (TANDA TERIMA)
+            // ==========================================
+            const [poDaftar, setPoDaftar] = useState(() => {
+                const saved = localStorage.getItem('BCA_DAFTAR_PO');
+                return saved ? JSON.parse(saved) : [];
+            });
+            const [poActiveId, setPoActiveId] = useState(null);
+            
+            const [poLogo, setPoLogo] = useState(null);
+            const [poCompanyName, setPoCompanyName] = useState("PT. WALIBAROKAH LAND");
+            
+            // Auto Nomor Transaksi & Proyek Pilihan
+            const [poNo, setPoNo] = useState(() => {
+                const d = new Date();
+                return `${d.getDate().toString().padStart(2, '0')}${(d.getMonth()+1).toString().padStart(2, '0')}${d.getFullYear()}`;
+            });
+            const [poProyekPilihan, setPoProyekPilihan] = useState("Lembah Bunder Regency");
+            const [poTerimaDari, setPoTerimaDari] = useState("Lembah Bunder Regency");
+            const [poAlamat, setPoAlamat] = useState("Sidorahayu, Wagir");
+            
+            const [poUntukPembayaran, setPoUntukPembayaran] = useState("Blesscon");
+
+            // Tabel Kiri (6 baris default)
+            const [poTableLeft, setPoTableLeft] = useState(() => Array.from({ length: 6 }, () => ({ noCek: "", bank: "", tanggal: "", jumlah: "" })));
+            const [poTotalLeft, setPoTotalLeft] = useState("");
+
+            // Tabel Kanan (6 baris default)
+            const [poTableRight, setPoTableRight] = useState(() => Array.from({ length: 6 }, () => ({ noFaktur: "", tanggal: "", jumlah: "" })));
+            const [poTotalRight, setPoTotalRight] = useState("");
+
+            const [poCatatan, setPoCatatan] = useState("tempo 30 hari");
+            const [poTempatTanggal, setPoTempatTanggal] = useState("Malang, Agustus 2026");
+            const [poPenerima1Nama, setPoPenerima1Nama] = useState("Busro Khufidon");
+            const [poPenerima1Hp, setPoPenerima1Hp] = useState("0821-4224-2120");
+            const [poPenerima2Nama, setPoPenerima2Nama] = useState("");
+
+            // Efek Kalkulasi Otomatis Total PO (Kanan) berdasarkan 3 Baris Pertama
+            useEffect(() => {
+                if (poTableRight[0] && poTableRight[2]) {
+                    const ritasiStr = poTableRight[0].noFaktur || "";
+                    const ritasi = parseInt(ritasiStr.replace(/\D/g, '')) || 0;
+                    
+                    const volStr = (poTableRight[2].noFaktur || "").split('x')[0].trim().replace(',', '.');
+                    const vol = parseFloat(volStr) || 0;
+                    
+                    const hargaStr = (poTableRight[0].jumlah || "").replace(/\D/g, '');
+                    const harga = parseInt(hargaStr) || 0;
+
+                    if (ritasi > 0 && vol > 0 && harga > 0) {
+                        const total = ritasi * vol * harga;
+                        setPoTotalRight(new Intl.NumberFormat('id-ID').format(total));
+                    }
+                }
+            }, [poTableRight]);
+
             // State Notifikasi popup global
             const [notification, setNotification] = useState(null);
 
@@ -401,6 +469,11 @@
             useEffect(() => {
                 localStorage.setItem('BCA_DAFTAR_SPK_TIPE30', JSON.stringify(t30DaftarSpk));
             }, [t30DaftarSpk]);
+
+            // Sync ke LocalStorage untuk PO Bata
+            useEffect(() => {
+                localStorage.setItem('BCA_DAFTAR_PO', JSON.stringify(poDaftar));
+            }, [poDaftar]);
 
             // Selalu trigger Lucide Icons rendering tiap ada perubahan view / render
             useEffect(() => {
@@ -965,25 +1038,107 @@
                 if (target === 'kanan') setT30LogoKanan(null);
             };
 
-            const handleT30PjSignatureUpload = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    if (!file.type.startsWith('image/')) {
-                        showNotification("Harap upload file gambar (PNG/JPG/SVG)!", "error");
-                        return;
-                    }
-                    const reader = new FileReader();
-                    reader.onloadend = () => {
-                        setT30PjSignatureImage(reader.result);
-                        showNotification("Tanda tangan digital PJ berhasil diunggah.");
-                    };
-                    reader.readAsDataURL(file);
+            // ==========================================
+            // HANDLER UNTUK PO BATA RINGAN
+            // ==========================================
+            const handlePoResetData = () => {
+                const d = new Date();
+                setPoNo(`${d.getDate().toString().padStart(2, '0')}${(d.getMonth()+1).toString().padStart(2, '0')}${d.getFullYear()}`);
+                
+                setPoProyekPilihan("Lembah Bunder Regency");
+                setPoTerimaDari("Lembah Bunder Regency");
+                setPoAlamat("Sidorahayu, Wagir");
+                
+                setPoLogo(null);
+                setPoCompanyName("PT. WALIBAROKAH LAND");
+                setPoUntukPembayaran("Blesscon");
+                setPoTableLeft(Array.from({ length: 6 }, () => ({ noCek: "", bank: "", tanggal: "", jumlah: "" })));
+                setPoTotalLeft("");
+                setPoTableRight(Array.from({ length: 6 }, () => ({ noFaktur: "", tanggal: "", jumlah: "" })));
+                setPoTotalRight("");
+                setPoCatatan("tempo 30 hari");
+                setPoTempatTanggal("Malang, Agustus 2026");
+                setPoPenerima1Nama("Busro Khufidon");
+                setPoPenerima1Hp("0821-4224-2120");
+                setPoPenerima2Nama("");
+                setPoActiveId(null);
+                showNotification("Formulir Tanda Terima berhasil dikosongkan!", "info");
+            };
+
+            const handlePoSave = () => {
+                const dataPo = {
+                    id: poActiveId || Date.now().toString(),
+                    poLogo, poCompanyName, poNo, poTerimaDari, poAlamat, poUntukPembayaran,
+                    poTableLeft, poTotalLeft, poTableRight, poTotalRight,
+                    poCatatan, poTempatTanggal, poPenerima1Nama, poPenerima1Hp, poPenerima2Nama,
+                    lastUpdated: new Date().toLocaleString('id-ID')
+                };
+
+                if (poActiveId) {
+                    setPoDaftar(poDaftar.map(item => item.id === poActiveId ? dataPo : item));
+                    showNotification("Draf Tanda Terima berhasil diperbarui!");
+                } else {
+                    setPoDaftar([...poDaftar, dataPo]);
+                    setPoActiveId(dataPo.id);
+                    showNotification("Tanda Terima baru berhasil disimpan!");
                 }
             };
 
-            const clearT30PjSignature = () => {
-                setT30PjSignatureImage(null);
-                showNotification("Tanda tangan digital PJ telah dihapus.", "info");
+            const handlePoLoad = (id) => {
+                const target = poDaftar.find(item => item.id === id);
+                if (target) {
+                    setPoActiveId(target.id);
+                    setPoLogo(target.poLogo || null);
+                    setPoCompanyName(target.poCompanyName || "");
+                    setPoNo(target.poNo || "");
+                    setPoTerimaDari(target.poTerimaDari || "");
+                    
+                    // Deteksi Proyek Pilihan di Dropdown
+                    const p = DAFTAR_PROYEK_PO.find(x => x.nama === (target.poTerimaDari || ""));
+                    setPoProyekPilihan(p ? p.nama : "Manual");
+
+                    setPoAlamat(target.poAlamat || "");
+                    setPoUntukPembayaran(target.poUntukPembayaran || "");
+                    setPoTableLeft(target.poTableLeft || Array.from({ length: 6 }, () => ({ noCek: "", bank: "", tanggal: "", jumlah: "" })));
+                    setPoTotalLeft(target.poTotalLeft || "");
+                    setPoTableRight(target.poTableRight || Array.from({ length: 6 }, () => ({ noFaktur: "", tanggal: "", jumlah: "" })));
+                    setPoTotalRight(target.poTotalRight || "");
+                    setPoCatatan(target.poCatatan || "");
+                    setPoTempatTanggal(target.poTempatTanggal || "");
+                    setPoPenerima1Nama(target.poPenerima1Nama || "");
+                    setPoPenerima1Hp(target.poPenerima1Hp || "");
+                    setPoPenerima2Nama(target.poPenerima2Nama || "");
+
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                    showNotification(`Memuat Tanda Terima: ${target.poTerimaDari}`);
+                }
+            };
+
+            const handlePoDelete = (id, e) => {
+                e.stopPropagation();
+                setPoDaftar(poDaftar.filter(item => item.id !== id));
+                if (poActiveId === id) setPoActiveId(null);
+                showNotification("Dokumen Tanda Terima berhasil dihapus.", "error");
+            };
+
+            const handlePoPrint = () => {
+                const originalTitle = document.title;
+                const safeName = poTerimaDari ? poTerimaDari.replace(/\s+/g, '_') : 'Tanda_Terima_Baru';
+                document.title = `Tanda_Terima_${safeName}`;
+                window.print();
+                setTimeout(() => { document.title = originalTitle; }, 2000);
+            };
+
+            // Helpers untuk edit tabel PO
+            const updateTableLeft = (idx, field, value) => {
+                const newData = [...poTableLeft];
+                newData[idx][field] = value;
+                setPoTableLeft(newData);
+            };
+            const updateTableRight = (idx, field, value) => {
+                const newData = [...poTableRight];
+                newData[idx][field] = value;
+                setPoTableRight(newData);
             };
 
             /* =========================================
@@ -1024,7 +1179,7 @@
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
                                 {/* KARTU MENU 1: SPK UMUM */}
                                 <div 
                                     onClick={() => handleNavigate('spk_umum')}
@@ -1064,6 +1219,28 @@
                                         </h3>
                                         <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
                                             Modul khusus pembuatan Surat Perintah Kerja yang disesuaikan template dan hitungannya untuk pekerja borongan unit rumah Tipe 30.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* KARTU MENU 3: PO BATA RINGAN (TANDA TERIMA) */}
+                                <div 
+                                    onClick={() => handleNavigate('po_bata')}
+                                    className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-8 cursor-pointer hover:border-orange-500 dark:hover:border-orange-500 hover:shadow-2xl hover:shadow-orange-900/10 transition-all duration-300 relative overflow-hidden"
+                                >
+                                    <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
+                                        <i data-lucide="receipt" className="w-32 h-32 text-orange-900 dark:text-orange-400"></i>
+                                    </div>
+                                    <div className="relative z-10">
+                                        <div className="w-16 h-16 bg-orange-50 dark:bg-orange-900/30 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform shadow-sm">
+                                            <i data-lucide="receipt" className="w-8 h-8 text-orange-600 dark:text-orange-400"></i>
+                                        </div>
+                                        <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-slate-100 mb-3 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors flex items-center gap-3">
+                                            3. PO Bata Ringan
+                                            <span className="bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400 text-[10px] px-2 py-1 rounded-md font-bold tracking-wider uppercase border border-orange-200 dark:border-orange-800/50">Baru</span>
+                                        </h3>
+                                        <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
+                                            Modul pembuatan Tanda Terima Pembayaran, dirancang khusus dengan layout untuk pencatatan PO Bata Ringan & Faktur.
                                         </p>
                                     </div>
                                 </div>
@@ -1700,6 +1877,468 @@
                                                 </tr>
                                             </tbody>
                                         </table>
+                                    </div>
+                                </div>
+                            </main>
+                        </div>
+                    </div>
+                );
+            }
+
+            /* =========================================
+               RENDERER: HALAMAN PO BATA RINGAN
+               ========================================= */
+            if (activeView === 'po_bata') {
+                return (
+                    <div key="view-pobata" className="min-h-screen transition-colors duration-300">
+                        {/* NOTIFIKASI POPUP */}
+                        {notification && (
+                            <div className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border transition-all animate-[slideInDown_0.3s_ease-out] print:hidden ${
+                                notification.type === 'error' ? 'bg-red-50 dark:bg-red-950/90 text-red-700 dark:text-red-200 border-red-200 dark:border-red-500/50' : 
+                                notification.type === 'info' ? 'bg-blue-50 dark:bg-indigo-950/90 text-blue-700 dark:text-indigo-200 border-blue-200 dark:border-indigo-500/50' :
+                                'bg-orange-50 dark:bg-orange-950/90 text-orange-700 dark:text-orange-200 border-orange-200 dark:border-orange-500/50'
+                            }`}>
+                                <i data-lucide={notification.type === 'error' ? "alert-triangle" : notification.type === 'info' ? "info" : "check-circle"} className="w-5 h-5 shrink-0"></i>
+                                <span className="text-sm font-semibold tracking-wide">{notification.message}</span>
+                            </div>
+                        )}
+
+                        {/* HEADER CONTROL BAR */}
+                        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm py-4 px-6 sticky top-0 z-40 print:hidden border-t-4 border-t-orange-500 transition-colors duration-300">
+                            <div className="max-w-[90rem] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                                <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
+                                    <button onClick={() => handleNavigate('home')} className="flex items-center justify-center p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-orange-50 text-slate-600 hover:text-orange-600 border border-transparent hover:border-orange-200 rounded-xl transition-all shadow-sm shrink-0" title="Kembali">
+                                        <i data-lucide="home" className="w-5 h-5"></i>
+                                    </button>
+                                    <div className="w-px h-8 bg-slate-200 dark:bg-slate-700 hidden sm:block shrink-0"></div>
+                                    <div className="flex-1 min-w-0">
+                                        <h1 className="font-extrabold text-lg tracking-wide text-slate-900 dark:text-white truncate">PO BATA RINGAN (TANDA TERIMA)</h1>
+                                        <p className="text-xs text-slate-500 font-medium mt-0.5 truncate">Format Khusus Pembayaran & Faktur</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 flex-wrap w-full md:w-auto mt-2 md:mt-0">
+                                    <button onClick={toggleTheme} className="flex-1 md:flex-initial flex items-center justify-center gap-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-700 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 transition-all text-xs shadow-sm" title="Ganti Tema">
+                                        {theme === 'light' ? <><i data-lucide="moon" className="w-4 h-4 text-slate-600"></i> Gelap</> : <><i data-lucide="sun" className="w-4 h-4 text-amber-400"></i> Terang</>}
+                                    </button>
+                                    <button onClick={handlePoResetData} className="flex-1 md:flex-initial flex justify-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm text-xs">
+                                        <i data-lucide="rotate-ccw" className="w-4 h-4 text-slate-400"></i> Reset
+                                    </button>
+                                    <button onClick={handlePreviewScroll} className="flex-1 md:flex-initial flex justify-center gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-700 shadow-sm text-xs">
+                                        <i data-lucide="eye" className="w-4 h-4 text-orange-500"></i> Pratinjau
+                                    </button>
+                                    <button onClick={handlePoSave} className="flex-1 md:flex-initial flex justify-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold px-4 py-2.5 rounded-xl shadow-md text-xs">
+                                        <i data-lucide="save" className="w-4 h-4"></i> {poActiveId ? "Update" : "Simpan"}
+                                    </button>
+                                    <button onClick={handlePoPrint} className="flex-1 md:flex-initial flex justify-center gap-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white font-semibold px-6 py-2.5 rounded-xl shadow-md text-xs">
+                                        <i data-lucide="printer" className="w-4 h-4"></i> Cetak
+                                    </button>
+                                </div>
+                            </div>
+                        </header>
+
+                        <div className="max-w-[90rem] mx-auto px-4 md:px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 print:p-0 print:block">
+                            
+                            {/* LEFT SIDEBAR */}
+                            <aside className="lg:col-span-4 space-y-6 print:hidden">
+                                {/* DATABASE LIST */}
+                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                                    <div className="flex items-center gap-2 mb-4 border-b border-slate-100 dark:border-slate-800 pb-4 justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <i data-lucide="folder-open" className="w-5 h-5 text-orange-500"></i>
+                                            <h2 className="font-bold text-slate-800 dark:text-slate-100">Database Lokal</h2>
+                                        </div>
+                                        <span className="bg-orange-50 text-orange-600 border border-orange-100 text-[10px] px-2.5 py-1 rounded-md font-bold">{poDaftar.length} Data</span>
+                                    </div>
+                                    <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
+                                        {poDaftar.map((item) => (
+                                            <div key={item.id} onClick={() => handlePoLoad(item.id)} className={`p-3 rounded-xl border cursor-pointer flex justify-between items-center group shadow-sm ${poActiveId === item.id ? 'bg-orange-50 border-orange-300' : 'bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-700 hover:border-orange-300'}`}>
+                                                <div className="space-y-1 overflow-hidden pr-2">
+                                                    <h4 className="text-xs font-bold truncate text-orange-700">{item.poTerimaDari || "Tanpa Nama"}</h4>
+                                                    <p className="text-[10px] text-slate-500 truncate">No: {item.poNo || "-"}</p>
+                                                </div>
+                                                <div className="flex gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity">
+                                                    <button onClick={(e) => { e.stopPropagation(); handlePoLoad(item.id); }} className="p-1.5 text-orange-500 hover:bg-orange-100 rounded-lg"><i data-lucide="edit" className="w-4 h-4"></i></button>
+                                                    <button onClick={(e) => handlePoDelete(item.id, e)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><i data-lucide="trash-2" className="w-4 h-4"></i></button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* PENGATURAN KOP & IDENTITAS */}
+                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
+                                    <h2 className="font-bold text-slate-800 dark:text-slate-100 border-b pb-3 flex items-center gap-2"><i data-lucide="settings" className="w-4 h-4"></i> Pengaturan Kop</h2>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Nama Perusahaan (Kop)</label>
+                                        <input type="text" value={poCompanyName} onChange={(e) => setPoCompanyName(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-400" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Logo Kop (Kiri)</label>
+                                        {poLogo ? (
+                                            <div className="relative group w-24 h-24 bg-white rounded-lg flex items-center justify-center p-2 border shadow-sm mx-auto">
+                                                <img src={poLogo} alt="Logo" className="max-h-full max-w-full object-contain" />
+                                                <button onClick={() => setPoLogo(null)} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity"><i data-lucide="trash" className="w-4 h-4 mr-1"></i> Hapus</button>
+                                            </div>
+                                        ) : (
+                                            <label className="cursor-pointer flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-300 hover:border-orange-400 hover:bg-orange-50 rounded-lg transition-all text-slate-400">
+                                                <i data-lucide="upload" className="w-5 h-5 mb-1"></i>
+                                                <span className="text-[10px] font-medium">Unggah Logo</span>
+                                                <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                                                    const file = e.target.files[0];
+                                                    if(file) {
+                                                        const reader = new FileReader();
+                                                        reader.onloadend = () => setPoLogo(reader.result);
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }} />
+                                            </label>
+                                        )}
+                                    </div>
+                                </div>
+                            </aside>
+
+                            {/* RIGHT MAIN EDITOR */}
+                            <main className="lg:col-span-8 space-y-6 print:m-0 print:col-span-12">
+                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6 print:hidden">
+                                    <div className="border-b pb-4"><h2 className="font-bold text-lg flex items-center gap-2"><i data-lucide="file-edit" className="w-5 h-5 text-orange-500"></i> Editor Data Formulir</h2></div>
+                                    
+                                    {/* INFO UTAMA */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="md:col-span-2">
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Nomor Transaksi/Dokumen</label>
+                                            <input type="text" value={poNo} onChange={(e) => setPoNo(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-400 font-mono tracking-widest" placeholder="Misal: 13082026"/>
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Telah terima dari</label>
+                                            <div className="flex gap-2">
+                                                <div className="relative w-1/2">
+                                                    <select 
+                                                        value={poProyekPilihan} 
+                                                        onChange={(e) => {
+                                                            const val = e.target.value;
+                                                            setPoProyekPilihan(val);
+                                                            if (val !== "Manual") {
+                                                                const p = DAFTAR_PROYEK_PO.find(x => x.nama === val);
+                                                                if (p) {
+                                                                    setPoTerimaDari(p.nama);
+                                                                    setPoAlamat(p.alamat);
+                                                                    setPoPenerima1Nama(p.penerima);
+                                                                    setPoPenerima1Hp(p.hp);
+                                                                }
+                                                            } else {
+                                                                setPoTerimaDari("");
+                                                                setPoAlamat("");
+                                                                setPoPenerima1Nama("");
+                                                                setPoPenerima1Hp("");
+                                                            }
+                                                        }}
+                                                        className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-400 appearance-none text-slate-700 dark:text-slate-300"
+                                                    >
+                                                        {DAFTAR_PROYEK_PO.map(p => <option key={p.nama} value={p.nama}>{p.nama}</option>)}
+                                                        <option value="Manual">-- Isi Manual --</option>
+                                                    </select>
+                                                    <i data-lucide="chevron-down" className="absolute right-3 top-2.5 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                                                </div>
+                                                <input 
+                                                    type="text" 
+                                                    value={poTerimaDari} 
+                                                    onChange={(e) => setPoTerimaDari(e.target.value)} 
+                                                    className="w-1/2 bg-slate-50 dark:bg-slate-950 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-400"
+                                                    placeholder="Nama Proyek (Manual)..."
+                                                    readOnly={poProyekPilihan !== "Manual"}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Untuk Pembayaran</label>
+                                            <input type="text" value={poUntukPembayaran} onChange={(e) => setPoUntukPembayaran(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-400"/>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Alamat</label>
+                                            <input 
+                                                type="text" 
+                                                value={poAlamat} 
+                                                onChange={(e) => setPoAlamat(e.target.value)} 
+                                                className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-400"
+                                                placeholder="Alamat Proyek..."
+                                                readOnly={poProyekPilihan !== "Manual"}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* DUAL TABLES */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
+                                        {/* Kiri: Cek/BG */}
+                                        <div className="space-y-2">
+                                            <h3 className="text-xs font-bold bg-slate-100 dark:bg-slate-800 p-2 rounded text-center">Tabel Cek/BG</h3>
+                                            <div className="border rounded-lg overflow-hidden text-xs">
+                                                <div className="grid grid-cols-4 bg-slate-50 dark:bg-slate-900 border-b font-bold">
+                                                    <div className="p-2 border-r text-center">NO CEK/BG</div><div className="p-2 border-r text-center">BANK</div><div className="p-2 border-r text-center">TANGGAL</div><div className="p-2 text-center">JUMLAH</div>
+                                                </div>
+                                                {poTableLeft.map((row, idx) => (
+                                                    <div key={idx} className="grid grid-cols-4 border-b last:border-b-0">
+                                                        <input type="text" value={row.noCek} onChange={(e)=>updateTableLeft(idx, 'noCek', e.target.value)} className="p-1.5 border-r outline-none w-full bg-transparent"/>
+                                                        <input type="text" value={row.bank} onChange={(e)=>updateTableLeft(idx, 'bank', e.target.value)} className="p-1.5 border-r outline-none w-full bg-transparent"/>
+                                                        <input type="text" value={row.tanggal} onChange={(e)=>updateTableLeft(idx, 'tanggal', e.target.value)} className="p-1.5 border-r outline-none w-full bg-transparent"/>
+                                                        <input type="text" value={row.jumlah} onChange={(e)=>updateTableLeft(idx, 'jumlah', e.target.value)} className="p-1.5 outline-none w-full bg-transparent text-right"/>
+                                                    </div>
+                                                ))}
+                                                <div className="grid grid-cols-4 bg-slate-50 dark:bg-slate-900 font-bold border-t">
+                                                    <div className="col-span-3 p-2 text-right border-r">TOTAL</div>
+                                                    <input type="text" value={poTotalLeft} onChange={(e)=>setPoTotalLeft(e.target.value)} className="p-1.5 outline-none w-full bg-transparent text-right" placeholder="Tulis Total..."/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {/* Kanan: Faktur */}
+                                        <div className="space-y-2">
+                                            <h3 className="text-xs font-bold bg-slate-100 dark:bg-slate-800 p-2 rounded text-center text-orange-700 dark:text-orange-400 border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2">
+                                                <i data-lucide="zap" className="w-3.5 h-3.5"></i>
+                                                Tabel Faktur / Rincian (Auto-Kalkulasi)
+                                            </h3>
+                                            <div className="border rounded-lg overflow-hidden text-xs">
+                                                <div className="grid grid-cols-3 bg-slate-50 dark:bg-slate-900 border-b font-bold">
+                                                    <div className="p-2 border-r text-center">NO FAKTUR</div><div className="p-2 border-r text-center">TANGGAL</div><div className="p-2 text-center">JUMLAH</div>
+                                                </div>
+                                                {poTableRight.map((row, idx) => (
+                                                    <div key={idx} className="grid grid-cols-3 border-b last:border-b-0 relative">
+                                                        {/* Logika Dropdown untuk Baris ke-1 & ke-2 (Index 0 & 1) */}
+                                                        {idx === 0 ? (
+                                                            <select 
+                                                                value={row.noFaktur} 
+                                                                onChange={(e) => {
+                                                                    const val = e.target.value;
+                                                                    const newData = [...poTableRight];
+                                                                    newData[0].noFaktur = val;
+                                                                    if (!newData[0].tanggal && val) {
+                                                                        const d = new Date();
+                                                                        newData[0].tanggal = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()}`;
+                                                                    }
+                                                                    setPoTableRight(newData);
+                                                                }} 
+                                                                className="p-1.5 border-r outline-none w-full bg-transparent appearance-none text-orange-700 dark:text-orange-400 font-bold"
+                                                            >
+                                                                <option value="">-- Pilih Ritasi --</option>
+                                                                {[...Array(100)].map((_, i) => <option key={i+1} value={`${i+1} rit`}>{i+1} rit</option>)}
+                                                            </select>
+                                                        ) : idx === 1 ? (
+                                                            <select 
+                                                                value={row.noFaktur} 
+                                                                onChange={(e) => {
+                                                                    const val = e.target.value;
+                                                                    const newData = [...poTableRight];
+                                                                    newData[1].noFaktur = val;
+                                                                    
+                                                                    let vol = val === "Blesscon 10 cm" ? "11,52 x 1" : (val === "Blesscon 7,5 cm" ? "11,88" : "");
+                                                                    if (vol) {
+                                                                        newData[2].noFaktur = vol;
+                                                                        newData[1].jumlah = `X ${vol.split('x')[0].trim()}`;
+                                                                    }
+                                                                    setPoTableRight(newData);
+                                                                }} 
+                                                                className="p-1.5 border-r outline-none w-full bg-transparent appearance-none text-orange-700 dark:text-orange-400 font-bold"
+                                                            >
+                                                                <option value="">-- Pilih Ukuran --</option>
+                                                                <option value="Blesscon 10 cm">Blesscon 10 cm</option>
+                                                                <option value="Blesscon 7,5 cm">Blesscon 7,5 cm</option>
+                                                            </select>
+                                                        ) : (
+                                                            <input type="text" value={row.noFaktur} onChange={(e)=>updateTableRight(idx, 'noFaktur', e.target.value)} className="p-1.5 border-r outline-none w-full bg-transparent text-center font-bold"/>
+                                                        )}
+                                                        
+                                                        {/* Icon penanda Dropdown */}
+                                                        {(idx === 0 || idx === 1) && <i data-lucide="chevron-down" className="absolute left-[29%] top-2 w-3.5 h-3.5 text-orange-400 pointer-events-none"></i>}
+
+                                                        {/* Kolom Tanggal */}
+                                                        <input type="text" value={row.tanggal} onChange={(e)=>updateTableRight(idx, 'tanggal', e.target.value)} className="p-1.5 border-r outline-none w-full bg-transparent text-center"/>
+                                                        
+                                                        {/* Kolom Jumlah */}
+                                                        {idx === 0 ? (
+                                                            <input 
+                                                                type="text" 
+                                                                value={row.jumlah} 
+                                                                onChange={(e) => updateTableRight(idx, 'jumlah', e.target.value)} 
+                                                                placeholder="Hrg Sat/m3 (Mis: 690000)"
+                                                                className="p-1.5 outline-none w-full bg-transparent text-right font-bold text-orange-700 dark:text-orange-400"
+                                                            />
+                                                        ) : (
+                                                            <input type="text" value={row.jumlah} onChange={(e)=>updateTableRight(idx, 'jumlah', e.target.value)} className="p-1.5 outline-none w-full bg-transparent text-right font-bold"/>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                                <div className="grid grid-cols-3 bg-slate-50 dark:bg-slate-900 font-bold border-t">
+                                                    <div className="col-span-2 p-2 text-right border-r">TOTAL</div>
+                                                    <input type="text" value={poTotalRight} onChange={(e)=>setPoTotalRight(e.target.value)} className="p-1.5 outline-none w-full bg-transparent text-right font-bold text-orange-700 dark:text-orange-400" placeholder="Tulis Total..."/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* FOOTER & TTD */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Catatan</label>
+                                            <input type="text" value={poCatatan} onChange={(e) => setPoCatatan(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-400"/>
+                                        </div>
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Tempat & Tanggal (Kanan Bawah)</label>
+                                            <input type="text" value={poTempatTanggal} onChange={(e) => setPoTempatTanggal(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-orange-400" placeholder="Malang, ..."/>
+                                        </div>
+                                        <div className="md:col-span-2 mt-2">
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Penandatangan (Yang menerima)</label>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <input type="text" value={poPenerima1Nama} onChange={(e) => setPoPenerima1Nama(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Nama Penerima 1" readOnly={poProyekPilihan !== "Manual"} />
+                                                    <input type="text" value={poPenerima1Hp} onChange={(e) => setPoPenerima1Hp(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Nomor HP/Keterangan" readOnly={poProyekPilihan !== "Manual"} />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <input type="text" value={poPenerima2Nama} onChange={(e) => setPoPenerima2Nama(e.target.value)} className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Nama Penerima 2 (Opsional)"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* PREVIEW CETAK PO (STYLING MENYESUAIKAN GAMBAR) */}
+                                <div className="pt-6 print:pt-0 border-t-2 border-dashed border-slate-300 print:border-none">
+                                    <div className="flex items-center justify-between mb-4 print:hidden">
+                                        <h3 className="text-slate-500 text-sm font-bold flex items-center gap-2 uppercase tracking-wider"><i data-lucide="eye" className="w-4 h-4 text-orange-500"></i> Pratinjau Tanda Terima</h3>
+                                    </div>
+                                    <div ref={previewRef} className="paper-preview px-12 py-12 print:shadow-none font-sans text-black" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                        
+                                        {/* HEADER */}
+                                        <div className="flex items-center gap-4 mb-8">
+                                            {poLogo && <img src={poLogo} alt="Logo" className="h-[50px] object-contain" />}
+                                            <h1 className="text-[15pt] font-bold tracking-wide uppercase">{poCompanyName}</h1>
+                                        </div>
+                                        
+                                        <div className="text-center mb-6">
+                                            <h2 className="text-[13pt] font-bold">TANDA TERIMA PEMBAYARAN</h2>
+                                        </div>
+                                        <div className="text-right font-bold text-[11pt] underline underline-offset-4 mb-4">
+                                            <u>No : {poNo}</u>
+                                        </div>
+
+                                        {/* FIELDS */}
+                                        <table className="w-full text-[11pt] mb-6 border-collapse">
+                                            <tbody>
+                                                <tr>
+                                                    <td className="w-40 py-1 align-top">Telah terima dari</td>
+                                                    <td className="w-4 py-1 align-top">:</td>
+                                                    <td className="py-1 align-top border-b border-black">{poTerimaDari}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className="py-1 align-top">Alamat</td>
+                                                    <td className="py-1 align-top">:</td>
+                                                    <td className="py-1 align-top border-b border-black">{poAlamat}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td className="py-1 align-top">Untuk Pembayaran</td>
+                                                    <td className="py-1 align-top">:</td>
+                                                    <td className="py-1 align-top border-b border-black">{poUntukPembayaran}</td>
+                                                </tr>
+                                                {/* Baris kosong pelengkap (seperti di gambar) */}
+                                                <tr><td colSpan="2"></td><td className="py-3 border-b border-black"></td></tr>
+                                            </tbody>
+                                        </table>
+
+                                        {/* TABLES */}
+                                        <div className="flex gap-4 mb-8 text-[10pt]">
+                                            {/* Left Table */}
+                                            <table className="w-1/2 border-collapse border border-black">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="border border-black p-1 text-center font-bold">NO CEK/BG</th>
+                                                        <th className="border border-black p-1 text-center font-bold">BANK</th>
+                                                        <th className="border border-black p-1 text-center font-bold">TANGGAL</th>
+                                                        <th className="border border-black p-1 text-center font-bold">JUMLAH</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {poTableLeft.map((r, i) => (
+                                                        <tr key={i} className="h-6">
+                                                            <td className="border border-black px-1">{r.noCek}</td>
+                                                            <td className="border border-black px-1">{r.bank}</td>
+                                                            <td className="border border-black px-1">{r.tanggal}</td>
+                                                            <td className="border border-black px-1 text-right">{r.jumlah}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colSpan="3" className="text-center font-bold py-1">TOTAL</td>
+                                                        <td className="border border-black px-1 text-right">{poTotalLeft}</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                            
+                                            {/* Right Table */}
+                                            <table className="w-1/2 border-collapse border border-black">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="border border-black p-1 text-center font-bold">NO FAKTUR</th>
+                                                        <th className="border border-black p-1 text-center font-bold">TANGGAL</th>
+                                                        <th className="border border-black p-1 text-center font-bold">JUMLAH</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {poTableRight.map((r, i) => (
+                                                        <tr key={i} className="h-6">
+                                                            <td className="border border-black px-1">{r.noFaktur}</td>
+                                                            <td className="border border-black px-1">{r.tanggal}</td>
+                                                            <td className="border border-black px-1 text-right">{r.jumlah}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                                <tfoot>
+                                                    <tr>
+                                                        <td colSpan="2" className="text-center font-bold py-1">TOTAL</td>
+                                                        <td className="border border-black px-1 text-right">{poTotalRight}</td>
+                                                    </tr>
+                                                </tfoot>
+                                            </table>
+                                        </div>
+
+                                        {/* FOOTER SECTION */}
+                                        <div className="flex justify-between items-start text-[11pt]">
+                                            {/* Left Footer */}
+                                            <div className="w-1/2 pr-4">
+                                                <div className="flex mb-12">
+                                                    <span className="w-24 underline decoration-red-500 underline-offset-4 decoration-wavy">Catatan :</span>
+                                                    <span className="flex-1 border-b border-black">{poCatatan}</span>
+                                                </div>
+                                                <div className="border-b border-black mb-8"></div>
+                                                
+                                                <div className="flex">
+                                                    <span className="w-24 text-blue-800 italic underline">Gambar :</span>
+                                                    <ol className="list-decimal list-inside text-red-700 italic">
+                                                        <li>Untuk customer</li>
+                                                        <li>Untuk Penagihan</li>
+                                                        <li>Untuk Administrasi</li>
+                                                        <li>Untuk Arsip</li>
+                                                    </ol>
+                                                </div>
+                                            </div>
+                                            
+                                            {/* Right Footer (Signatures) */}
+                                            <div className="w-1/2 flex flex-col items-center">
+                                                <div className="mb-4 text-blue-800 underline decoration-black underline-offset-4">{poTempatTanggal}</div>
+                                                <div className="w-full flex justify-around mt-4 text-center">
+                                                    <div className="w-40 flex flex-col items-center">
+                                                        <p className="underline decoration-red-500 decoration-wavy underline-offset-4 mb-20">Yang menerima,</p>
+                                                        <p className="border-b border-black w-full mb-1">{poPenerima1Nama}</p>
+                                                        <p>{poPenerima1Hp}</p>
+                                                    </div>
+                                                    <div className="w-40 flex flex-col items-center">
+                                                        <p className="underline decoration-red-500 decoration-wavy underline-offset-4 mb-20">Yang menerima,</p>
+                                                        {poPenerima2Nama ? (
+                                                            <p className="border-b border-black w-full mb-1">{poPenerima2Nama}</p>
+                                                        ) : (
+                                                            <p className="border-b border-black w-full"></p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </main>
