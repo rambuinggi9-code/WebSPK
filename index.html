@@ -1084,28 +1084,26 @@
                                                 <div className="w-full flex justify-between px-4 mt-4 text-center">
                                                     
                                                     {/* PENERIMA 1 (Dengan Tanda Tangan) */}
-                                                    <div className="w-[45%] flex flex-col justify-between h-[160px] relative group items-center">
-                                                        <p className="mb-auto mt-0 text-black">Yang menerima,</p>
-                                                        
-                                                        {poPenerima1Signature ? (
-                                                            <div className="flex items-center justify-center h-28 w-full overflow-hidden absolute inset-0 top-1/2 -translate-y-1/2 z-0 -mt-4">
-                                                                <img src={poPenerima1Signature} className="signature-img max-h-full object-contain mix-blend-multiply opacity-90"/>
-                                                                <label className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded">
-                                                                    <i data-lucide="upload-cloud" className="w-4 h-4 text-orange-600 mb-1"></i>
-                                                                    <span className="text-[9px] font-bold text-orange-700">Ubah TTD</span>
-                                                                    <input type="file" accept="image/*" className="hidden" onChange={handlePoPenerima1SignatureUpload}/>
-                                                                </label>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="absolute inset-0 top-1/2 -translate-y-1/2 z-10 w-full flex justify-center -mt-4">
-                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-24 h-14 border border-dashed border-orange-400 hover:border-orange-600 rounded bg-orange-50 hover:bg-orange-100 transition-colors">
+                                                    <div className="w-[45%] flex flex-col h-[160px] group items-center">
+                                                        <p className="mt-0 text-black">Yang menerima,</p>
+                                                        <div className="relative my-2 flex h-20 w-full items-center justify-center overflow-hidden">
+                                                            {poPenerima1Signature ? (
+                                                                <>
+                                                                    <img src={poPenerima1Signature} className="signature-img max-h-full object-contain mix-blend-multiply opacity-90"/>
+                                                                    <label className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded">
+                                                                        <i data-lucide="upload-cloud" className="w-4 h-4 text-orange-600 mb-1"></i>
+                                                                        <span className="text-[9px] font-bold text-orange-700">Ubah TTD</span>
+                                                                        <input type="file" accept="image/*" className="hidden" onChange={handlePoPenerima1SignatureUpload}/>
+                                                                    </label>
+                                                                </>
+                                                            ) : (
+                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-24 h-12 border border-dashed border-orange-400 hover:border-orange-600 rounded bg-orange-50 hover:bg-orange-100 transition-colors">
                                                                     <span className="text-[8px] text-orange-600 font-bold text-center leading-tight">Upload TTD</span>
                                                                     <input type="file" accept="image/*" className="hidden" onChange={handlePoPenerima1SignatureUpload} />
                                                                 </label>
-                                                            </div>
-                                                        )}
-
-                                                        <div className="w-full relative z-10 mt-auto flex flex-col items-center bg-white/60 print:bg-transparent">
+                                                            )}
+                                                        </div>
+                                                        <div className="w-full mt-auto flex flex-col items-center bg-white/60 print:bg-transparent">
                                                             <p className="border-b border-black w-full pb-0.5 whitespace-nowrap overflow-hidden text-center">{poPenerima1Nama || "\u00A0"}</p>
                                                             <p className="pt-0.5 min-h-[1.5rem] text-center">{poPenerima1Hp || "\u00A0"}</p>
                                                         </div>
