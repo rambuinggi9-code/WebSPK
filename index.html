@@ -916,14 +916,14 @@
                                             </div>
                                             <div className="w-1/2 flex flex-col items-center">
                                                 <div className="mb-4 text-black underline decoration-black underline-offset-4">{poTempatTanggal}</div>
-                                                <div className="w-full flex justify-between px-4 mt-4 text-center gap-6">
+                                                <div className="w-full flex justify-between px-4 mt-4 text-center">
                                                     
                                                     {/* PENERIMA 1 (Dengan Tanda Tangan) */}
-                                                    <div className="w-[45%] flex flex-col justify-between h-[130px] relative group items-center">
-                                                        <p className="underline decoration-red-500 decoration-wavy underline-offset-4 mb-auto mt-0 text-black">Yang menerima,</p>
+                                                    <div className="w-[45%] flex flex-col justify-between h-[160px] relative group items-center">
+                                                        <p className="mb-auto mt-0 text-black">Yang menerima,</p>
                                                         
                                                         {poPenerima1Signature ? (
-                                                            <div className="flex items-center justify-center h-16 w-full overflow-hidden absolute inset-0 top-1/2 -translate-y-1/2 z-0 mt-4">
+                                                            <div className="flex items-center justify-center h-28 w-full overflow-hidden absolute inset-0 top-1/2 -translate-y-1/2 z-0 -mt-4">
                                                                 <img src={poPenerima1Signature} className="signature-img max-h-full object-contain mix-blend-multiply opacity-90"/>
                                                                 <label className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded">
                                                                     <i data-lucide="upload-cloud" className="w-4 h-4 text-orange-600 mb-1"></i>
@@ -932,8 +932,8 @@
                                                                 </label>
                                                             </div>
                                                         ) : (
-                                                            <div className="absolute inset-0 top-1/2 -translate-y-1/2 z-10 w-full flex justify-center mt-4">
-                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-20 h-10 border border-dashed border-orange-400 hover:border-orange-600 rounded bg-orange-50 hover:bg-orange-100 transition-colors">
+                                                            <div className="absolute inset-0 top-1/2 -translate-y-1/2 z-10 w-full flex justify-center -mt-4">
+                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-24 h-14 border border-dashed border-orange-400 hover:border-orange-600 rounded bg-orange-50 hover:bg-orange-100 transition-colors">
                                                                     <span className="text-[8px] text-orange-600 font-bold text-center leading-tight">Upload TTD</span>
                                                                     <input type="file" accept="image/*" className="hidden" onChange={handlePoPenerima1SignatureUpload} />
                                                                 </label>
@@ -947,8 +947,8 @@
                                                     </div>
 
                                                     {/* PENERIMA 2 */}
-                                                    <div className="w-[45%] flex flex-col justify-between h-[130px] relative group items-center">
-                                                        <p className="underline decoration-red-500 decoration-wavy underline-offset-4 mb-auto mt-0 text-black">Yang menerima,</p>
+                                                    <div className="w-[45%] flex flex-col justify-between h-[160px] relative group items-center">
+                                                        <p className="mb-auto mt-0 text-black">Yang menerima,</p>
                                                         <div className="w-full relative z-10 mt-auto flex flex-col items-center">
                                                             <p className="border-b border-black w-full pb-0.5 whitespace-nowrap overflow-hidden text-center">{poPenerima2Nama || "\u00A0"}</p>
                                                             <p className="pt-0.5 min-h-[1.5rem] text-center">&nbsp;</p>
