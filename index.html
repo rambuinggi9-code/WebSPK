@@ -10,23 +10,46 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = { darkMode: 'class' }
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 50: '#fffaf2', 100: '#f9ead4', 200: '#ecd1af', 300: '#d8b58c', 400: '#ae8260', 500: '#806047', 600: '#614534', 700: '#49332b', 800: '#30282a', 900: '#20242d', 950: '#121923' },
+                        blue: { 50: '#e7f7ff', 100: '#c8efff', 200: '#95e1ff', 300: '#58ccff', 400: '#27b3ee', 500: '#168ed3', 600: '#146fab', 700: '#155a8a', 800: '#174b70', 900: '#183f5d', 950: '#112a40' },
+                        teal: { 50: '#e4fbf7', 100: '#c2f4ec', 200: '#8ce7d9', 300: '#50d8c8', 400: '#2ac2b3', 500: '#169b91', 600: '#117b74', 700: '#12625e', 800: '#164e4c', 900: '#173f3e', 950: '#0d2a2a' },
+                        orange: { 50: '#fff4df', 100: '#ffe7b9', 200: '#ffd181', 300: '#fbb34a', 400: '#f3912d', 500: '#e66e1d', 600: '#c75117', 700: '#a33d18', 800: '#84321b', 900: '#6d2b1a', 950: '#3d180e' },
+                        amber: { 50: '#fff9df', 100: '#fff0ae', 200: '#ffdf69', 300: '#fac747', 400: '#f3a923', 500: '#dc8a16', 600: '#ba6914', 700: '#944e17', 800: '#783e18', 900: '#633419', 950: '#391b0b' },
+                        emerald: { 50: '#eafbf1', 100: '#ccf5dc', 200: '#9be9bc', 300: '#5bd491', 400: '#32b96e', 500: '#209852', 600: '#187a42', 700: '#176238', 800: '#17502f', 900: '#154229', 950: '#0d271a' }
+                    },
+                    boxShadow: {
+                        sketch: '5px 6px 0 rgba(42, 74, 92, 0.14)',
+                        float: '0 16px 35px -18px rgba(53, 79, 92, 0.42)'
+                    }
+                }
+            }
+        }
     </script>
     <script src="https://unpkg.com/lucide@latest"></script>
     
     <style>
         .architecture-bg {
-            background-color: #f8fafc;
+            background-color: #fff8ed;
             background-image: 
-                linear-gradient(to right, #e2e8f0 1px, transparent 1px),
-                linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
-            background-size: 32px 32px;
+                radial-gradient(circle at 8% 6%, rgba(251, 179, 74, 0.24) 0 5.5rem, transparent 5.6rem),
+                radial-gradient(circle at 91% 12%, rgba(80, 216, 200, 0.18) 0 7rem, transparent 7.1rem),
+                linear-gradient(to right, rgba(31, 139, 190, 0.14) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(31, 139, 190, 0.14) 1px, transparent 1px);
+            background-size: auto, auto, 28px 28px, 28px 28px;
         }
         .dark .architecture-bg {
-            background-color: #020617;
+            background-color: #121f2a;
             background-image: 
-                linear-gradient(to right, rgba(30, 41, 59, 0.4) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(30, 41, 59, 0.4) 1px, transparent 1px);
+                radial-gradient(circle at 8% 6%, rgba(243, 145, 45, 0.12) 0 5.5rem, transparent 5.6rem),
+                radial-gradient(circle at 91% 12%, rgba(80, 216, 200, 0.10) 0 7rem, transparent 7.1rem),
+                linear-gradient(to right, rgba(148, 217, 241, 0.10) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(148, 217, 241, 0.10) 1px, transparent 1px);
+            background-size: auto, auto, 28px 28px, 28px 28px;
         }
 
         @media print {
@@ -53,6 +76,19 @@
             .print-cols-2 { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 0.5rem !important; }
             .print-cols-3 { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 0.5rem !important; }
             .print-cols-4 { display: grid !important; grid-template-columns: repeat(4, minmax(0, 1fr)) !important; gap: 0.5rem !important; }
+
+            /* The PO form is a single sheet. Removing min-height: 100vh in print
+               prevents the screen-sized wrapper from overflowing onto a blank page. */
+            .po-print-shell {
+                min-height: 0 !important;
+                height: auto !important;
+                margin-bottom: 0 !important;
+                padding-bottom: 0 !important;
+            }
+            .po-print-document {
+                break-after: avoid-page;
+                page-break-after: avoid;
+            }
         }
         
         .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
@@ -71,9 +107,96 @@
             color: black;
             box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
         }
+
+        /* Fun architectural treatment: translucent planning boards, colourful material swatches,
+           and a paper-sheet preview while preserving the document's neutral print layout. */
+        @media screen {
+            ::selection { background: #ffd181; color: #30282a; }
+
+            .fun-architecture .bg-white:not(.paper-preview) {
+                background-color: rgba(255, 253, 248, 0.88) !important;
+                backdrop-filter: blur(10px);
+            }
+            .fun-architecture .rounded-2xl { border-radius: 1.45rem !important; }
+            .fun-architecture .shadow-sm { box-shadow: 4px 5px 0 rgba(35, 80, 102, 0.12) !important; }
+            .fun-architecture .shadow-md { box-shadow: 0 12px 24px -14px rgba(44, 73, 87, 0.48) !important; }
+            .fun-architecture .border { border-color: rgba(135, 99, 67, 0.22); }
+
+            .fun-architecture button {
+                transition: transform 170ms ease, box-shadow 170ms ease, filter 170ms ease !important;
+            }
+            .fun-architecture button:hover {
+                transform: translateY(-2px) rotate(-0.25deg);
+                filter: saturate(1.08);
+            }
+            .fun-architecture button:active { transform: translateY(1px); }
+            .fun-architecture input:not([type="file"]),
+            .fun-architecture select,
+            .fun-architecture textarea { border-radius: 0.8rem !important; }
+
+            .fun-architecture .paper-preview {
+                position: relative;
+                overflow: hidden;
+                border: 4px solid #f2c36e;
+                border-radius: 1.8rem;
+                box-shadow: 11px 12px 0 rgba(32, 111, 139, 0.18), 0 20px 34px -24px rgba(28, 51, 66, 0.72);
+            }
+            .fun-architecture .paper-preview::before {
+                content: '';
+                position: absolute;
+                inset: 0.55rem;
+                border: 1px dashed rgba(22, 142, 211, 0.30);
+                border-radius: 1.35rem;
+                pointer-events: none;
+            }
+            .fun-architecture .paper-preview > * { position: relative; z-index: 1; }
+
+            .dark .fun-architecture .dark\:bg-slate-900,
+            .dark .fun-architecture .dark\:bg-slate-950 {
+                background-color: rgba(29, 43, 52, 0.90) !important;
+                backdrop-filter: blur(10px);
+            }
+            .dark .fun-architecture .paper-preview { border-color: #f3a923; }
+
+            .fun-architecture .app-menu-bar {
+                position: fixed !important;
+                top: 0 !important;
+                right: 0;
+                left: 0;
+                width: 100%;
+                z-index: 60 !important;
+                isolation: isolate;
+                box-shadow: 0 8px 18px -14px rgba(25, 53, 68, 0.72) !important;
+            }
+            .fun-architecture .app-page-shell {
+                padding-top: var(--app-menu-height, 6.5rem);
+            }
+            .fun-architecture .app-menu-bar::after {
+                content: '';
+                position: absolute;
+                z-index: -1;
+                left: 0;
+                right: 0;
+                bottom: -4px;
+                height: 4px;
+                background: repeating-linear-gradient(90deg, rgba(22, 142, 211, 0.82) 0 22px, rgba(243, 169, 35, 0.82) 22px 33px, rgba(42, 194, 179, 0.82) 33px 55px);
+                box-shadow: 0 3px 9px rgba(29, 87, 108, 0.18);
+            }
+            .fun-architecture .realtime-clock {
+                min-width: 12.25rem;
+                background: linear-gradient(135deg, #fffaf0 0%, #e7f7ff 100%);
+                border-color: rgba(22, 142, 211, 0.30) !important;
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75), 3px 3px 0 rgba(22, 142, 211, 0.10);
+            }
+            .dark .fun-architecture .realtime-clock {
+                background: linear-gradient(135deg, #20313a 0%, #173d52 100%);
+                border-color: rgba(149, 225, 255, 0.25) !important;
+                box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05), 3px 3px 0 rgba(0, 0, 0, 0.18);
+            }
+        }
     </style>
 </head>
-<body class="architecture-bg text-slate-800 dark:text-slate-100 font-sans antialiased pb-12 print:p-0 print:bg-white print:text-black transition-colors duration-300">
+<body class="fun-architecture architecture-bg text-slate-800 dark:text-slate-100 font-sans antialiased pb-12 print:p-0 print:bg-white print:text-black transition-colors duration-300">
 
     <div id="root"></div>
 
@@ -192,6 +315,30 @@
             return options;
         };
 
+        const RealtimeClock = () => {
+            const [now, setNow] = useState(() => new Date());
+
+            useEffect(() => {
+                const timerId = window.setInterval(() => setNow(new Date()), 1000);
+                return () => window.clearInterval(timerId);
+            }, []);
+
+            const hari = now.toLocaleDateString('id-ID', { weekday: 'long' });
+            const tanggal = now.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+            const jam = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+            return (
+                <div className="realtime-clock flex items-center gap-2.5 rounded-xl border px-3 py-2 text-slate-700 dark:text-slate-100" aria-live="polite" title="Waktu lokal saat ini">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-white shadow-sm"><i data-lucide="clock-3" className="w-4 h-4"></i></div>
+                    <div className="min-w-0 leading-tight">
+                        <p className="text-[10px] font-black uppercase tracking-wide text-blue-700 dark:text-blue-200">{hari}</p>
+                        <p className="whitespace-nowrap text-[10px] font-semibold text-slate-500 dark:text-slate-300">{tanggal}</p>
+                    </div>
+                    <time className="ml-auto font-mono text-sm font-black tracking-wider text-slate-800 dark:text-white">{jam}</time>
+                </div>
+            );
+        };
+
         function App() {
             const [activeView, setActiveView] = useState('home');
             const [theme, setTheme] = useState(() => localStorage.getItem('BCA_THEME') || 'light');
@@ -276,6 +423,22 @@
             const [poPenerima1Signature, setPoPenerima1Signature] = useState(null);
 
             useEffect(() => { if (theme === 'dark') document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); localStorage.setItem('BCA_THEME', theme); }, [theme]);
+            useEffect(() => {
+                const root = document.documentElement;
+                const menu = document.querySelector('.app-menu-bar');
+                if (!menu) { root.style.removeProperty('--app-menu-height'); return undefined; }
+
+                const syncMenuHeight = () => root.style.setProperty('--app-menu-height', `${menu.getBoundingClientRect().height}px`);
+                syncMenuHeight();
+                const observer = window.ResizeObserver ? new window.ResizeObserver(syncMenuHeight) : null;
+                observer?.observe(menu);
+                window.addEventListener('resize', syncMenuHeight);
+
+                return () => {
+                    observer?.disconnect();
+                    window.removeEventListener('resize', syncMenuHeight);
+                };
+            }, [activeView]);
             useEffect(() => { localStorage.setItem('BCA_DAFTAR_SPK', JSON.stringify(daftarSpk)); }, [daftarSpk]);
             useEffect(() => { localStorage.setItem('BCA_DAFTAR_SPK_TIPE30', JSON.stringify(t30DaftarSpk)); }, [t30DaftarSpk]);
             useEffect(() => { localStorage.setItem('BCA_DAFTAR_PO', JSON.stringify(poDaftar)); }, [poDaftar]);
@@ -470,14 +633,14 @@
             // ==============================================================================
             if (activeView === 'spk_tipe30') {
                 return (
-                    <div key="view-tipe30" className="min-h-screen transition-colors duration-300">
+                    <div key="view-tipe30" className="app-page-shell min-h-screen transition-colors duration-300">
                         <div className="print:hidden">
                             {notification && (
                                 <div className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border transition-all animate-[slideInDown_0.3s_ease-out] ${notification.type === 'error' ? 'bg-red-50 text-red-700 border-red-200' : notification.type === 'info' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-teal-50 text-teal-700 border-teal-200'}`}>
                                     <i data-lucide={notification.type === 'error' ? "alert-triangle" : notification.type === 'info' ? "info" : "check-circle"} className="w-5 h-5 shrink-0"></i><span className="text-sm font-semibold tracking-wide">{notification.message}</span>
                                 </div>
                             )}
-                            <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm py-4 px-6 sticky top-0 z-40 border-t-4 border-t-teal-600 transition-colors duration-300">
+                            <header className="app-menu-bar bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm py-4 px-6 sticky top-0 z-40 border-t-4 border-t-teal-600 transition-colors duration-300">
                                 <div className="max-w-[90rem] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                                     <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
                                         <button onClick={() => handleNavigate('home')} className="flex p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-teal-50 text-slate-600 hover:text-teal-600 rounded-xl transition-all shadow-sm group shrink-0" title="Kembali"><i data-lucide="home" className="w-5 h-5"></i></button>
@@ -485,6 +648,7 @@
                                         <div className="flex-1 min-w-0"><h1 className="font-extrabold text-lg tracking-wide text-slate-900 dark:text-white truncate">SPK BORONGAN (TIPE 30)</h1><p className="text-xs text-slate-500 font-medium mt-0.5 truncate">PT Bangun Cinta Alam</p></div>
                                     </div>
                                     <div className="flex items-center gap-3 flex-wrap w-full md:w-auto">
+                                        <RealtimeClock />
                                         <button onClick={toggleTheme} className="flex gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm text-xs">{theme === 'light' ? <><i data-lucide="moon" className="w-4 h-4"></i> Gelap</> : <><i data-lucide="sun" className="w-4 h-4 text-amber-400"></i> Terang</>}</button>
                                         <button onClick={handleT30ResetData} className="flex gap-2 bg-white dark:bg-slate-800 text-slate-700 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm text-xs"><i data-lucide="rotate-ccw" className="w-4 h-4"></i> Reset</button>
                                         <button onClick={handlePreviewScroll} className="flex gap-2 bg-white dark:bg-slate-800 text-slate-700 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm text-xs"><i data-lucide="eye" className="w-4 h-4 text-teal-500"></i> Pratinjau</button>
@@ -730,21 +894,22 @@
             // ==============================================================================
             if (activeView === 'po_bata') {
                 return (
-                    <div key="view-pobata" className="min-h-screen transition-colors duration-300">
+                    <div key="view-pobata" className="app-page-shell po-print-shell min-h-screen transition-colors duration-300">
                         <div className="print:hidden">
                             {notification && (
                                 <div className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border transition-all animate-[slideInDown_0.3s_ease-out] ${notification.type === 'error' ? 'bg-red-50 text-red-700 border-red-200' : notification.type === 'info' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-orange-50 text-orange-700 border-orange-200'}`}>
                                     <i data-lucide={notification.type === 'error' ? "alert-triangle" : notification.type === 'info' ? "info" : "check-circle"} className="w-5 h-5 shrink-0"></i><span className="text-sm font-semibold tracking-wide">{notification.message}</span>
                                 </div>
                             )}
-                            <header className="bg-white dark:bg-slate-900 border-b border-slate-200 shadow-sm py-4 px-6 sticky top-0 z-40 border-t-4 border-t-orange-500">
+                            <header className="app-menu-bar bg-white dark:bg-slate-900 border-b border-slate-200 shadow-sm py-4 px-6 sticky top-0 z-40 border-t-4 border-t-orange-500">
                                 <div className="max-w-[90rem] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                                     <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
                                         <button onClick={() => handleNavigate('home')} className="flex p-2.5 bg-slate-100 hover:bg-orange-50 text-slate-600 hover:text-orange-600 rounded-xl shadow-sm"><i data-lucide="home" className="w-5 h-5"></i></button>
                                         <div className="w-px h-8 bg-slate-200 hidden sm:block"></div>
                                         <div><h1 className="font-extrabold text-lg tracking-wide text-slate-900 dark:text-white">PO BATA RINGAN (TANDA TERIMA)</h1><p className="text-xs text-slate-500 font-medium">Format Khusus Pembayaran & Faktur</p></div>
                                     </div>
-                                    <div className="flex gap-3 flex-wrap">
+                                    <div className="flex items-center gap-3 flex-wrap">
+                                        <RealtimeClock />
                                         <button onClick={toggleTheme} className="flex gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl border border-slate-300 text-xs shadow-sm">{theme === 'light' ? <><i data-lucide="moon" className="w-4 h-4"></i> Gelap</> : <><i data-lucide="sun" className="w-4 h-4 text-amber-400"></i> Terang</>}</button>
                                         <button onClick={handlePoResetData} className="flex gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm text-xs"><i data-lucide="rotate-ccw" className="w-4 h-4"></i> Reset</button>
                                         <button onClick={handlePreviewScroll} className="flex gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm text-xs"><i data-lucide="eye" className="w-4 h-4 text-orange-500"></i> Pratinjau</button>
@@ -881,7 +1046,7 @@
 
                                 <div className="pt-6 print:pt-0 border-t-2 border-dashed border-slate-300 print:border-none">
                                     <div className="flex items-center justify-between mb-4 print:hidden"><h3 className="text-slate-500 text-sm font-bold flex items-center gap-2 uppercase tracking-wider"><i data-lucide="eye" className="w-4 h-4 text-orange-500"></i> Pratinjau Tanda Terima</h3></div>
-                                    <div ref={previewRef} className="paper-preview px-12 py-12 print:p-0 print:m-0 print:shadow-none print:max-w-full print:rounded-none print:border-none font-sans text-black" style={{ fontFamily: 'Arial, sans-serif' }}>
+                                    <div ref={previewRef} className="po-print-document paper-preview px-12 py-12 print:p-0 print:m-0 print:shadow-none print:max-w-full print:rounded-none print:border-none font-sans text-black" style={{ fontFamily: 'Arial, sans-serif' }}>
                                         <div className="flex items-center gap-4 mb-8">
                                             {poLogo && <img src={poLogo} alt="Logo" className="h-[50px] object-contain" />}
                                             <h1 className="text-[15pt] font-bold tracking-wide uppercase">{poCompanyName}</h1>
@@ -969,14 +1134,14 @@
             // RENDER HALAMAN SPK UMUM
             // ==============================================================================
             return (
-                <div key="view-umum" className="min-h-screen transition-colors duration-300">
+                <div key="view-umum" className="app-page-shell min-h-screen transition-colors duration-300">
                     <div className="print:hidden">
                         {notification && (
                             <div className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border transition-all animate-[slideInDown_0.3s_ease-out] ${notification.type === 'error' ? 'bg-red-50 text-red-700 border-red-200' : notification.type === 'info' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-emerald-50 text-emerald-700 border-emerald-200'}`}>
                                 <i data-lucide={notification.type === 'error' ? "alert-triangle" : notification.type === 'info' ? "info" : "check-circle"} className="w-5 h-5 shrink-0"></i><span className="text-sm font-semibold tracking-wide">{notification.message}</span>
                             </div>
                         )}
-                        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm py-4 px-6 sticky top-0 z-40 border-t-4 border-t-blue-600 transition-colors duration-300">
+                        <header className="app-menu-bar bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shadow-sm py-4 px-6 sticky top-0 z-40 border-t-4 border-t-blue-600 transition-colors duration-300">
                             <div className="max-w-[90rem] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                                 <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
                                     <button onClick={() => handleNavigate('home')} className="flex items-center justify-center p-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-blue-50 text-slate-600 hover:text-blue-600 rounded-xl transition-all shadow-sm group shrink-0"><i data-lucide="home" className="w-5 h-5"></i></button>
@@ -984,6 +1149,7 @@
                                     <div className="flex-1 min-w-0"><h1 className="font-extrabold text-lg tracking-wide text-slate-900 dark:text-white truncate">SPK GENERATOR & DATABASE</h1><p className="text-xs text-slate-500 font-medium mt-0.5 truncate">PT Bangun Cinta Alam</p></div>
                                 </div>
                                 <div className="flex items-center gap-3 flex-wrap w-full md:w-auto">
+                                    <RealtimeClock />
                                     <button onClick={toggleTheme} className="flex gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm text-xs">{theme === 'light' ? <><i data-lucide="moon" className="w-4 h-4"></i> Gelap</> : <><i data-lucide="sun" className="w-4 h-4 text-amber-400"></i> Terang</>}</button>
                                     <button onClick={handleResetData} className="flex gap-2 bg-white dark:bg-slate-800 text-slate-700 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm text-xs"><i data-lucide="rotate-ccw" className="w-4 h-4"></i> Reset</button>
                                     <button onClick={handlePreviewScroll} className="flex gap-2 bg-white dark:bg-slate-800 text-slate-700 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm text-xs"><i data-lucide="eye" className="w-4 h-4 text-blue-500"></i> Pratinjau</button>
