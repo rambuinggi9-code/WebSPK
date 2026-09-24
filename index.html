@@ -280,6 +280,10 @@
             return terbilang(parseInt(angka)).trim().replace(/\s+/g, ' ') + " rupiah";
         };
 
+        const formatRpString = (angka) => {
+            return 'Rp ' + new Intl.NumberFormat('id-ID').format(angka || 0);
+        };
+
         const formatDateIndo = (dateStr) => {
             if(!dateStr) return "";
             const date = new Date(dateStr);
@@ -422,6 +426,25 @@
             const [poPenerima2Nama, setPoPenerima2Nama] = useState("");
             const [poPenerima1Signature, setPoPenerima1Signature] = useState(null);
 
+            // ================= PO PAVING STATE =================
+            const [popDaftar, setPopDaftar] = useState(() => { const saved = localStorage.getItem('BCA_DAFTAR_PO_PAVING'); return saved ? JSON.parse(saved) : []; });
+            const [popActiveId, setPopActiveId] = useState(null);
+            const [popLogo, setPopLogo] = useState(null);
+            const [popNo, setPopNo] = useState(() => { const d = new Date(); return `${d.getDate().toString().padStart(2, '0')}${(d.getMonth()+1).toString().padStart(2, '0')}${d.getFullYear().toString().slice(-2)}`; });
+            const [popTanggal, setPopTanggal] = useState(() => { const d = new Date(); const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]; return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`; });
+            const [popKepada, setPopKepada] = useState("PT Duta Bangsa Mandiri");
+            const [popUp, setPopUp] = useState("Bp. Yuda");
+            const [popAlamatPerusahaan, setPopAlamatPerusahaan] = useState("Jl. Krebet Timur RT 23 RW 05, Krebet, Bululawang");
+            const [popAlamatPengiriman, setPopAlamatPengiriman] = useState("Wagir, Lembah Bunder");
+            const [popItems, setPopItems] = useState([{ id: "1", deskripsi: "Paving Block (Spesifikasi: K300, Uk. 21 x 11 x 6 )", volumeStr: "1.000", satuan: "MTR", harga: "53500" }]);
+            const [popTerm1, setPopTerm1] = useState("1 Bulan");
+            const [popTerm2, setPopTerm2] = useState("Terdapat dana masuk per minggu");
+            const [popTerm3, setPopTerm3] = useState("Spesifikasi dan harga disesuaikan dengan kesepakatan.");
+            const [popDibuatOlehName, setPopDibuatOlehName] = useState("Agus Sutanto");
+            const [popDisetujuiOlehName, setPopDisetujuiOlehName] = useState("Sita Dita Cahyani");
+            const [popDibuatOlehSig, setPopDibuatOlehSig] = useState(null);
+            const [popDisetujuiOlehSig, setPopDisetujuiOlehSig] = useState(null);
+
             useEffect(() => { if (theme === 'dark') document.documentElement.classList.add('dark'); else document.documentElement.classList.remove('dark'); localStorage.setItem('BCA_THEME', theme); }, [theme]);
             useEffect(() => {
                 const root = document.documentElement;
@@ -442,6 +465,7 @@
             useEffect(() => { localStorage.setItem('BCA_DAFTAR_SPK', JSON.stringify(daftarSpk)); }, [daftarSpk]);
             useEffect(() => { localStorage.setItem('BCA_DAFTAR_SPK_TIPE30', JSON.stringify(t30DaftarSpk)); }, [t30DaftarSpk]);
             useEffect(() => { localStorage.setItem('BCA_DAFTAR_PO', JSON.stringify(poDaftar)); }, [poDaftar]);
+            useEffect(() => { localStorage.setItem('BCA_DAFTAR_PO_PAVING', JSON.stringify(popDaftar)); }, [popDaftar]);
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); });
 
             // Otomatisasi SPK Tipe 30
@@ -571,6 +595,32 @@
             const handlePoPenerima1SignatureUpload = (e) => { const f = e.target.files[0]; if (f) { if (!f.type.startsWith('image/')) { showNotification("Upload gambar!", "error"); return; } const r = new FileReader(); r.onloadend = () => { setPoPenerima1Signature(r.result); showNotification("TTD Penerima 1 diunggah."); }; r.readAsDataURL(f); } };
             const clearPoPenerima1Signature = () => { setPoPenerima1Signature(null); showNotification("TTD Penerima 1 dihapus.", "info"); };
 
+            // ================= HANDLER PO PAVING =================
+            const handlePopResetData = () => {
+                const d = new Date(); const m = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+                setPopNo(`${d.getDate().toString().padStart(2, '0')}${(d.getMonth()+1).toString().padStart(2, '0')}${d.getFullYear().toString().slice(-2)}`); setPopTanggal(`${d.getDate()} ${m[d.getMonth()]} ${d.getFullYear()}`);
+                setPopKepada(""); setPopUp(""); setPopAlamatPerusahaan("Jl. Krebet Timur RT 23 RW 05, Krebet, Bululawang"); setPopAlamatPengiriman("");
+                setPopItems([{ id: Date.now().toString(), deskripsi: "", volumeStr: "", satuan: "", harga: "" }]);
+                setPopTerm1("1 Bulan"); setPopTerm2("Terdapat dana masuk per minggu"); setPopTerm3("Spesifikasi dan harga disesuaikan dengan kesepakatan.");
+                setPopDibuatOlehName("Agus Sutanto"); setPopDisetujuiOlehName("Sita Dita Cahyani"); setPopDibuatOlehSig(null); setPopDisetujuiOlehSig(null); setPopLogo(null); setPopActiveId(null);
+                showNotification("Formulir PO Paving dikosongkan!", "info");
+            };
+            const handlePopSave = () => {
+                const data = { id: popActiveId || Date.now().toString(), popNo, popTanggal, popKepada, popUp, popAlamatPerusahaan, popAlamatPengiriman, popItems, popTerm1, popTerm2, popTerm3, popDibuatOlehName, popDisetujuiOlehName, popDibuatOlehSig, popDisetujuiOlehSig, popLogo, lastUpdated: new Date().toLocaleString('id-ID') };
+                if (popActiveId) { setPopDaftar(popDaftar.map(item => item.id === popActiveId ? data : item)); showNotification("PO Paving diperbarui!"); } 
+                else { setPopDaftar([...popDaftar, data]); setPopActiveId(data.id); showNotification("PO Paving disimpan!"); }
+            };
+            const handlePopLoad = (id) => {
+                const t = popDaftar.find(item => item.id === id);
+                if (t) { setPopActiveId(t.id); setPopNo(t.popNo || ""); setPopTanggal(t.popTanggal || ""); setPopKepada(t.popKepada || ""); setPopUp(t.popUp || ""); setPopAlamatPerusahaan(t.popAlamatPerusahaan || ""); setPopAlamatPengiriman(t.popAlamatPengiriman || ""); setPopItems(t.popItems || [{ id: Date.now().toString(), deskripsi: "", volumeStr: "", satuan: "", harga: "" }]); setPopTerm1(t.popTerm1 || ""); setPopTerm2(t.popTerm2 || ""); setPopTerm3(t.popTerm3 || ""); setPopDibuatOlehName(t.popDibuatOlehName || "Agus Sutanto"); setPopDisetujuiOlehName(t.popDisetujuiOlehName || "Sita Dita Cahyani"); setPopDibuatOlehSig(t.popDibuatOlehSig || null); setPopDisetujuiOlehSig(t.popDisetujuiOlehSig || null); setPopLogo(t.popLogo || null); window.scrollTo({ top: 0, behavior: 'smooth' }); showNotification(`Memuat PO: ${t.popNo}`); }
+            };
+            const handlePopDelete = (id, e) => { e.stopPropagation(); setPopDaftar(popDaftar.filter(item => item.id !== id)); if (popActiveId === id) setPopActiveId(null); showNotification("PO Paving Dihapus.", "error"); };
+            const handlePopPrint = () => { const ot = document.title; document.title = `PO_Paving_${popNo ? popNo : 'Baru'}`; window.print(); setTimeout(() => document.title = ot, 2000); };
+            
+            const addPopItem = () => setPopItems([...popItems, { id: Date.now().toString(), deskripsi: "", volumeStr: "", satuan: "", harga: "" }]);
+            const updatePopItem = (idx, field, value) => { const newItems = [...popItems]; newItems[idx][field] = value; setPopItems(newItems); };
+            const removePopItem = (idx) => setPopItems(popItems.filter((_, i) => i !== idx));
+
             // ==============================================================================
             // RENDER HALAMAN HOME
             // ==============================================================================
@@ -604,10 +654,7 @@
                                     <div className="absolute top-1/2 -translate-y-1/2 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none"><i data-lucide="home" className="w-48 h-48 text-teal-900 dark:text-teal-400"></i></div>
                                     <div className="w-20 h-20 shrink-0 bg-teal-50 dark:bg-teal-900/30 rounded-3xl flex items-center justify-center group-hover:scale-110 transition-transform relative z-10"><i data-lucide="home" className="w-10 h-10 text-teal-600 dark:text-teal-400"></i></div>
                                     <div className="relative z-10 flex-1">
-                                        <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-slate-100 mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 flex flex-col sm:flex-row items-center sm:items-start gap-3">
-                                            2. SPK Borongan Tipe 30 
-                                            <span className="bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-400 text-[10px] px-2.5 py-1 rounded-md font-bold uppercase border dark:border-teal-800">Aktif</span>
-                                        </h3>
+                                        <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-slate-100 mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400">2. SPK Borongan Tipe 30</h3>
                                         <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Modul khusus pembuatan Surat Perintah Kerja yang disesuaikan template dan hitungannya untuk pekerja borongan unit rumah Tipe 30.</p>
                                     </div>
                                 </div>
@@ -615,11 +662,16 @@
                                     <div className="absolute top-1/2 -translate-y-1/2 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none"><i data-lucide="receipt" className="w-48 h-48 text-orange-900 dark:text-orange-400"></i></div>
                                     <div className="w-20 h-20 shrink-0 bg-orange-50 dark:bg-orange-900/30 rounded-3xl flex items-center justify-center group-hover:scale-110 transition-transform relative z-10"><i data-lucide="receipt" className="w-10 h-10 text-orange-600 dark:text-orange-400"></i></div>
                                     <div className="relative z-10 flex-1">
-                                        <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-slate-100 mb-2 group-hover:text-orange-600 dark:group-hover:text-orange-400 flex flex-col sm:flex-row items-center sm:items-start gap-3">
-                                            3. PO Bata Ringan 
-                                            <span className="bg-orange-100 dark:bg-orange-900/50 text-orange-700 dark:text-orange-400 text-[10px] px-2.5 py-1 rounded-md font-bold uppercase border dark:border-orange-800">Baru</span>
-                                        </h3>
+                                        <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-slate-100 mb-2 group-hover:text-orange-600 dark:group-hover:text-orange-400">3. PO Bata Ringan</h3>
                                         <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Modul pembuatan Tanda Terima Pembayaran, dirancang khusus dengan layout untuk pencatatan PO Bata Ringan & Faktur.</p>
+                                    </div>
+                                </div>
+                                <div onClick={() => handleNavigate('po_paving')} className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 md:p-8 cursor-pointer hover:border-indigo-500 hover:shadow-2xl transition-all relative overflow-hidden flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
+                                    <div className="absolute top-1/2 -translate-y-1/2 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none"><i data-lucide="truck" className="w-48 h-48 text-indigo-900 dark:text-indigo-400"></i></div>
+                                    <div className="w-20 h-20 shrink-0 bg-indigo-50 dark:bg-indigo-900/30 rounded-3xl flex items-center justify-center group-hover:scale-110 transition-transform relative z-10"><i data-lucide="truck" className="w-10 h-10 text-indigo-600 dark:text-indigo-400"></i></div>
+                                    <div className="relative z-10 flex-1">
+                                        <h3 className="text-xl md:text-2xl font-black text-slate-800 dark:text-slate-100 mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">4. PO Paving Duta Bangsa</h3>
+                                        <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Modul pembuatan Purchase Order khusus untuk Paving Block dan sejenisnya, lengkap dengan detail tujuan pengiriman dan persetujuan.</p>
                                     </div>
                                 </div>
                             </div>
@@ -929,7 +981,7 @@
                                     </div>
                                     <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
                                         {poDaftar.map((item) => (
-                                            <div key={item.id} onClick={() => handlePoLoad(item.id)} className={`p-3 rounded-xl border cursor-pointer flex justify-between items-center group shadow-sm ${poActiveId === item.id ? 'bg-orange-50 border-orange-300' : 'bg-white dark:bg-slate-950 hover:border-orange-300'}`}>
+                                            <div key={item.id} onClick={() => handlePoLoad(item.id)} className={`p-3 rounded-xl border cursor-pointer flex justify-between items-center group shadow-sm ${poActiveId === item.id ? 'bg-orange-50 border-orange-300' : 'bg-white dark:bg-slate-955 hover:border-orange-300'}`}>
                                                 <div className="space-y-1 overflow-hidden pr-2"><h4 className="text-xs font-bold truncate text-orange-700">{item.poTerimaDari || "Tanpa Nama"}</h4><p className="text-[10px] text-slate-500 truncate">No: {item.poNo || "-"}</p></div>
                                                 <div className="flex gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={(e) => { e.stopPropagation(); handlePoLoad(item.id); }} className="p-1.5 text-orange-500 hover:bg-orange-100 rounded-lg"><i data-lucide="edit" className="w-4 h-4"></i></button><button onClick={(e) => handlePoDelete(item.id, e)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><i data-lucide="trash-2" className="w-4 h-4"></i></button></div>
                                             </div>
@@ -980,7 +1032,7 @@
                                         <div className="space-y-2">
                                             <h3 className="text-xs font-bold bg-slate-100 p-2 rounded text-center">Tabel Cek/BG</h3>
                                             <div className="border rounded-lg overflow-hidden text-xs">
-                                                <div className="grid grid-cols-4 bg-slate-50 border-b font-bold"><div className="p-2 border-r text-center">NO CEK/BG</div><div className="p-2 border-r text-center">BANK</div><div className="p-2 border-r text-center">TANGGAL</div><div className="p-2 text-center">JUMLAH</div></div>
+                                                <div className="grid grid-cols-4 bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-300 border-b border-orange-200 dark:border-orange-800 font-bold"><div className="p-2 border-r border-orange-200 dark:border-orange-800 text-center">NO CEK/BG</div><div className="p-2 border-r border-orange-200 dark:border-orange-800 text-center">BANK</div><div className="p-2 border-r border-orange-200 dark:border-orange-800 text-center">TANGGAL</div><div className="p-2 text-center">JUMLAH</div></div>
                                                 {poTableLeft.map((row, idx) => (
                                                     <div key={idx} className="grid grid-cols-4 border-b last:border-b-0"><input type="text" value={row.noCek} onChange={(e)=>updateTableLeft(idx, 'noCek', e.target.value)} className="p-1.5 border-r outline-none w-full bg-transparent"/><input type="text" value={row.bank} onChange={(e)=>updateTableLeft(idx, 'bank', e.target.value)} className="p-1.5 border-r outline-none w-full bg-transparent"/><input type="text" value={row.tanggal} onChange={(e)=>updateTableLeft(idx, 'tanggal', e.target.value)} className="p-1.5 border-r outline-none w-full bg-transparent"/><input type="text" value={row.jumlah} onChange={(e)=>updateTableLeft(idx, 'jumlah', e.target.value)} className="p-1.5 outline-none w-full bg-transparent text-right"/></div>
                                                 ))}
@@ -990,7 +1042,7 @@
                                         <div className="space-y-2">
                                             <h3 className="text-xs font-bold bg-slate-100 p-2 rounded text-center text-orange-700 border flex items-center justify-center gap-2"><i data-lucide="zap" className="w-3.5 h-3.5"></i>Tabel Faktur / Rincian (Auto-Kalkulasi)</h3>
                                             <div className="border rounded-lg overflow-hidden text-xs">
-                                                <div className="grid grid-cols-3 bg-slate-50 border-b font-bold"><div className="p-2 border-r text-center">NO FAKTUR</div><div className="p-2 border-r text-center">TANGGAL</div><div className="p-2 text-center">JUMLAH</div></div>
+                                                <div className="grid grid-cols-3 bg-orange-100 dark:bg-orange-900/50 text-orange-800 dark:text-orange-300 border-b border-orange-200 dark:border-orange-800 font-bold"><div className="p-2 border-r border-orange-200 dark:border-orange-800 text-center">NO FAKTUR</div><div className="p-2 border-r border-orange-200 dark:border-orange-800 text-center">TANGGAL</div><div className="p-2 text-center">JUMLAH</div></div>
                                                 {poTableRight.map((row, idx) => (
                                                     <div key={idx} className="grid grid-cols-3 border-b last:border-b-0 relative">
                                                         {idx === 0 ? (
@@ -1063,14 +1115,14 @@
                                         </table>
                                         <div className="flex gap-4 mb-8 text-[10pt]">
                                             <table className="w-1/2 border-collapse border border-black" style={{ tableLayout: 'fixed' }}>
-                                                <thead><tr><th className="border border-black p-1 text-center font-bold w-1/4">NO CEK/BG</th><th className="border border-black p-1 text-center font-bold w-1/4">BANK</th><th className="border border-black p-1 text-center font-bold w-1/4">TANGGAL</th><th className="border border-black p-1 text-center font-bold w-1/4">JUMLAH</th></tr></thead>
+                                                <thead><tr className="bg-slate-100"><th className="border border-black p-1 text-center font-bold w-1/4">NO CEK/BG</th><th className="border border-black p-1 text-center font-bold w-1/4">BANK</th><th className="border border-black p-1 text-center font-bold w-1/4">TANGGAL</th><th className="border border-black p-1 text-center font-bold w-1/4">JUMLAH</th></tr></thead>
                                                 <tbody>{poTableLeft.map((r, i) => (<tr key={i} className="h-6"><td className="border border-black px-1 break-words">{r.noCek}</td><td className="border border-black px-1 break-words">{r.bank}</td><td className="border border-black px-1 break-words">{r.tanggal}</td><td className="border border-black px-1 text-right break-words">{r.jumlah}</td></tr>))}</tbody>
-                                                <tfoot><tr><td colSpan="3" className="text-center font-bold py-1">TOTAL</td><td className="border border-black px-1 text-right break-words">{poTotalLeft}</td></tr></tfoot>
+                                                <tfoot><tr className="bg-slate-50"><td colSpan="3" className="border border-black text-center font-bold py-1">TOTAL</td><td className="border border-black px-1 text-right break-words font-bold">{poTotalLeft}</td></tr></tfoot>
                                             </table>
                                             <table className="w-1/2 border-collapse border border-black" style={{ tableLayout: 'fixed' }}>
-                                                <thead><tr><th className="border border-black p-1 text-center font-bold w-1/4">NO FAKTUR</th><th className="border border-black p-1 text-center font-bold w-1/4">TANGGAL</th><th className="border border-black p-1 text-center font-bold w-1/4">JUMLAH</th></tr></thead>
+                                                <thead><tr className="bg-slate-100"><th className="border border-black p-1 text-center font-bold w-1/4">NO FAKTUR</th><th className="border border-black p-1 text-center font-bold w-1/4">TANGGAL</th><th className="border border-black p-1 text-center font-bold w-1/4">JUMLAH</th></tr></thead>
                                                 <tbody>{poTableRight.map((r, i) => (<tr key={i} className="h-6"><td className="border border-black px-1 break-words">{r.noFaktur}</td><td className="border border-black px-1 break-words">{r.tanggal}</td><td className="border border-black px-1 text-right break-words">{r.jumlah}</td></tr>))}</tbody>
-                                                <tfoot><tr><td colSpan="2" className="text-center font-bold py-1">TOTAL</td><td className="border border-black px-1 text-right break-words">{poTotalRight}</td></tr></tfoot>
+                                                <tfoot><tr className="bg-slate-50"><td colSpan="2" className="border border-black text-center font-bold py-1">TOTAL</td><td className="border border-black px-1 text-right break-words font-bold">{poTotalRight}</td></tr></tfoot>
                                             </table>
                                         </div>
                                         <div className="flex justify-between items-start text-[11pt]">
@@ -1118,6 +1170,243 @@
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </main>
+                        </div>
+                    </div>
+                );
+            }
+
+            // ==============================================================================
+            // RENDER HALAMAN PO PAVING
+            // ==============================================================================
+            if (activeView === 'po_paving') {
+                return (
+                    <div key="view-popaving" className="app-page-shell po-print-shell min-h-screen transition-colors duration-300">
+                        <div className="print:hidden">
+                            {notification && (
+                                <div className={`fixed top-20 right-6 z-50 flex items-center gap-3 px-5 py-3 rounded-xl shadow-2xl border transition-all animate-[slideInDown_0.3s_ease-out] ${notification.type === 'error' ? 'bg-red-50 text-red-700 border-red-200' : notification.type === 'info' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-indigo-50 text-indigo-700 border-indigo-200'}`}>
+                                    <i data-lucide={notification.type === 'error' ? "alert-triangle" : notification.type === 'info' ? "info" : "check-circle"} className="w-5 h-5 shrink-0"></i><span className="text-sm font-semibold tracking-wide">{notification.message}</span>
+                                </div>
+                            )}
+                            <header className="app-menu-bar bg-white dark:bg-slate-900 border-b border-slate-200 shadow-sm py-4 px-6 sticky top-0 z-40 border-t-4 border-t-indigo-500">
+                                <div className="max-w-[90rem] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                                    <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto">
+                                        <button onClick={() => handleNavigate('home')} className="flex p-2.5 bg-slate-100 hover:bg-indigo-50 text-slate-600 hover:text-indigo-600 rounded-xl shadow-sm"><i data-lucide="home" className="w-5 h-5"></i></button>
+                                        <div className="w-px h-8 bg-slate-200 hidden sm:block"></div>
+                                        <div><h1 className="font-extrabold text-lg tracking-wide text-slate-900 dark:text-white">PURCHASE ORDER PAVING</h1><p className="text-xs text-slate-500 font-medium">Format Pengadaan Material</p></div>
+                                    </div>
+                                    <div className="flex items-center gap-3 flex-wrap">
+                                        <RealtimeClock />
+                                        <button onClick={toggleTheme} className="flex gap-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold px-4 py-2.5 rounded-xl border border-slate-300 text-xs shadow-sm">{theme === 'light' ? <><i data-lucide="moon" className="w-4 h-4"></i> Gelap</> : <><i data-lucide="sun" className="w-4 h-4 text-amber-400"></i> Terang</>}</button>
+                                        <button onClick={handlePopResetData} className="flex gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm text-xs"><i data-lucide="rotate-ccw" className="w-4 h-4"></i> Reset</button>
+                                        <button onClick={handlePreviewScroll} className="flex gap-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-semibold px-4 py-2.5 rounded-xl border border-slate-300 shadow-sm text-xs"><i data-lucide="eye" className="w-4 h-4 text-indigo-500"></i> Pratinjau</button>
+                                        <button onClick={handlePopSave} className="flex gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2.5 rounded-xl shadow-md text-xs"><i data-lucide="save" className="w-4 h-4"></i> {popActiveId ? "Update" : "Simpan"}</button>
+                                        <button onClick={handlePopPrint} className="flex gap-2 bg-gradient-to-r from-indigo-600 to-blue-600 text-white font-semibold px-6 py-2.5 rounded-xl shadow-md text-xs"><i data-lucide="printer" className="w-4 h-4"></i> Cetak</button>
+                                    </div>
+                                </div>
+                            </header>
+                        </div>
+
+                        <div className="max-w-[90rem] mx-auto px-4 md:px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 print:p-0 print:block">
+                            <aside className="lg:col-span-4 space-y-6 print:hidden">
+                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+                                    <div className="flex items-center justify-between mb-4 border-b border-slate-100 pb-4">
+                                        <div className="flex gap-2"><i data-lucide="folder-open" className="w-5 h-5 text-indigo-500"></i><h2 className="font-bold text-slate-800 dark:text-slate-100">Database Lokal</h2></div>
+                                        <span className="bg-indigo-50 text-indigo-600 border border-indigo-100 text-[10px] px-2.5 py-1 rounded-md font-bold">{popDaftar.length} Data</span>
+                                    </div>
+                                    <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
+                                        {popDaftar.map((item) => (
+                                            <div key={item.id} onClick={() => handlePopLoad(item.id)} className={`p-3 rounded-xl border cursor-pointer flex justify-between items-center group shadow-sm ${popActiveId === item.id ? 'bg-indigo-50 border-indigo-300' : 'bg-white dark:bg-slate-950 hover:border-indigo-300'}`}>
+                                                <div className="space-y-1 overflow-hidden pr-2"><h4 className="text-xs font-bold truncate text-indigo-700">{item.popKepada || "Tanpa Nama"}</h4><p className="text-[10px] text-slate-500 truncate">PO: {item.popNo || "-"}</p></div>
+                                                <div className="flex gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={(e) => { e.stopPropagation(); handlePopLoad(item.id); }} className="p-1.5 text-indigo-500 hover:bg-indigo-100 rounded-lg"><i data-lucide="edit" className="w-4 h-4"></i></button><button onClick={(e) => handlePopDelete(item.id, e)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><i data-lucide="trash-2" className="w-4 h-4"></i></button></div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4">
+                                    <h2 className="font-bold text-slate-800 dark:text-slate-100 border-b pb-3 flex items-center gap-2"><i data-lucide="image" className="w-5 h-5 text-indigo-500"></i> Logo Dokumen</h2>
+                                    <div>
+                                        {popLogo ? (
+                                            <div className="relative group w-32 h-32 bg-slate-50 rounded-lg flex items-center justify-center p-2 border shadow-sm mx-auto"><img src={popLogo} className="max-h-full max-w-full object-contain" /><button onClick={() => setPopLogo(null)} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs"><i data-lucide="trash" className="w-4 h-4 mr-1"></i> Hapus</button></div>
+                                        ) : (
+                                            <label className="cursor-pointer flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-lg bg-slate-50 transition-colors"><i data-lucide="upload" className="w-6 h-6 mb-2 text-slate-400"></i><span className="text-xs font-medium text-slate-500">Unggah Logo Perusahaan</span><input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files[0]; if(f) { const r = new FileReader(); r.onloadend = () => setPopLogo(r.result); r.readAsDataURL(f); } }} /></label>
+                                        )}
+                                    </div>
+                                </div>
+                            </aside>
+
+                            <main className="lg:col-span-8 space-y-6 print:m-0 print:col-span-12">
+                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-6 print:hidden">
+                                    <div className="border-b pb-4"><h2 className="font-bold text-lg flex items-center gap-2"><i data-lucide="file-edit" className="w-5 h-5 text-indigo-500"></i> Editor Detail PO Paving</h2></div>
+                                    
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div className="space-y-3">
+                                            <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">No. PO</label><input type="text" value={popNo} onChange={(e) => setPopNo(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-indigo-500"/></div>
+                                            <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Kepada (Vendor/Supplier)</label><input type="text" value={popKepada} onChange={(e) => setPopKepada(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-indigo-500"/></div>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Tanggal</label><input type="text" value={popTanggal} onChange={(e) => setPopTanggal(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-indigo-500"/></div>
+                                            <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">UP (Up. Person)</label><input type="text" value={popUp} onChange={(e) => setPopUp(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-indigo-500"/></div>
+                                        </div>
+                                        <div className="md:col-span-2 pt-2 border-t mt-2">
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Alamat Perusahaan (Penagihan)</label>
+                                            <textarea rows="2" value={popAlamatPerusahaan} onChange={(e) => setPopAlamatPerusahaan(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-indigo-500 resize-none"/>
+                                        </div>
+                                        <div className="md:col-span-2">
+                                            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">Alamat Pengiriman (Delivery Location)</label>
+                                            <textarea rows="2" value={popAlamatPengiriman} onChange={(e) => setPopAlamatPengiriman(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm outline-none focus:border-indigo-500 resize-none"/>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4 pt-4 border-t">
+                                        <div className="flex justify-between items-center"><h3 className="text-sm font-bold bg-slate-100 p-2 rounded text-indigo-700 flex items-center gap-2"><i data-lucide="list" className="w-4 h-4"></i>Daftar Barang Pesanan</h3><button onClick={addPopItem} className="bg-indigo-50 text-indigo-600 text-xs font-bold px-3 py-1.5 rounded flex items-center gap-1 hover:bg-indigo-100"><i data-lucide="plus" className="w-3.5 h-3.5"></i>Tambah Baris</button></div>
+                                        <div className="border rounded-lg overflow-x-auto">
+                                            <table className="w-full text-xs text-left whitespace-nowrap min-w-[600px]">
+                                                <thead className="bg-indigo-100 dark:bg-indigo-900/50 border-b border-indigo-200 dark:border-indigo-800"><tr className="font-bold text-indigo-800 dark:text-indigo-300 uppercase text-[10px]"><th className="p-2 w-10 text-center">No</th><th className="p-2">Deskripsi Barang (Bisa Enter)</th><th className="p-2 w-24 text-center">Volume/Qty</th><th className="p-2 w-20 text-center">Satuan</th><th className="p-2 w-32 text-right">Harga Sat (Rp)</th><th className="p-2 w-10 text-center">Aksi</th></tr></thead>
+                                                <tbody>
+                                                    {popItems.map((item, idx) => (
+                                                        <tr key={item.id} className="border-b last:border-b-0">
+                                                            <td className="p-2 text-center">{idx + 1}</td>
+                                                            <td className="p-2"><textarea rows="2" value={item.deskripsi} onChange={(e) => updatePopItem(idx, 'deskripsi', e.target.value)} className="w-full border rounded p-1.5 outline-none resize-none text-xs"/></td>
+                                                            <td className="p-2"><input type="text" value={item.volumeStr} onChange={(e) => updatePopItem(idx, 'volumeStr', e.target.value)} placeholder="Cth: 1.000" className="w-full border rounded p-1.5 text-center outline-none"/></td>
+                                                            <td className="p-2"><input type="text" value={item.satuan} onChange={(e) => updatePopItem(idx, 'satuan', e.target.value)} placeholder="MTR" className="w-full border rounded p-1.5 text-center outline-none uppercase"/></td>
+                                                            <td className="p-2"><input type="number" value={item.harga} onChange={(e) => updatePopItem(idx, 'harga', e.target.value)} className="w-full border rounded p-1.5 text-right outline-none"/></td>
+                                                            <td className="p-2 text-center"><button onClick={() => removePopItem(idx)} className="text-red-500 hover:bg-red-50 p-1.5 rounded"><i data-lucide="trash-2" className="w-4 h-4"></i></button></td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-4 pt-4 border-t">
+                                        <h3 className="text-sm font-bold bg-slate-100 p-2 rounded text-indigo-700">Ketentuan & Persyaratan (Term of Payment)</h3>
+                                        <div className="space-y-3 pl-2 border-l-2 border-indigo-200">
+                                            <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">1. Term of Payment</label><input type="text" value={popTerm1} onChange={(e) => setPopTerm1(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none"/></div>
+                                            <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">2. Sistem Pembayaran</label><input type="text" value={popTerm2} onChange={(e) => setPopTerm2(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none"/></div>
+                                            <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">3. Catatan Lain</label><input type="text" value={popTerm3} onChange={(e) => setPopTerm3(e.target.value)} className="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none"/></div>
+                                        </div>
+                                    </div>
+
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t">
+                                        <div className="space-y-3">
+                                            <h3 className="text-sm font-bold text-slate-700 border-b pb-2">Penandatangan 1 (Dibuat Oleh)</h3>
+                                            <input type="text" value={popDibuatOlehName} onChange={(e) => setPopDibuatOlehName(e.target.value)} placeholder="Nama Terang (Opsional)" className="w-full border rounded-lg px-3 py-2 text-sm outline-none"/>
+                                            {popDibuatOlehSig ? (
+                                                <div className="relative group p-2 bg-slate-50 rounded-lg border flex items-center justify-center h-20 overflow-hidden"><img src={popDibuatOlehSig} className="max-h-full object-contain"/><button onClick={() => setPopDibuatOlehSig(null)} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center text-xs font-bold transition-opacity">Hapus TTD</button></div>
+                                            ) : (
+                                                <label className="cursor-pointer flex flex-col items-center justify-center h-20 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-lg bg-slate-50"><span className="text-[10px] font-medium text-slate-500">Unggah TTD (Dibuat Oleh)</span><input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files[0]; if(f){ const r=new FileReader(); r.onloadend=()=>setPopDibuatOlehSig(r.result); r.readAsDataURL(f); } }} /></label>
+                                            )}
+                                        </div>
+                                        <div className="space-y-3">
+                                            <h3 className="text-sm font-bold text-slate-700 border-b pb-2">Penandatangan 2 (Disetujui Oleh)</h3>
+                                            <input type="text" value={popDisetujuiOlehName} onChange={(e) => setPopDisetujuiOlehName(e.target.value)} placeholder="Nama Terang (Opsional)" className="w-full border rounded-lg px-3 py-2 text-sm outline-none"/>
+                                            {popDisetujuiOlehSig ? (
+                                                <div className="relative group p-2 bg-slate-50 rounded-lg border flex items-center justify-center h-20 overflow-hidden"><img src={popDisetujuiOlehSig} className="max-h-full object-contain"/><button onClick={() => setPopDisetujuiOlehSig(null)} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center text-xs font-bold transition-opacity">Hapus TTD</button></div>
+                                            ) : (
+                                                <label className="cursor-pointer flex flex-col items-center justify-center h-20 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-lg bg-slate-50"><span className="text-[10px] font-medium text-slate-500">Unggah TTD (Disetujui Oleh)</span><input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files[0]; if(f){ const r=new FileReader(); r.onloadend=()=>setPopDisetujuiOlehSig(r.result); r.readAsDataURL(f); } }} /></label>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div className="pt-6 print:pt-0 border-t-2 border-dashed border-slate-300 print:border-none">
+                                    <div className="flex items-center justify-between mb-4 print:hidden"><h3 className="text-slate-500 text-sm font-bold flex items-center gap-2 uppercase tracking-wider"><i data-lucide="eye" className="w-4 h-4 text-indigo-500"></i> Pratinjau Cetak PO Paving</h3></div>
+                                    
+                                    <div ref={previewRef} className="po-print-document paper-preview px-14 py-16 print:p-0 print:m-0 print:shadow-none print:max-w-full print:rounded-none print:border-none font-serif text-black" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+                                        <div className="flex items-center gap-6 mb-12">
+                                            {popLogo && <img src={popLogo} alt="Logo" className="h-[75px] object-contain" />}
+                                            <h1 className="text-[16pt] font-bold tracking-wide uppercase">PURCHASE ORDER</h1>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-x-8 gap-y-4 mb-10 text-[11pt]">
+                                            <div className="flex"><span className="w-24 shrink-0">No. PO</span><span className="w-4 shrink-0">:</span><span>{popNo}</span></div>
+                                            <div className="flex"><span className="w-24 shrink-0">Tanggal</span><span className="w-4 shrink-0">:</span><span>{popTanggal}</span></div>
+                                            <div className="flex"><span className="w-24 shrink-0">Kepada</span><span className="w-4 shrink-0">:</span><span>{popKepada}</span></div>
+                                            <div className="flex"><span className="w-24 shrink-0">UP</span><span className="w-4 shrink-0">:</span><span>{popUp}</span></div>
+                                        </div>
+
+                                        <div className="mb-10 text-[11pt] space-y-4 leading-relaxed">
+                                            <div>
+                                                <div className="font-bold">Alamat Perusahaan:</div>
+                                                <div className="whitespace-pre-line">{popAlamatPerusahaan}</div>
+                                            </div>
+                                            <div>
+                                                <div className="font-bold">Alamat Pengiriman (Delivery Location):</div>
+                                                <div className="whitespace-pre-line">{popAlamatPengiriman}</div>
+                                            </div>
+                                        </div>
+
+                                        <table className="w-full border-collapse border border-black text-[11pt] mb-8">
+                                            <thead>
+                                                <tr className="bg-slate-100">
+                                                    <th className="border border-black p-2 w-10 text-center font-bold">No.</th>
+                                                    <th className="border border-black p-2 text-center font-bold">Deskripsi / Spesifikasi Barang</th>
+                                                    <th className="border border-black p-2 w-20 text-center font-bold">Volume /<br/>Qty</th>
+                                                    <th className="border border-black p-2 w-16 text-center font-bold">Satuan</th>
+                                                    <th className="border border-black p-2 w-32 text-center font-bold">Harga Satuan<br/>(Rp)</th>
+                                                    <th className="border border-black p-2 w-32 text-center font-bold">Total Harga<br/>(Rp)</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {popItems.map((item, idx) => {
+                                                    // Remove dots/commas to calculate properly, assume volumeStr is string like "1.000"
+                                                    const volNum = parseFloat((item.volumeStr || "0").replace(/\./g, '').replace(',', '.')) || 0;
+                                                    const hrgNum = parseFloat(item.harga) || 0;
+                                                    const total = volNum * hrgNum;
+                                                    
+                                                    return (
+                                                        <tr key={idx} className="align-top">
+                                                            <td className="border border-black p-2 text-center">{idx + 1}</td>
+                                                            <td className="border border-black p-2 whitespace-pre-line">{item.deskripsi}</td>
+                                                            <td className="border border-black p-2 text-center">{item.volumeStr}</td>
+                                                            <td className="border border-black p-2 text-center">{item.satuan}</td>
+                                                            <td className="border border-black p-2">
+                                                                <div className="flex justify-between gap-2">
+                                                                    <span>Rp</span>
+                                                                    <span>{new Intl.NumberFormat('id-ID').format(hrgNum)}</span>
+                                                                </div>
+                                                            </td>
+                                                            <td className="border border-black p-2">
+                                                                <div className="flex justify-between gap-2">
+                                                                    <span>Rp</span>
+                                                                    <span>{new Intl.NumberFormat('id-ID').format(total)}</span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+
+                                        <div className="mb-16 text-[11pt]">
+                                            <div className="font-bold mb-1">Ketentuan & Persyaratan (Term of Payment):</div>
+                                            <ol className="list-decimal pl-4 space-y-1">
+                                                <li>Term of Payment: {popTerm1}</li>
+                                                <li>Sistem Pembayaran: {popTerm2}</li>
+                                                <li>Catatan Lain: {popTerm3}</li>
+                                            </ol>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-8 text-center text-[11pt] mt-12 mb-10 items-end h-40">
+                                            <div className="flex flex-col justify-between h-[160px] relative">
+                                                <div className="mt-0">Dibuat Oleh,</div>
+                                                <div className="relative my-auto flex h-24 w-full items-center justify-center overflow-hidden">
+                                                    {popDibuatOlehSig && <img src={popDibuatOlehSig} className="signature-img max-h-full object-contain mix-blend-multiply opacity-90"/>}
+                                                </div>
+                                                <div className="mt-auto">( {popDibuatOlehName ? popDibuatOlehName : "..........................................."} )</div>
+                                            </div>
+                                            <div className="flex flex-col justify-between h-[160px] relative">
+                                                <div className="mt-0">Disetujui Oleh,</div>
+                                                <div className="relative my-auto flex h-24 w-full items-center justify-center overflow-hidden">
+                                                    {popDisetujuiOlehSig && <img src={popDisetujuiOlehSig} className="signature-img max-h-full object-contain mix-blend-multiply opacity-90"/>}
+                                                </div>
+                                                <div className="mt-auto">( {popDisetujuiOlehName ? popDisetujuiOlehName : "..........................................."} )</div>
                                             </div>
                                         </div>
                                     </div>
@@ -1261,7 +1550,7 @@
                                     {materials.length > 0 && (
                                         <div className="overflow-x-auto rounded-xl border bg-white shadow-sm">
                                             <table className="w-full text-left text-xs">
-                                                <thead><tr className="border-b bg-slate-50 text-slate-500 uppercase font-bold text-[10px]"><th className="py-3 px-3">Nama Material</th><th className="py-3 px-2 w-20 text-center">Qty</th><th className="py-3 px-2 w-20 text-center">Satuan</th><th className="py-3 px-3 w-32 text-right">Harga (Rp)</th><th className="py-3 px-3 w-32 text-right">Total</th><th className="py-3 px-3 w-12 text-center">Aksi</th></tr></thead>
+                                                <thead><tr className="border-b border-blue-200 dark:border-blue-800 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 uppercase font-bold text-[10px]"><th className="py-3 px-3">Nama Material</th><th className="py-3 px-2 w-20 text-center">Qty</th><th className="py-3 px-2 w-20 text-center">Satuan</th><th className="py-3 px-3 w-32 text-right">Harga (Rp)</th><th className="py-3 px-3 w-32 text-right">Total</th><th className="py-3 px-3 w-12 text-center">Aksi</th></tr></thead>
                                                 <tbody>{materials.map((mat, idx) => (
                                                     <tr key={mat.id} className="border-b hover:bg-blue-50/50">
                                                         <td className="py-2 px-3"><input type="text" value={mat.nama} onChange={(e) => updateMaterial(idx, 'nama', e.target.value)} placeholder="Cth: Semen" className="w-full border rounded-md px-2.5 py-1.5 outline-none"/></td>
@@ -1287,7 +1576,7 @@
                                             <div className="flex justify-end"><button onClick={addLaborHarian} className="flex gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs px-3.5 py-2 rounded-xl font-bold"><i data-lucide="plus" className="w-4 h-4"></i> Tambah Tenaga Harian</button></div>
                                             <div className="overflow-x-auto rounded-xl border bg-white shadow-sm">
                                                 <table className="w-full text-left text-xs">
-                                                    <thead><tr className="border-b bg-slate-50 text-slate-500 uppercase font-bold text-[10px]"><th className="py-3 px-3">Golongan Tenaga Kerja</th><th className="py-3 px-2 w-28 text-center">Satuan</th><th className="py-3 px-2 w-28 text-center">Volume</th><th className="py-3 px-3 w-32 text-right">Harga (Rp)</th><th className="py-3 px-3 w-32 text-right">Total</th><th className="py-3 px-3 w-12 text-center">Aksi</th></tr></thead>
+                                                    <thead><tr className="border-b border-blue-200 dark:border-blue-800 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 uppercase font-bold text-[10px]"><th className="py-3 px-3">Golongan Tenaga Kerja</th><th className="py-3 px-2 w-28 text-center">Satuan</th><th className="py-3 px-2 w-28 text-center">Volume</th><th className="py-3 px-3 w-32 text-right">Harga (Rp)</th><th className="py-3 px-3 w-32 text-right">Total</th><th className="py-3 px-3 w-12 text-center">Aksi</th></tr></thead>
                                                     <tbody>{laborHarian.map((lab, idx) => (
                                                         <tr key={lab.id} className="border-b hover:bg-blue-50/50">
                                                             <td className="py-2 px-3"><input type="text" value={lab.tenaga} onChange={(e) => updateLaborHarian(idx, 'tenaga', e.target.value)} className="w-full border rounded-md px-2.5 py-1.5 outline-none"/></td>
@@ -1307,7 +1596,7 @@
                                             {laborBorongan.length > 0 && (
                                                 <div className="overflow-x-auto rounded-xl border bg-white shadow-sm">
                                                     <table className="w-full text-left text-xs">
-                                                        <thead><tr className="border-b bg-slate-50 text-slate-500 uppercase font-bold text-[10px]"><th className="py-3 px-3">Uraian Borongan</th><th className="py-3 px-2 w-24 text-center">Vol</th><th className="py-3 px-2 w-24 text-center">Sat</th><th className="py-3 px-3 w-32 text-right">Harga (Rp)</th><th className="py-3 px-3 w-32 text-right">Total</th><th className="py-3 px-3 w-12 text-center">Aksi</th></tr></thead>
+                                                        <thead><tr className="border-b border-blue-200 dark:border-blue-800 bg-blue-100 dark:bg-blue-900/50 text-blue-800 dark:text-blue-300 uppercase font-bold text-[10px]"><th className="py-3 px-3">Uraian Borongan</th><th className="py-3 px-2 w-24 text-center">Vol</th><th className="py-3 px-2 w-24 text-center">Sat</th><th className="py-3 px-3 w-32 text-right">Harga (Rp)</th><th className="py-3 px-3 w-32 text-right">Total</th><th className="py-3 px-3 w-12 text-center">Aksi</th></tr></thead>
                                                         <tbody>{laborBorongan.map((lab, idx) => (
                                                             <tr key={lab.id} className="border-b hover:bg-blue-50/50">
                                                                 <td className="py-2 px-3"><input type="text" value={lab.uraian} onChange={(e) => updateLaborBorongan(idx, 'uraian', e.target.value)} className="w-full border rounded-md px-2.5 py-1.5 outline-none"/></td>
