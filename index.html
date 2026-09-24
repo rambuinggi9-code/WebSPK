@@ -9,6 +9,7 @@
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -719,8 +720,8 @@
                                         <span className="bg-teal-50 text-teal-600 border border-teal-100 text-[10px] px-2.5 py-1 rounded-md font-bold">{t30DaftarSpk.length} Data</span>
                                     </div>
                                     <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
-                                        {t30DaftarSpk.map((item) => (
-                                            <div key={item.id} onClick={() => handleT30LoadSpk(item.id)} className={`p-3.5 rounded-xl border text-left cursor-pointer flex justify-between items-center group shadow-sm ${t30ActiveSpkId === item.id ? 'bg-teal-50 border-teal-300' : 'bg-white dark:bg-slate-950 border-slate-200 hover:border-teal-300'}`}>
+                                        {[...t30DaftarSpk].reverse().map((item) => (
+                                            <div key={item.id} onClick={() => handleT30LoadSpk(item.id)} className={`p-3.5 rounded-xl border text-left cursor-pointer flex justify-between items-center group shadow-sm ${t30ActiveSpkId === item.id ? 'bg-teal-50 border-teal-300' : 'bg-white dark:bg-slate-955 border-slate-200 hover:border-teal-300'}`}>
                                                 <div className="space-y-1 min-w-0 flex-1 pr-3">
                                                     <h4 className="text-xs font-bold font-mono truncate text-teal-700">{item.t30NamaPemborong || "Draf SPK"}</h4>
                                                     <p className="text-[11px] text-slate-500 truncate font-medium">{item.t30LokasiPekerjaanDetail || "Belum ada lokasi"}</p>
@@ -980,7 +981,7 @@
                                         <span className="bg-orange-50 text-orange-600 border border-orange-100 text-[10px] px-2.5 py-1 rounded-md font-bold">{poDaftar.length} Data</span>
                                     </div>
                                     <div className="space-y-2 max-h-[250px] overflow-y-auto pr-1 custom-scrollbar">
-                                        {poDaftar.map((item) => (
+                                        {[...poDaftar].reverse().map((item) => (
                                             <div key={item.id} onClick={() => handlePoLoad(item.id)} className={`p-3 rounded-xl border cursor-pointer flex justify-between items-center group shadow-sm ${poActiveId === item.id ? 'bg-orange-50 border-orange-300' : 'bg-white dark:bg-slate-955 hover:border-orange-300'}`}>
                                                 <div className="space-y-1 overflow-hidden pr-2"><h4 className="text-xs font-bold truncate text-orange-700">{item.poTerimaDari || "Tanpa Nama"}</h4><p className="text-[10px] text-slate-500 truncate">No: {item.poNo || "-"}</p></div>
                                                 <div className="flex gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={(e) => { e.stopPropagation(); handlePoLoad(item.id); }} className="p-1.5 text-orange-500 hover:bg-orange-100 rounded-lg"><i data-lucide="edit" className="w-4 h-4"></i></button><button onClick={(e) => handlePoDelete(item.id, e)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><i data-lucide="trash-2" className="w-4 h-4"></i></button></div>
@@ -1219,7 +1220,7 @@
                                         <span className="bg-indigo-50 text-indigo-600 border border-indigo-100 text-[10px] px-2.5 py-1 rounded-md font-bold">{popDaftar.length} Data</span>
                                     </div>
                                     <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
-                                        {popDaftar.map((item) => (
+                                        {[...popDaftar].reverse().map((item) => (
                                             <div key={item.id} onClick={() => handlePopLoad(item.id)} className={`p-3 rounded-xl border cursor-pointer flex justify-between items-center group shadow-sm ${popActiveId === item.id ? 'bg-indigo-50 border-indigo-300' : 'bg-white dark:bg-slate-950 hover:border-indigo-300'}`}>
                                                 <div className="space-y-1 overflow-hidden pr-2"><h4 className="text-xs font-bold truncate text-indigo-700">{item.popKepada || "Tanpa Nama"}</h4><p className="text-[10px] text-slate-500 truncate">PO: {item.popNo || "-"}</p></div>
                                                 <div className="flex gap-1 opacity-100 lg:opacity-0 group-hover:opacity-100 transition-opacity"><button onClick={(e) => { e.stopPropagation(); handlePopLoad(item.id); }} className="p-1.5 text-indigo-500 hover:bg-indigo-100 rounded-lg"><i data-lucide="edit" className="w-4 h-4"></i></button><button onClick={(e) => handlePopDelete(item.id, e)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg"><i data-lucide="trash-2" className="w-4 h-4"></i></button></div>
@@ -1455,7 +1456,7 @@
                                     <span className="bg-blue-50 text-blue-600 border border-blue-100 text-[10px] px-2.5 py-1 rounded-md font-bold">{daftarSpk.length} Data</span>
                                 </div>
                                 <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
-                                    {daftarSpk.map((item) => (
+                                    {[...daftarSpk].reverse().map((item) => (
                                         <div key={item.id} onClick={() => handleLoadSpk(item.id)} className={`p-3.5 rounded-xl border text-left cursor-pointer flex justify-between items-center group shadow-sm ${activeSpkId === item.id ? 'bg-blue-50 border-blue-300' : 'bg-white dark:bg-slate-955 border-slate-200 hover:border-blue-300'}`}>
                                             <div className="space-y-1.5 min-w-0 flex-1 pr-3">
                                                 <h4 className="text-xs font-bold font-mono truncate text-blue-700">{item.spkNumber || "Draf SPK"}</h4>
