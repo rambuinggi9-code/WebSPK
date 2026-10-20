@@ -348,7 +348,38 @@
             const [activeView, setActiveView] = useState('home');
             const [theme, setTheme] = useState(() => localStorage.getItem('BCA_THEME') || 'light');
             const [notification, setNotification] = useState(null);
+            const notificationTimerRef = useRef(null);
             const previewRef = useRef(null);
+
+            const processImageUpload = (file, maxWidth, callback) => {
+                if (!file) return;
+                if (!file.type.startsWith('image/')) {
+                    callback(null, 'Format file harus berupa gambar!');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                        canvas.width = width;
+                        canvas.height = height;
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
+                        callback(canvas.toDataURL('image/jpeg', 0.7), null);
+                    };
+                    img.onerror = () => callback(null, 'Gagal memuat gambar.');
+                    img.src = e.target.result;
+                };
+                reader.onerror = () => callback(null, 'Gagal membaca file.');
+                reader.readAsDataURL(file);
+            };
 
             // ================= SPK UMUM STATE =================
             const [daftarSpk, setDaftarSpk] = useState(() => { const saved = localStorage.getItem('BCA_DAFTAR_SPK'); return saved ? JSON.parse(saved) : []; });
@@ -463,10 +494,22 @@
                     window.removeEventListener('resize', syncMenuHeight);
                 };
             }, [activeView]);
-            useEffect(() => { localStorage.setItem('BCA_DAFTAR_SPK', JSON.stringify(daftarSpk)); }, [daftarSpk]);
-            useEffect(() => { localStorage.setItem('BCA_DAFTAR_SPK_TIPE30', JSON.stringify(t30DaftarSpk)); }, [t30DaftarSpk]);
-            useEffect(() => { localStorage.setItem('BCA_DAFTAR_PO', JSON.stringify(poDaftar)); }, [poDaftar]);
-            useEffect(() => { localStorage.setItem('BCA_DAFTAR_PO_PAVING', JSON.stringify(popDaftar)); }, [popDaftar]);
+            useEffect(() => { 
+                try { localStorage.setItem('BCA_DAFTAR_SPK', JSON.stringify(daftarSpk)); }
+                catch(e) { console.error(e); showNotification("Gagal menyimpan SPK: Memori penuh! Hapus data lama.", "error"); }
+            }, [daftarSpk]);
+            useEffect(() => { 
+                try { localStorage.setItem('BCA_DAFTAR_SPK_TIPE30', JSON.stringify(t30DaftarSpk)); }
+                catch(e) { console.error(e); showNotification("Gagal menyimpan Tipe 30: Memori penuh! Hapus data lama.", "error"); }
+            }, [t30DaftarSpk]);
+            useEffect(() => { 
+                try { localStorage.setItem('BCA_DAFTAR_PO', JSON.stringify(poDaftar)); }
+                catch(e) { console.error(e); showNotification("Gagal menyimpan PO: Memori penuh! Hapus data lama.", "error"); }
+            }, [poDaftar]);
+            useEffect(() => { 
+                try { localStorage.setItem('BCA_DAFTAR_PO_PAVING', JSON.stringify(popDaftar)); }
+                catch(e) { console.error(e); showNotification("Gagal menyimpan PO Paving: Memori penuh! Hapus data lama.", "error"); }
+            }, [popDaftar]);
             useEffect(() => { if (window.lucide) window.lucide.createIcons(); });
 
             // Otomatisasi SPK Tipe 30
@@ -509,28 +552,42 @@
             };
             const handleRemoveT30Lokasi = (index) => setT30MultiLokasi(t30MultiLokasi.filter((_, i) => i !== index));
             const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
-            const showNotification = (message, type = 'success') => { setNotification({ message, type }); setTimeout(() => setNotification(null), 4000); };
+            const showNotification = (message, type = 'success') => { 
+                setNotification({ message, type }); 
+                if (notificationTimerRef.current) clearTimeout(notificationTimerRef.current);
+                notificationTimerRef.current = setTimeout(() => setNotification(null), 4000); 
+            };
             const handlePreviewScroll = () => { if (previewRef.current) { previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' }); showNotification("Menampilkan Pratinjau Dokumen.", "info"); } };
             const handleNavigate = (view) => { setActiveView(view); window.scrollTo({ top: 0, behavior: 'instant' }); };
 
             // ================= HANDLER SPK UMUM =================
             const handleResetData = () => {
-                setSelectedProyekIdx(DEFAULT_STATE.selectedProyekIdx); setPemberiTugas(DEFAULT_STATE.pemberiTugas); setSelectedPjIdx(DEFAULT_STATE.selectedPjIdx); setStartDate(DEFAULT_STATE.startDate); setEndDate(DEFAULT_STATE.endDate); setIsManualSpk(DEFAULT_STATE.isManualSpk); setSpkNumber(""); setRuangLingkup(JSON.parse(JSON.stringify(DEFAULT_STATE.ruangLingkup))); setMaterials(JSON.parse(JSON.stringify(DEFAULT_STATE.materials))); setLaborType(DEFAULT_STATE.laborType); setLaborHarian(JSON.parse(JSON.stringify(DEFAULT_STATE.laborHarian))); setLaborBorongan(JSON.parse(JSON.stringify(DEFAULT_STATE.laborBorongan))); setKeuanganName(DEFAULT_STATE.keuanganName); setKepalaKantorName(DEFAULT_STATE.kepalaKantorName); setPjSignatureImage(DEFAULT_STATE.pjSignatureImage); setInstansiName("PT. BANGUN CINTA ALAM"); setInstansiAddress("Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com"); setActiveSpkId(null); showNotification("Formulir berhasil dikosongkan!", "info");
+                setSelectedProyekIdx(DEFAULT_STATE.selectedProyekIdx); setPemberiTugas(DEFAULT_STATE.pemberiTugas); setSelectedPjIdx(DEFAULT_STATE.selectedPjIdx); setStartDate(DEFAULT_STATE.startDate); setEndDate(DEFAULT_STATE.endDate); setIsManualSpk(DEFAULT_STATE.isManualSpk); setSpkNumber(""); setRuangLingkup(JSON.parse(JSON.stringify(DEFAULT_STATE.ruangLingkup))); setMaterials(JSON.parse(JSON.stringify(DEFAULT_STATE.materials))); setLaborType(DEFAULT_STATE.laborType); setLaborHarian(JSON.parse(JSON.stringify(DEFAULT_STATE.laborHarian))); setLaborBorongan(JSON.parse(JSON.stringify(DEFAULT_STATE.laborBorongan))); setKeuanganName(DEFAULT_STATE.keuanganName); setKepalaKantorName(DEFAULT_STATE.kepalaKantorName); setPjSignatureImage(DEFAULT_STATE.pjSignatureImage); setLogoKiri(null); setLogoKanan(null); setInstansiName("PT. BANGUN CINTA ALAM"); setInstansiAddress("Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com"); setActiveSpkId(null); showNotification("Formulir berhasil dikosongkan!", "info");
             };
             const handlePrint = () => { const ot = document.title; document.title = `SPK_${spkNumber ? spkNumber.replace(/\//g, '_') : 'Baru'}`; window.print(); setTimeout(() => document.title = ot, 2000); };
             const handleSaveSpk = () => {
                 if(selectedProyekIdx === "") { showNotification("Pilih nama proyek!", "error"); return; }
-                const data = { id: activeSpkId || Date.now().toString(), spkNumber, proyekIdx: selectedProyekIdx, proyekNama: DAFTAR_PROYEK[selectedProyekIdx]?.nama, pemberiTugas, pjIdx: selectedPjIdx, startDate, endDate, ruangLingkup, materials, laborType, laborHarian, laborBorongan, keuanganName, kepalaKantorName, pjSignatureImage, instansiName, instansiAddress, lastUpdated: new Date().toLocaleString('id-ID') };
+                const data = { id: activeSpkId || (Date.now().toString() + '-' + Math.floor(Math.random()*1000)), spkNumber, proyekIdx: selectedProyekIdx, proyekNama: DAFTAR_PROYEK[selectedProyekIdx]?.nama, pemberiTugas, pjIdx: selectedPjIdx, startDate, endDate, ruangLingkup, materials, laborType, laborHarian, laborBorongan, keuanganName, kepalaKantorName, pjSignatureImage, instansiName, instansiAddress, logoKiri, logoKanan, lastUpdated: new Date().toLocaleString('id-ID') };
                 if (activeSpkId) { setDaftarSpk(daftarSpk.map(item => item.id === activeSpkId ? data : item)); showNotification("SPK diperbarui!"); } else { setDaftarSpk([...daftarSpk, data]); setActiveSpkId(data.id); showNotification("SPK disimpan!"); }
             };
             const handleLoadSpk = (id) => {
                 const target = daftarSpk.find(item => item.id === id);
-                if (target) { setActiveSpkId(target.id); setSpkNumber(target.spkNumber || ""); setSelectedProyekIdx(target.proyekIdx !== undefined ? target.proyekIdx : ""); setPemberiTugas(target.pemberiTugas || ""); setSelectedPjIdx(target.pjIdx !== undefined ? target.pjIdx : ""); setStartDate(target.startDate || ""); setEndDate(target.endDate || ""); setRuangLingkup(target.ruangLingkup || []); setMaterials(target.materials || []); setLaborType(target.laborType || "harian"); setLaborHarian(target.laborHarian || []); setLaborBorongan(target.laborBorongan || []); setKeuanganName(target.keuanganName || ""); setKepalaKantorName(target.kepalaKantorName || ""); setPjSignatureImage(target.pjSignatureImage || null); setInstansiName(target.instansiName || "PT. BANGUN CINTA ALAM"); setInstansiAddress(target.instansiAddress || "Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com"); setIsManualSpk(true); window.scrollTo({ top: 0, behavior: 'smooth' }); showNotification(`Memuat: ${target.spkNumber}`); }
+                if (target) { setActiveSpkId(target.id); setSpkNumber(target.spkNumber || ""); setSelectedProyekIdx(target.proyekIdx !== undefined ? target.proyekIdx : ""); setPemberiTugas(target.pemberiTugas || ""); setSelectedPjIdx(target.pjIdx !== undefined ? target.pjIdx : ""); setStartDate(target.startDate || ""); setEndDate(target.endDate || ""); setRuangLingkup(target.ruangLingkup || []); setMaterials(target.materials || []); setLaborType(target.laborType || "harian"); setLaborHarian(target.laborHarian || []); setLaborBorongan(target.laborBorongan || []); setKeuanganName(target.keuanganName || ""); setKepalaKantorName(target.kepalaKantorName || ""); setPjSignatureImage(target.pjSignatureImage || null); setInstansiName(target.instansiName || "PT. BANGUN CINTA ALAM"); setInstansiAddress(target.instansiAddress || "Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com"); setLogoKiri(target.logoKiri || null); setLogoKanan(target.logoKanan || null); setIsManualSpk(true); window.scrollTo({ top: 0, behavior: 'smooth' }); showNotification(`Memuat: ${target.spkNumber}`); }
             };
             const handleDeleteSpk = (id, e) => { e.stopPropagation(); setDaftarSpk(daftarSpk.filter(item => item.id !== id)); if (activeSpkId === id) setActiveSpkId(null); showNotification("Dihapus.", "error"); };
 
-            const handleLogoUpload = (e, target) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onloadend = () => { if (target === 'kiri') setLogoKiri(reader.result); if (target === 'kanan') setLogoKanan(reader.result); }; reader.readAsDataURL(file); } };
-            const handlePjSignatureUpload = (e) => { const file = e.target.files[0]; if (file) { if (!file.type.startsWith('image/')) { showNotification("Upload file gambar!", "error"); return; } const reader = new FileReader(); reader.onloadend = () => { setPjSignatureImage(reader.result); showNotification("TTD diunggah."); }; reader.readAsDataURL(file); } };
+            const handleLogoUpload = (e, target) => { 
+                processImageUpload(e.target.files[0], 400, (result, err) => {
+                    if(err) return showNotification(err, "error");
+                    if (target === 'kiri') setLogoKiri(result); if (target === 'kanan') setLogoKanan(result);
+                });
+            };
+            const handlePjSignatureUpload = (e) => { 
+                processImageUpload(e.target.files[0], 400, (result, err) => {
+                    if(err) return showNotification(err, "error");
+                    setPjSignatureImage(result); showNotification("TTD diunggah.");
+                });
+            };
             const clearLogo = (target) => { if (target === 'kiri') setLogoKiri(null); if (target === 'kanan') setLogoKanan(null); };
             const clearPjSignature = () => { setPjSignatureImage(null); showNotification("TTD dihapus.", "info"); };
             const durasiHari = (startDate && endDate) ? calculateWorkingDays(startDate, endDate) : 0;
@@ -558,12 +615,12 @@
 
             // ================= HANDLER TIPE 30 =================
             const handleT30ResetData = () => {
-                setT30HariPembuatan(""); setT30TanggalPembuatan(""); setT30NamaPemborong(""); setT30HpPemborong(""); setT30AlamatPemborong(""); setT30DetailPekerjaanOpsional(""); setT30LokasiPekerjaanDetail("Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)"); setT30BlokHuruf("F"); setT30BlokNomor("2"); setT30MultiLokasi([]); setT30NilaiBorongan(""); setT30NilaiBoronganTerbilang(""); setT30WaktuPelaksanaan("30"); setT30WaktuToleransi("10"); setT30TotalWaktuPelaksanaan("40"); setT30DendaKeterlambatan(""); setT30DendaKeterlambatanTerbilang(""); setT30JamGudangPagiMulai("07.30"); setT30JamGudangPagiSelesai("08.30"); setT30JamGudangSiangMulai("12.30"); setT30JamGudangSiangSelesai("13.30"); setT30TempatDitetapkan("Malang"); setT30TanggalDitetapkan(getLocalDateString()); setT30LampiranImage(null); setT30PjSignatureImage(null); setT30InstansiName("PT. BANGUN CINTA ALAM"); setT30InstansiAddress("Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com"); setT30ActiveSpkId(null); showNotification("Formulir Tipe 30 dikosongkan!", "info");
+                setT30HariPembuatan(""); setT30TanggalPembuatan(""); setT30NamaPemborong(""); setT30HpPemborong(""); setT30AlamatPemborong(""); setT30DetailPekerjaanOpsional(""); setT30LokasiPekerjaanDetail("Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)"); setT30BlokHuruf("F"); setT30BlokNomor("2"); setT30MultiLokasi([]); setT30NilaiBorongan(""); setT30NilaiBoronganTerbilang(""); setT30WaktuPelaksanaan("30"); setT30WaktuToleransi("10"); setT30TotalWaktuPelaksanaan("40"); setT30DendaKeterlambatan(""); setT30DendaKeterlambatanTerbilang(""); setT30JamGudangPagiMulai("07.30"); setT30JamGudangPagiSelesai("08.30"); setT30JamGudangSiangMulai("12.30"); setT30JamGudangSiangSelesai("13.30"); setT30TempatDitetapkan("Malang"); setT30TanggalDitetapkan(getLocalDateString()); setT30LampiranImage(null); setT30PjSignatureImage(null); setT30LogoKiri(null); setT30LogoKanan(null); setT30InstansiName("PT. BANGUN CINTA ALAM"); setT30InstansiAddress("Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com"); setT30ActiveSpkId(null); showNotification("Formulir Tipe 30 dikosongkan!", "info");
             };
             const handleT30Print = () => { const ot = document.title; document.title = `SPK_T30_${t30NamaPemborong ? t30NamaPemborong.replace(/\s+/g, '_') : 'Baru'}`; window.print(); setTimeout(() => document.title = ot, 2000); };
             const handleT30SaveSpk = () => {
                 if(!t30NamaPemborong) { showNotification("Isi nama pemborong!", "error"); return; }
-                const data = { id: t30ActiveSpkId || Date.now().toString(), t30HariPembuatan, t30TanggalPembuatan, t30NamaPemborong, t30HpPemborong, t30AlamatPemborong, t30DetailPekerjaanOpsional, t30LokasiPekerjaanDetail, t30BlokHuruf, t30BlokNomor, t30MultiLokasi: t30MultiLokasi.length > 0 ? t30MultiLokasi : [{ huruf: t30BlokHuruf, nomor: t30BlokNomor, detail: t30DetailPekerjaanOpsional }], t30NilaiBorongan, t30NilaiBoronganTerbilang, t30WaktuPelaksanaan, t30WaktuToleransi, t30TotalWaktuPelaksanaan, t30DendaKeterlambatan, t30DendaKeterlambatanTerbilang, t30JamGudangPagiMulai, t30JamGudangPagiSelesai, t30JamGudangSiangMulai, t30JamGudangSiangSelesai, t30TempatDitetapkan, t30TanggalDitetapkan, t30PjSignatureImage, t30InstansiName, t30InstansiAddress, t30LogoKiri, t30LogoKanan, t30LampiranImage, lastUpdated: new Date().toLocaleString('id-ID') };
+                const data = { id: t30ActiveSpkId || (Date.now().toString() + '-' + Math.floor(Math.random()*1000)), t30HariPembuatan, t30TanggalPembuatan, t30NamaPemborong, t30HpPemborong, t30AlamatPemborong, t30DetailPekerjaanOpsional, t30LokasiPekerjaanDetail, t30BlokHuruf, t30BlokNomor, t30MultiLokasi: t30MultiLokasi.length > 0 ? t30MultiLokasi : [{ huruf: t30BlokHuruf, nomor: t30BlokNomor, detail: t30DetailPekerjaanOpsional }], t30NilaiBorongan, t30NilaiBoronganTerbilang, t30WaktuPelaksanaan, t30WaktuToleransi, t30TotalWaktuPelaksanaan, t30DendaKeterlambatan, t30DendaKeterlambatanTerbilang, t30JamGudangPagiMulai, t30JamGudangPagiSelesai, t30JamGudangSiangMulai, t30JamGudangSiangSelesai, t30TempatDitetapkan, t30TanggalDitetapkan, t30PjSignatureImage, t30InstansiName, t30InstansiAddress, t30LogoKiri, t30LogoKanan, t30LampiranImage, lastUpdated: new Date().toLocaleString('id-ID') };
                 if (t30ActiveSpkId) { setT30DaftarSpk(t30DaftarSpk.map(item => item.id === t30ActiveSpkId ? data : item)); showNotification("SPK Tipe 30 diperbarui!"); } else { setT30DaftarSpk([...t30DaftarSpk, data]); setT30ActiveSpkId(data.id); showNotification("SPK Tipe 30 disimpan!"); }
             };
             const handleT30LoadSpk = (id) => {
@@ -571,8 +628,18 @@
                 if (target) { setT30ActiveSpkId(target.id); setT30HariPembuatan(target.t30HariPembuatan || ""); setT30TanggalPembuatan(target.t30TanggalPembuatan || ""); setT30NamaPemborong(target.t30NamaPemborong || ""); setT30HpPemborong(target.t30HpPemborong || ""); setT30AlamatPemborong(target.t30AlamatPemborong || ""); setT30DetailPekerjaanOpsional(target.t30DetailPekerjaanOpsional || ""); setT30LokasiPekerjaanDetail(target.t30LokasiPekerjaanDetail || ""); setT30BlokHuruf(target.t30BlokHuruf || "F"); setT30BlokNomor(target.t30BlokNomor || "2"); setT30MultiLokasi(target.t30MultiLokasi && target.t30MultiLokasi.length > 0 ? target.t30MultiLokasi : [{ huruf: target.t30BlokHuruf || "F", nomor: target.t30BlokNomor || "2", detail: target.t30DetailPekerjaanOpsional || "" }]); setT30NilaiBorongan(target.t30NilaiBorongan || ""); setT30NilaiBoronganTerbilang(target.t30NilaiBoronganTerbilang || ""); setT30WaktuPelaksanaan(target.t30WaktuPelaksanaan || ""); setT30WaktuToleransi(target.t30WaktuToleransi || ""); setT30TotalWaktuPelaksanaan(target.t30TotalWaktuPelaksanaan || ""); setT30DendaKeterlambatan(target.t30DendaKeterlambatan || ""); setT30DendaKeterlambatanTerbilang(target.t30DendaKeterlambatanTerbilang || ""); setT30JamGudangPagiMulai(target.t30JamGudangPagiMulai || "07.30"); setT30JamGudangPagiSelesai(target.t30JamGudangPagiSelesai || "08.30"); setT30JamGudangSiangMulai(target.t30JamGudangSiangMulai || "12.30"); setT30JamGudangSiangSelesai(target.t30JamGudangSiangSelesai || "13.30"); setT30TempatDitetapkan(target.t30TempatDitetapkan || ""); setT30TanggalDitetapkan(target.t30TanggalDitetapkan || getLocalDateString()); setT30LampiranImage(target.t30LampiranImage || null); setT30PjSignatureImage(target.t30PjSignatureImage || null); setT30InstansiName(target.t30InstansiName || "PT. BANGUN CINTA ALAM"); setT30InstansiAddress(target.t30InstansiAddress || "Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com"); setT30LogoKiri(target.t30LogoKiri || null); setT30LogoKanan(target.t30LogoKanan || null); window.scrollTo({ top: 0, behavior: 'smooth' }); showNotification(`Memuat: ${target.t30NamaPemborong}`); }
             };
             const handleT30DeleteSpk = (id, e) => { e.stopPropagation(); setT30DaftarSpk(t30DaftarSpk.filter(item => item.id !== id)); if (t30ActiveSpkId === id) setT30ActiveSpkId(null); showNotification("Dihapus.", "error"); };
-            const handleT30LogoUpload = (e, target) => { const f = e.target.files[0]; if (f) { const r = new FileReader(); r.onloadend = () => { if (target === 'kiri') setT30LogoKiri(r.result); if (target === 'kanan') setT30LogoKanan(r.result); }; r.readAsDataURL(f); } };
-            const handleT30PjSignatureUpload = (e) => { const f = e.target.files[0]; if (f) { if (!f.type.startsWith('image/')) { showNotification("Upload gambar!", "error"); return; } const r = new FileReader(); r.onloadend = () => { setT30PjSignatureImage(r.result); showNotification("TTD diunggah."); }; r.readAsDataURL(f); } };
+            const handleT30LogoUpload = (e, target) => { 
+                processImageUpload(e.target.files[0], 400, (result, err) => {
+                    if(err) return showNotification(err, "error");
+                    if (target === 'kiri') setT30LogoKiri(result); if (target === 'kanan') setT30LogoKanan(result);
+                });
+            };
+            const handleT30PjSignatureUpload = (e) => { 
+                processImageUpload(e.target.files[0], 400, (result, err) => {
+                    if(err) return showNotification(err, "error");
+                    setT30PjSignatureImage(result); showNotification("TTD diunggah.");
+                });
+            };
             const clearT30Logo = (target) => { if (target === 'kiri') setT30LogoKiri(null); if (target === 'kanan') setT30LogoKanan(null); };
             const clearT30PjSignature = () => { setT30PjSignatureImage(null); showNotification("TTD dihapus.", "info"); };
 
@@ -581,7 +648,7 @@
                 const d = new Date(); setPoNo(`${d.getDate().toString().padStart(2, '0')}${(d.getMonth()+1).toString().padStart(2, '0')}${d.getFullYear()}`); setPoProyekPilihan("Lembah Bunder Regency"); setPoTerimaDari("Lembah Bunder Regency"); setPoAlamat("Sidorahayu, Wagir"); setPoLogo(null); setPoCompanyName("PT WALI BAROKAH LAND"); setPoUntukPembayaran("Blesscon"); setPoTableLeft(Array.from({ length: 6 }, () => ({ noCek: "", bank: "", tanggal: "", jumlah: "" }))); setPoTotalLeft(""); setPoTableRight(Array.from({ length: 6 }, () => ({ noFaktur: "", tanggal: "", jumlah: "" }))); setPoTotalRight(""); setPoCatatan("tempo 30 hari"); setPoTempatTanggal("Malang, Agustus 2026"); setPoPenerima1Nama("Busro Khufidon"); setPoPenerima1Hp("0821-4224-2120"); setPoPenerima2Nama(""); setPoPenerima1Signature(null); setPoActiveId(null); showNotification("Formulir Tanda Terima dikosongkan!", "info");
             };
             const handlePoSave = () => {
-                const data = { id: poActiveId || Date.now().toString(), poLogo, poCompanyName, poNo, poTerimaDari, poAlamat, poUntukPembayaran, poTableLeft, poTotalLeft, poTableRight, poTotalRight, poCatatan, poTempatTanggal, poPenerima1Nama, poPenerima1Hp, poPenerima2Nama, poPenerima1Signature, lastUpdated: new Date().toLocaleString('id-ID') };
+                const data = { id: poActiveId || (Date.now().toString() + '-' + Math.floor(Math.random()*1000)), poLogo, poCompanyName, poNo, poTerimaDari, poAlamat, poUntukPembayaran, poTableLeft, poTotalLeft, poTableRight, poTotalRight, poCatatan, poTempatTanggal, poPenerima1Nama, poPenerima1Hp, poPenerima2Nama, poPenerima1Signature, lastUpdated: new Date().toLocaleString('id-ID') };
                 if (poActiveId) { setPoDaftar(poDaftar.map(item => item.id === poActiveId ? data : item)); showNotification("Tanda Terima diperbarui!"); } else { setPoDaftar([...poDaftar, data]); setPoActiveId(data.id); showNotification("Tanda Terima disimpan!"); }
             };
             const handlePoLoad = (id) => {
@@ -593,7 +660,12 @@
             const updateTableLeft = (idx, field, value) => { const newData = [...poTableLeft]; newData[idx][field] = value; setPoTableLeft(newData); };
             const updateTableRight = (idx, field, value) => { const newData = [...poTableRight]; newData[idx][field] = value; setPoTableRight(newData); };
             
-            const handlePoPenerima1SignatureUpload = (e) => { const f = e.target.files[0]; if (f) { if (!f.type.startsWith('image/')) { showNotification("Upload gambar!", "error"); return; } const r = new FileReader(); r.onloadend = () => { setPoPenerima1Signature(r.result); showNotification("TTD Penerima 1 diunggah."); }; r.readAsDataURL(f); } };
+            const handlePoPenerima1SignatureUpload = (e) => { 
+                processImageUpload(e.target.files[0], 400, (result, err) => {
+                    if(err) return showNotification(err, "error");
+                    setPoPenerima1Signature(result); showNotification("TTD Penerima 1 diunggah.");
+                });
+            };
             const clearPoPenerima1Signature = () => { setPoPenerima1Signature(null); showNotification("TTD Penerima 1 dihapus.", "info"); };
 
             // ================= HANDLER PO PAVING =================
@@ -607,7 +679,7 @@
                 showNotification("Formulir PO Paving dikosongkan!", "info");
             };
             const handlePopSave = () => {
-                const data = { id: popActiveId || Date.now().toString(), popNo, popTanggal, popKepada, popUp, popAlamatPerusahaan, popAlamatPengiriman, popItems, popTerm1, popTerm2, popTerm3, popDibuatOlehName, popDisetujuiOlehName, popDibuatOlehSig, popDisetujuiOlehSig, popLogo, lastUpdated: new Date().toLocaleString('id-ID') };
+                const data = { id: popActiveId || (Date.now().toString() + '-' + Math.floor(Math.random()*1000)), popNo, popTanggal, popKepada, popUp, popAlamatPerusahaan, popAlamatPengiriman, popItems, popTerm1, popTerm2, popTerm3, popDibuatOlehName, popDisetujuiOlehName, popDibuatOlehSig, popDisetujuiOlehSig, popLogo, lastUpdated: new Date().toLocaleString('id-ID') };
                 if (popActiveId) { setPopDaftar(popDaftar.map(item => item.id === popActiveId ? data : item)); showNotification("PO Paving diperbarui!"); } 
                 else { setPopDaftar([...popDaftar, data]); setPopActiveId(data.id); showNotification("PO Paving disimpan!"); }
             };
@@ -853,7 +925,7 @@
                                             {t30LampiranImage ? (
                                                 <div className="relative group p-3 bg-white rounded-xl border flex items-center justify-center h-48 overflow-hidden"><img src={t30LampiranImage} className="max-h-full max-w-full object-contain"/><button onClick={() => { setT30LampiranImage(null); showNotification("Lampiran dihapus.", "info"); }} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-xl transition-opacity font-bold"><i data-lucide="trash-2" className="w-6 h-6 mb-2 text-red-400"></i>Hapus Lampiran</button></div>
                                             ) : (
-                                                <label className="cursor-pointer flex flex-col items-center justify-center h-32 border-2 border-dashed border-slate-300 hover:border-teal-400 rounded-xl bg-white"><div className="p-2 bg-white border shadow-sm rounded-full mb-2"><i data-lucide="upload-cloud" className="w-5 h-5 text-slate-400"></i></div><span className="text-xs font-medium">Unggah Gambar</span><input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files[0]; if(f){ const r = new FileReader(); r.onloadend=()=>setT30LampiranImage(r.result); r.readAsDataURL(f); } }} /></label>
+                                                <label className="cursor-pointer flex flex-col items-center justify-center h-32 border-2 border-dashed border-slate-300 hover:border-teal-400 rounded-xl bg-white"><div className="p-2 bg-white border shadow-sm rounded-full mb-2"><i data-lucide="upload-cloud" className="w-5 h-5 text-slate-400"></i></div><span className="text-xs font-medium">Unggah Gambar</span><input type="file" accept="image/*" className="hidden" onChange={(e) => processImageUpload(e.target.files[0], 1000, (res, err) => { if(err) showNotification(err, "error"); else { setT30LampiranImage(res); showNotification("Lampiran diunggah."); } })} /></label>
                                             )}
                                         </div>
                                     </div>
@@ -997,7 +1069,7 @@
                                         {poLogo ? (
                                             <div className="relative group w-24 h-24 bg-white rounded-lg flex items-center justify-center p-2 border shadow-sm mx-auto"><img src={poLogo} className="max-h-full max-w-full object-contain" /><button onClick={() => setPoLogo(null)} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs"><i data-lucide="trash" className="w-4 h-4 mr-1"></i> Hapus</button></div>
                                         ) : (
-                                            <label className="cursor-pointer flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-300 hover:border-orange-400 rounded-lg"><i data-lucide="upload" className="w-5 h-5 mb-1 text-slate-400"></i><span className="text-[10px] font-medium text-slate-400">Unggah Logo</span><input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files[0]; if(f) { const r = new FileReader(); r.onloadend = () => setPoLogo(r.result); r.readAsDataURL(f); } }} /></label>
+                                            <label className="cursor-pointer flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-300 hover:border-orange-400 rounded-lg"><i data-lucide="upload" className="w-5 h-5 mb-1 text-slate-400"></i><span className="text-[10px] font-medium text-slate-400">Unggah Logo</span><input type="file" accept="image/*" className="hidden" onChange={(e) => processImageUpload(e.target.files[0], 400, (res, err) => { if(err) showNotification(err, "error"); else { setPoLogo(res); showNotification("Logo diunggah."); } })} /></label>
                                         )}
                                     </div>
                                 </div>
@@ -1234,7 +1306,7 @@
                                         {popLogo ? (
                                             <div className="relative group w-32 h-32 bg-slate-50 rounded-lg flex items-center justify-center p-2 border shadow-sm mx-auto"><img src={popLogo} className="max-h-full max-w-full object-contain" /><button onClick={() => setPopLogo(null)} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs"><i data-lucide="trash" className="w-4 h-4 mr-1"></i> Hapus</button></div>
                                         ) : (
-                                            <label className="cursor-pointer flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-lg bg-slate-50 transition-colors"><i data-lucide="upload" className="w-6 h-6 mb-2 text-slate-400"></i><span className="text-xs font-medium text-slate-500">Unggah Logo Perusahaan</span><input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files[0]; if(f) { const r = new FileReader(); r.onloadend = () => setPopLogo(r.result); r.readAsDataURL(f); } }} /></label>
+                                            <label className="cursor-pointer flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-lg bg-slate-50 transition-colors"><i data-lucide="upload" className="w-6 h-6 mb-2 text-slate-400"></i><span className="text-xs font-medium text-slate-500">Unggah Logo Perusahaan</span><input type="file" accept="image/*" className="hidden" onChange={(e) => processImageUpload(e.target.files[0], 400, (res, err) => { if(err) showNotification(err, "error"); else { setPopLogo(res); showNotification("Logo diunggah."); } })} /></label>
                                         )}
                                     </div>
                                 </div>
@@ -1300,7 +1372,7 @@
                                             {popDibuatOlehSig ? (
                                                 <div className="relative group p-2 bg-slate-50 rounded-lg border flex items-center justify-center h-20 overflow-hidden"><img src={popDibuatOlehSig} className="max-h-full object-contain"/><button onClick={() => setPopDibuatOlehSig(null)} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center text-xs font-bold transition-opacity">Hapus TTD</button></div>
                                             ) : (
-                                                <label className="cursor-pointer flex flex-col items-center justify-center h-20 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-lg bg-slate-50"><span className="text-[10px] font-medium text-slate-500">Unggah TTD (Dibuat Oleh)</span><input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files[0]; if(f){ const r=new FileReader(); r.onloadend=()=>setPopDibuatOlehSig(r.result); r.readAsDataURL(f); } }} /></label>
+                                                <label className="cursor-pointer flex flex-col items-center justify-center h-20 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-lg bg-slate-50"><span className="text-[10px] font-medium text-slate-500">Unggah TTD (Dibuat Oleh)</span><input type="file" accept="image/*" className="hidden" onChange={(e) => processImageUpload(e.target.files[0], 400, (res, err) => { if(err) showNotification(err, "error"); else { setPopDibuatOlehSig(res); showNotification("TTD (Dibuat Oleh) diunggah."); } })} /></label>
                                             )}
                                         </div>
                                         <div className="space-y-3">
@@ -1309,7 +1381,7 @@
                                             {popDisetujuiOlehSig ? (
                                                 <div className="relative group p-2 bg-slate-50 rounded-lg border flex items-center justify-center h-20 overflow-hidden"><img src={popDisetujuiOlehSig} className="max-h-full object-contain"/><button onClick={() => setPopDisetujuiOlehSig(null)} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center text-xs font-bold transition-opacity">Hapus TTD</button></div>
                                             ) : (
-                                                <label className="cursor-pointer flex flex-col items-center justify-center h-20 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-lg bg-slate-50"><span className="text-[10px] font-medium text-slate-500">Unggah TTD (Disetujui Oleh)</span><input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files[0]; if(f){ const r=new FileReader(); r.onloadend=()=>setPopDisetujuiOlehSig(r.result); r.readAsDataURL(f); } }} /></label>
+                                                <label className="cursor-pointer flex flex-col items-center justify-center h-20 border-2 border-dashed border-slate-300 hover:border-indigo-400 rounded-lg bg-slate-50"><span className="text-[10px] font-medium text-slate-500">Unggah TTD (Disetujui Oleh)</span><input type="file" accept="image/*" className="hidden" onChange={(e) => processImageUpload(e.target.files[0], 400, (res, err) => { if(err) showNotification(err, "error"); else { setPopDisetujuiOlehSig(res); showNotification("TTD (Disetujui Oleh) diunggah."); } })} /></label>
                                             )}
                                         </div>
                                     </div>
