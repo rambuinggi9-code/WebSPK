@@ -532,6 +532,25 @@
                 }
             });
 
+            // Efek untuk membuat Nomor SPK Otomatis (SPK Umum)
+            useEffect(() => {
+                if (!isManualSpk) {
+                    if (selectedProyekIdx !== "") {
+                        const proyekKode = DAFTAR_PROYEK[selectedProyekIdx]?.kode || "XXX";
+                        const dateRef = startDate ? new Date(startDate) : new Date();
+                        const romanMonth = getRomanMonth(dateRef.getMonth());
+                        const year = dateRef.getFullYear();
+                        
+                        // Menghitung nomor urut berdasarkan total data yang ada di database lokal
+                        const urut = String(daftarSpk.length + 1).padStart(3, '0');
+                        
+                        setSpkNumber(`${urut}/SPK/BCA-${proyekKode}/${romanMonth}/${year}`);
+                    } else {
+                        setSpkNumber("");
+                    }
+                }
+            }, [isManualSpk, selectedProyekIdx, startDate, daftarSpk.length]);
+
             const showNotification = (msg, type = "success") => {
                 setNotification({ message: msg, type });
                 if (notificationTimerRef.current) clearTimeout(notificationTimerRef.current);
