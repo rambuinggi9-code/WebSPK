@@ -525,6 +525,13 @@
                 catch(e) { console.error(e); showNotification("Gagal menyimpan PO Paving: Memori penuh! Hapus data lama.", "error"); }
             }, [popDaftar]);
 
+            // Memanggil lucide.createIcons() untuk merender icon setiap kali ada pembaruan tampilan
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            });
+
             const showNotification = (msg, type = "success") => {
                 setNotification({ message: msg, type });
                 if (notificationTimerRef.current) clearTimeout(notificationTimerRef.current);
