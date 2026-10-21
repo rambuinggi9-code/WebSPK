@@ -298,6 +298,20 @@
             return d.toISOString().split('T')[0];
         };
 
+        const getStorageUsageMB = () => {
+            try {
+                let total = 0;
+                for (let key in localStorage) {
+                    if (localStorage.hasOwnProperty(key)) {
+                        total += ((localStorage[key].length + key.length) * 2);
+                    }
+                }
+                return (total / (1024 * 1024)).toFixed(2);
+            } catch (e) {
+                return "0";
+            }
+        };
+
         const terbilangAngka = (angka) => {
             const num = parseInt(angka);
             if(isNaN(num)) return "";
@@ -504,61 +518,84 @@
             }, [t30DaftarSpk]);
             useEffect(() => { 
                 try { localStorage.setItem('BCA_DAFTAR_PO', JSON.stringify(poDaftar)); }
-                catch(e) { console.error(e); showNotification("Gagal menyimpan PO: Memori penuh! Hapus data lama.", "error"); }
+                catch(e) { console.error(e); showNotification("Gagal menyimpan PO Bata: Memori penuh! Hapus data lama.", "error"); }
             }, [poDaftar]);
             useEffect(() => { 
                 try { localStorage.setItem('BCA_DAFTAR_PO_PAVING', JSON.stringify(popDaftar)); }
                 catch(e) { console.error(e); showNotification("Gagal menyimpan PO Paving: Memori penuh! Hapus data lama.", "error"); }
             }, [popDaftar]);
-            useEffect(() => { if (window.lucide) window.lucide.createIcons(); });
 
-            // Otomatisasi SPK Tipe 30
-            useEffect(() => {
-                if (t30TanggalPembuatan) { const date = new Date(t30TanggalPembuatan); if (!isNaN(date.getTime())) { const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"]; setT30HariPembuatan(days[date.getDay()]); } } else setT30HariPembuatan("");
-            }, [t30TanggalPembuatan]);
-            useEffect(() => {
-                if (t30NilaiBorongan && !isNaN(t30NilaiBorongan)) { const val = parseInt(t30NilaiBorongan); setT30NilaiBoronganTerbilang(formatTerbilangRupiah(val)); const denda = val * 0.1; setT30DendaKeterlambatan(denda.toString()); setT30DendaKeterlambatanTerbilang(formatTerbilangRupiah(denda)); } else { setT30NilaiBoronganTerbilang(""); setT30DendaKeterlambatan(""); setT30DendaKeterlambatanTerbilang(""); }
-            }, [t30NilaiBorongan]);
-            useEffect(() => {
-                if (t30MultiLokasi && t30MultiLokasi.length > 0) {
-                    const unitStrings = t30MultiLokasi.map(loc => { let text = `Blok ${loc.huruf}-${loc.nomor} (Tipe 30)`; if (loc.detail && loc.detail.trim() !== "") { text += ` - ${loc.detail}`; } return text; });
-                    setT30LokasiPekerjaanDetail(`Proyek Lembah Bunder Regency ${unitStrings.join(", ")}`);
-                } else {
-                    let baseText = `Proyek Lembah Bunder Regency Blok ${t30BlokHuruf}-${t30BlokNomor} (Tipe 30)`; if (t30DetailPekerjaanOpsional.trim() !== "") { baseText += ` - ${t30DetailPekerjaanOpsional}`; } setT30LokasiPekerjaanDetail(baseText);
-                }
-            }, [t30MultiLokasi, t30BlokHuruf, t30BlokNomor, t30DetailPekerjaanOpsional]);
-
-            // Otomatisasi SPK Umum
-            useEffect(() => {
-                if (!isManualSpk) {
-                    if (startDate && selectedProyekIdx !== "") { const dateObj = new Date(startDate); const monthRoman = getRomanMonth(dateObj.getMonth()); const year = dateObj.getFullYear(); const proyek = DAFTAR_PROYEK[selectedProyekIdx]; const projectCode = proyek ? proyek.kode : "PROYEK"; setSpkNumber(`042/BCA-SPK/${monthRoman}/${projectCode}-${year}`); } else setSpkNumber("");
-                }
-            }, [selectedProyekIdx, startDate, isManualSpk]);
-
-            // Otomatisasi Kalkulasi PO Bata Ringan
-            useEffect(() => {
-                if (poTableRight[0] && poTableRight[2]) {
-                    const ritasiStr = poTableRight[0].noFaktur || ""; const ritasi = parseInt(ritasiStr.replace(/\D/g, '')) || 0;
-                    const volStr = (poTableRight[2].noFaktur || "").split('x')[0].trim().replace(',', '.'); const vol = parseFloat(volStr) || 0;
-                    const hargaStr = (poTableRight[0].jumlah || "").replace(/\D/g, ''); const harga = parseInt(hargaStr) || 0;
-                    if (ritasi > 0 && vol > 0 && harga > 0) { const total = ritasi * vol * harga; setPoTotalRight(new Intl.NumberFormat('id-ID').format(total)); }
-                }
-            }, [poTableRight]);
-
-            const handleAddT30Lokasi = () => {
-                const exists = t30MultiLokasi.find(l => l.huruf === t30BlokHuruf && l.nomor === t30BlokNomor);
-                if (!exists) { setT30MultiLokasi([...t30MultiLokasi, { huruf: t30BlokHuruf, nomor: t30BlokNomor, detail: t30DetailPekerjaanOpsional }]); setT30DetailPekerjaanOpsional(""); } 
-                else showNotification(`Blok ${t30BlokHuruf}-${t30BlokNomor} sudah ditambahkan!`, "error");
-            };
-            const handleRemoveT30Lokasi = (index) => setT30MultiLokasi(t30MultiLokasi.filter((_, i) => i !== index));
-            const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
-            const showNotification = (message, type = 'success') => { 
-                setNotification({ message, type }); 
+            const showNotification = (msg, type = "success") => {
+                setNotification({ message: msg, type });
                 if (notificationTimerRef.current) clearTimeout(notificationTimerRef.current);
-                notificationTimerRef.current = setTimeout(() => setNotification(null), 4000); 
+                notificationTimerRef.current = setTimeout(() => setNotification(null), 3000);
             };
-            const handlePreviewScroll = () => { if (previewRef.current) { previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' }); showNotification("Menampilkan Pratinjau Dokumen.", "info"); } };
-            const handleNavigate = (view) => { setActiveView(view); window.scrollTo({ top: 0, behavior: 'instant' }); };
+
+            const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
+
+            const handleNavigate = (view) => {
+                setActiveView(view);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
+            const handlePreviewScroll = () => {
+                if (previewRef.current) {
+                    previewRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            };
+
+            const handleExportAllData = () => {
+                const backup = {
+                    version: "1.0",
+                    exportDate: new Date().toISOString(),
+                    daftarSpk, t30DaftarSpk, poDaftar, popDaftar
+                };
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backup, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", `Backup_BCA_SPK_${getLocalDateString()}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                showNotification("Berhasil mengunduh file backup JSON ke komputer!");
+            };
+
+            const handleImportAllData = (e) => {
+                const fileReader = new FileReader();
+                if (!e.target.files || !e.target.files[0]) return;
+                fileReader.onload = (event) => {
+                    try {
+                        const parsed = JSON.parse(event.target.result);
+                        if (parsed.daftarSpk) setDaftarSpk(parsed.daftarSpk);
+                        if (parsed.t30DaftarSpk) setT30DaftarSpk(parsed.t30DaftarSpk);
+                        if (parsed.poDaftar) setPoDaftar(parsed.poDaftar);
+                        if (parsed.popDaftar) setPopDaftar(parsed.popDaftar);
+                        showNotification("Data berhasil dipulihkan dari file backup!");
+                    } catch (err) {
+                        showNotification("Format file backup JSON tidak valid!", "error");
+                    }
+                };
+                fileReader.readAsText(e.target.files[0]);
+                e.target.value = '';
+            };
+
+            const handleClearAllStorage = () => {
+                if (window.confirm("Apakah Anda yakin ingin mengosongkan memori? Disarankan mengunduh Backup Data (JSON) terlebih dahulu agar data tidak hilang.")) {
+                    localStorage.removeItem('BCA_DAFTAR_SPK');
+                    localStorage.removeItem('BCA_DAFTAR_SPK_TIPE30');
+                    localStorage.removeItem('BCA_DAFTAR_PO');
+                    localStorage.removeItem('BCA_DAFTAR_PO_PAVING');
+                    setDaftarSpk([]);
+                    setT30DaftarSpk([]);
+                    setPoDaftar([]);
+                    setPopDaftar([]);
+                    setActiveSpkId(null);
+                    setT30ActiveSpkId(null);
+                    setPoActiveId(null);
+                    setPopActiveId(null);
+                    showNotification("Memori browser berhasil dikosongkan!", "info");
+                }
+            };
 
             // ================= HANDLER SPK UMUM =================
             const handleResetData = () => {
@@ -614,6 +651,27 @@
             const grandTotal = totalMaterial + totalLabor;
 
             // ================= HANDLER TIPE 30 =================
+            const updateT30LokasiPekerjaanDetail = (locations) => {
+                if (locations.length === 0) {
+                    setT30LokasiPekerjaanDetail("Proyek Lembah Bunder Regency (Tipe 30)");
+                    return;
+                }
+                const units = locations.map(loc => `Blok ${loc.huruf}-${loc.nomor}${loc.detail ? ` (${loc.detail})` : ''}`).join(', ');
+                setT30LokasiPekerjaanDetail(`Proyek Lembah Bunder Regency ${units} (Tipe 30)`);
+            };
+            const handleAddT30Lokasi = () => {
+                const newLoc = { huruf: t30BlokHuruf, nomor: t30BlokNomor, detail: t30DetailPekerjaanOpsional };
+                const updated = [...t30MultiLokasi, newLoc];
+                setT30MultiLokasi(updated);
+                updateT30LokasiPekerjaanDetail(updated);
+                setT30DetailPekerjaanOpsional("");
+            };
+            const handleRemoveT30Lokasi = (idx) => {
+                const updated = t30MultiLokasi.filter((_, i) => i !== idx);
+                setT30MultiLokasi(updated);
+                updateT30LokasiPekerjaanDetail(updated);
+            };
+
             const handleT30ResetData = () => {
                 setT30HariPembuatan(""); setT30TanggalPembuatan(""); setT30NamaPemborong(""); setT30HpPemborong(""); setT30AlamatPemborong(""); setT30DetailPekerjaanOpsional(""); setT30LokasiPekerjaanDetail("Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)"); setT30BlokHuruf("F"); setT30BlokNomor("2"); setT30MultiLokasi([]); setT30NilaiBorongan(""); setT30NilaiBoronganTerbilang(""); setT30WaktuPelaksanaan("30"); setT30WaktuToleransi("10"); setT30TotalWaktuPelaksanaan("40"); setT30DendaKeterlambatan(""); setT30DendaKeterlambatanTerbilang(""); setT30JamGudangPagiMulai("07.30"); setT30JamGudangPagiSelesai("08.30"); setT30JamGudangSiangMulai("12.30"); setT30JamGudangSiangSelesai("13.30"); setT30TempatDitetapkan("Malang"); setT30TanggalDitetapkan(getLocalDateString()); setT30LampiranImage(null); setT30PjSignatureImage(null); setT30LogoKiri(null); setT30LogoKanan(null); setT30InstansiName("PT. BANGUN CINTA ALAM"); setT30InstansiAddress("Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com"); setT30ActiveSpkId(null); showNotification("Formulir Tipe 30 dikosongkan!", "info");
             };
@@ -715,6 +773,22 @@
                             </div>
                             
                             <div className="flex flex-col gap-6 w-full max-w-3xl mx-auto pb-10">
+                                {}
+                                <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
+                                    <div className="space-y-1 text-center sm:text-left">
+                                        <div className="flex items-center justify-center sm:justify-start gap-2 text-slate-800 dark:text-slate-100 font-extrabold text-base">
+                                            <i data-lucide="hard-drive" className="w-5 h-5 text-amber-500"></i>
+                                            <span>Penyimpanan Lokal Browser</span>
+                                        </div>
+                                        <p className="text-xs text-slate-500 font-medium">Status: {getStorageUsageMB()} MB terpakai dari kapasitas maks ~5 MB ({Number(getStorageUsageMB()) > 4.2 ? "Memori Hampir Penuh" : "Kapasitas Aman"})</p>
+                                    </div>
+                                    <div className="flex items-center gap-2 flex-wrap justify-center">
+                                        <button onClick={handleExportAllData} className="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md transition-transform active:scale-95"><i data-lucide="download" className="w-4 h-4"></i> Backup (JSON)</button>
+                                        <label className="flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold cursor-pointer shadow-md transition-transform active:scale-95"><i data-lucide="upload" className="w-4 h-4"></i> Impor Backup<input type="file" accept=".json" className="hidden" onChange={handleImportAllData} /></label>
+                                        <button onClick={handleClearAllStorage} className="flex items-center gap-1.5 px-3.5 py-2.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-xl text-xs font-bold transition-transform active:scale-95" title="Kosongkan memori browser"><i data-lucide="trash-2" className="w-4 h-4"></i> Bersihkan</button>
+                                    </div>
+                                </div>
+
                                 <div onClick={() => handleNavigate('spk_umum')} className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2rem] p-6 md:p-8 cursor-pointer hover:border-blue-500 dark:hover:border-indigo-500 hover:shadow-2xl transition-all relative overflow-hidden flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6">
                                     <div className="absolute top-1/2 -translate-y-1/2 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity pointer-events-none"><i data-lucide="file-signature" className="w-48 h-48 text-blue-900 dark:text-indigo-400"></i></div>
                                     <div className="w-20 h-20 shrink-0 bg-blue-50 dark:bg-indigo-900/40 rounded-3xl flex items-center justify-center group-hover:scale-110 transition-transform relative z-10"><i data-lucide="file-signature" className="w-10 h-10 text-blue-600 dark:text-indigo-400"></i></div>
@@ -1527,6 +1601,14 @@
                                     <div className="flex items-center gap-2"><i data-lucide="folder-open" className="w-5 h-5 text-blue-600"></i><h2 className="font-bold text-slate-800 dark:text-slate-100">Database SPK Lokal</h2></div>
                                     <span className="bg-blue-50 text-blue-600 border border-blue-100 text-[10px] px-2.5 py-1 rounded-md font-bold">{daftarSpk.length} Data</span>
                                 </div>
+                                {}
+                                <div className="p-3 bg-slate-50 dark:bg-slate-950 rounded-xl mb-3 text-xs space-y-2 border border-slate-200 dark:border-slate-800">
+                                    <div className="flex justify-between items-center text-[10px] font-bold text-slate-600 dark:text-slate-400"><span>Memori: {getStorageUsageMB()} MB / ~5 MB</span><span className={Number(getStorageUsageMB()) > 4.2 ? "text-red-500 font-extrabold" : "text-emerald-600"}>{Number(getStorageUsageMB()) > 4.2 ? "Hampir Penuh!" : "Aman"}</span></div>
+                                    <div className="flex gap-1.5">
+                                        <button onClick={handleExportAllData} className="flex-1 py-1.5 px-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-bold flex items-center justify-center gap-1"><i data-lucide="download" className="w-3 h-3"></i> Backup JSON</button>
+                                        <button onClick={handleClearAllStorage} className="py-1.5 px-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1" title="Kosongkan memori jika penuh"><i data-lucide="trash-2" className="w-3 h-3"></i> Bersihkan</button>
+                                    </div>
+                                </div>
                                 <div className="space-y-2 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
                                     {[...daftarSpk].reverse().map((item) => (
                                         <div key={item.id} onClick={() => handleLoadSpk(item.id)} className={`p-3.5 rounded-xl border text-left cursor-pointer flex justify-between items-center group shadow-sm ${activeSpkId === item.id ? 'bg-blue-50 border-blue-300' : 'bg-white dark:bg-slate-955 border-slate-200 hover:border-blue-300'}`}>
@@ -1731,9 +1813,19 @@
                                                                         <tbody>
                                                                             {ruangLingkup.map((item, parentIdx) => (
                                                                                 <React.Fragment key={item.id}>
-                                                                                    <tr className="bg-slate-50 font-bold"><td className="border border-black p-1.5 text-center">{parentIdx + 1}</td><td className="border border-black p-1.5 uppercase">{item.uraian}</td><td className="border border-black p-1.5 text-center">{item.volume}</td><td className="border border-black p-1.5 text-center">{item.satuan}</td></tr>
+                                                                                    <tr className="bg-slate-50 font-bold">
+                                                                                        <td className="border border-black p-1.5 text-center">{parentIdx + 1}</td>
+                                                                                        <td className="border border-black p-1.5 uppercase">{item.uraian}</td>
+                                                                                        <td className="border border-black p-1.5 text-center">{item.volume}</td>
+                                                                                        <td className="border border-black p-1.5 text-center">{item.satuan}</td>
+                                                                                    </tr>
                                                                                     {item.subs && item.subs.map((sub, subIdx) => (
-                                                                                        <tr key={sub.id}><td className="border border-black p-1.5 text-right text-[9pt] pr-2">{parentIdx + 1}.{subIdx + 1}</td><td className="border border-black p-1.5">- {sub.uraian}</td><td className="border border-black p-1.5 text-center">{sub.volume}</td><td className="border border-black p-1.5 text-center">{sub.satuan}</td></tr>
+                                                                                        <tr key={sub.id}>
+                                                                                            <td className="border border-black p-1.5 text-right text-[9pt] pr-2">{parentIdx + 1}.{subIdx + 1}</td>
+                                                                                            <td className="border border-black p-1.5">- {sub.uraian}</td>
+                                                                                            <td className="border border-black p-1.5 text-center">{sub.volume}</td>
+                                                                                            <td className="border border-black p-1.5 text-center">{sub.satuan}</td>
+                                                                                        </tr>
                                                                                     ))}
                                                                                 </React.Fragment>
                                                                             ))}
@@ -1749,9 +1841,19 @@
                                                                         <thead><tr className="bg-slate-100"><th className="border border-black p-1.5 w-10 text-center">No</th><th className="border border-black p-1.5 text-left">Nama Material</th><th className="border border-black p-1.5 w-16 text-center">Qty</th><th className="border border-black p-1.5 w-16 text-center">Sat</th><th className="border border-black p-1.5 w-28 text-right">Harga (Rp)</th><th className="border border-black p-1.5 w-32 text-right">Jumlah (Rp)</th></tr></thead>
                                                                         <tbody>
                                                                             {materials.map((m, i) => (
-                                                                                <tr key={m.id}><td className="border border-black p-1.5 text-center">{i + 1}</td><td className="border border-black p-1.5">{m.nama}</td><td className="border border-black p-1.5 text-center">{m.qty}</td><td className="border border-black p-1.5 text-center">{m.satuan}</td><td className="border border-black p-1.5 text-right">{formatRupiah(m.harga).replace('Rp', '')}</td><td className="border border-black p-1.5 text-right">{formatRupiah(m.qty * m.harga).replace('Rp', '')}</td></tr>
+                                                                                <tr key={m.id}>
+                                                                                    <td className="border border-black p-1.5 text-center">{i + 1}</td>
+                                                                                    <td className="border border-black p-1.5">{m.nama}</td>
+                                                                                    <td className="border border-black p-1.5 text-center">{m.qty}</td>
+                                                                                    <td className="border border-black p-1.5 text-center">{m.satuan}</td>
+                                                                                    <td className="border border-black p-1.5 text-right">{formatRupiah(m.harga).replace('Rp', '')}</td>
+                                                                                    <td className="border border-black p-1.5 text-right">{formatRupiah(m.qty * m.harga).replace('Rp', '')}</td>
+                                                                                </tr>
                                                                             ))}
-                                                                            <tr><td colSpan="5" className="border border-black p-1.5 text-right font-bold bg-slate-50">SUBTOTAL MATERIAL</td><td className="border border-black p-1.5 text-right font-bold bg-slate-50">{formatRupiah(totalMaterial)}</td></tr>
+                                                                            <tr>
+                                                                                <td colSpan="5" className="border border-black p-1.5 text-right font-bold bg-slate-50">SUBTOTAL MATERIAL</td>
+                                                                                <td className="border border-black p-1.5 text-right font-bold bg-slate-50">{formatRupiah(totalMaterial)}</td>
+                                                                            </tr>
                                                                         </tbody>
                                                                     </table>
                                                                 ) : (<div className="py-2 text-slate-400 italic text-sm">-- Material belum diisi --</div>)}
@@ -1764,11 +1866,28 @@
                                                                         <thead><tr className="bg-slate-100"><th className="border border-black p-1.5 w-10 text-center">No</th><th className="border border-black p-1.5 text-left">{laborType === 'harian' ? 'Tenaga Kerja' : 'Uraian Pekerjaan'}</th><th className="border border-black p-1.5 w-16 text-center">Vol</th><th className="border border-black p-1.5 w-20 text-center">Sat</th><th className="border border-black p-1.5 w-28 text-right">Harga (Rp)</th><th className="border border-black p-1.5 w-32 text-right">Jumlah (Rp)</th></tr></thead>
                                                                         <tbody>
                                                                             {laborType === 'harian' ? laborHarian.map((l, i) => (
-                                                                                <tr key={l.id}><td className="border border-black p-1.5 text-center">{i + 1}</td><td className="border border-black p-1.5">{l.tenaga}</td><td className="border border-black p-1.5 text-center">{l.volume}</td><td className="border border-black p-1.5 text-center">{l.satuan}</td><td className="border border-black p-1.5 text-right">{formatRupiah(l.harga).replace('Rp', '')}</td><td className="border border-black p-1.5 text-right">{formatRupiah(l.volume * l.harga).replace('Rp', '')}</td></tr>
+                                                                                <tr key={l.id}>
+                                                                                    <td className="border border-black p-1.5 text-center">{i + 1}</td>
+                                                                                    <td className="border border-black p-1.5">{l.tenaga}</td>
+                                                                                    <td className="border border-black p-1.5 text-center">{l.volume}</td>
+                                                                                    <td className="border border-black p-1.5 text-center">{l.satuan}</td>
+                                                                                    <td className="border border-black p-1.5 text-right">{formatRupiah(l.harga).replace('Rp', '')}</td>
+                                                                                    <td className="border border-black p-1.5 text-right">{formatRupiah(l.volume * l.harga).replace('Rp', '')}</td>
+                                                                                </tr>
                                                                             )) : laborBorongan.map((l, i) => (
-                                                                                <tr key={l.id}><td className="border border-black p-1.5 text-center">{i + 1}</td><td className="border border-black p-1.5">{l.uraian}</td><td className="border border-black p-1.5 text-center">{l.volume}</td><td className="border border-black p-1.5 text-center">{l.satuan}</td><td className="border border-black p-1.5 text-right">{formatRupiah(l.harga).replace('Rp', '')}</td><td className="border border-black p-1.5 text-right">{formatRupiah(l.volume * l.harga).replace('Rp', '')}</td></tr>
+                                                                                <tr key={l.id}>
+                                                                                    <td className="border border-black p-1.5 text-center">{i + 1}</td>
+                                                                                    <td className="border border-black p-1.5">{l.uraian}</td>
+                                                                                    <td className="border border-black p-1.5 text-center">{l.volume}</td>
+                                                                                    <td className="border border-black p-1.5 text-center">{l.satuan}</td>
+                                                                                    <td className="border border-black p-1.5 text-right">{formatRupiah(l.harga).replace('Rp', '')}</td>
+                                                                                    <td className="border border-black p-1.5 text-right">{formatRupiah(l.volume * l.harga).replace('Rp', '')}</td>
+                                                                                </tr>
                                                                             ))}
-                                                                            <tr><td colSpan="5" className="border border-black p-1.5 text-right font-bold bg-slate-50">SUBTOTAL TENAGA KERJA</td><td className="border border-black p-1.5 text-right font-bold bg-slate-50">{formatRupiah(totalLabor)}</td></tr>
+                                                                            <tr>
+                                                                                <td colSpan="5" className="border border-black p-1.5 text-right font-bold bg-slate-50">SUBTOTAL TENAGA KERJA</td>
+                                                                                <td className="border border-black p-1.5 text-right font-bold bg-slate-50">{formatRupiah(totalLabor)}</td>
+                                                                            </tr>
                                                                         </tbody>
                                                                     </table>
                                                                 ) : (<div className="py-2 text-slate-400 italic text-sm">-- Tenaga kerja belum diisi --</div>)}
