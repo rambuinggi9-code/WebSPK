@@ -473,7 +473,10 @@
                                     Sistem mendeteksi ketidaksesuaian format data saat memuat dokumen ({this.state.errorMessage}). Data Anda tetap aman tersimpan di browser.
                                 </p>
                                 <button
-                                    onClick={() => this.setState({ hasError: false, errorMessage: "" })}
+                                    onClick={() => {
+                                        if (this.props.onReset) this.props.onReset();
+                                        this.setState({ hasError: false, errorMessage: "" });
+                                    }}
                                     className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs shadow-sm"
                                 >
                                     Pulihkan Halaman Sekarang
@@ -1000,6 +1003,261 @@
                     showNotification("Gagal memuat struktur dokumen SPK.", "error");
                 }
             };
+            const handleDeleteSpk = (id, e) => {
+                if (e) e.stopPropagation();
+                setDaftarSpk(daftarSpk.filter(item => String(item.id) !== String(id)));
+                if (String(activeSpkId) === String(id)) setActiveSpkId(null);
+                showNotification("Dokumen SPK dihapus.", "error");
+            };
+            const handleLogoUpload = (e, side) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+                processImageUpload(file, 400, (res, err) => {
+                    if (err) return showNotification(err, "error");
+                    if (side === 'kiri') {
+                        setLogoKiri(res);
+                        showNotification("Logo kiri berhasil diunggah.");
+                    } else {
+                        setLogoKanan(res);
+                        showNotification("Logo kanan berhasil diunggah.");
+                    }
+                });
+                e.target.value = '';
+            };
+            const clearLogo = (side) => {
+                if (side === 'kiri') {
+                    setLogoKiri(null);
+                    showNotification("Logo kiri dihapus.", "info");
+                } else {
+                    setLogoKanan(null);
+                    showNotification("Logo kanan dihapus.", "info");
+                }
+            };
+            const handlePjSignatureUpload = (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+                processImageUpload(file, 400, (res, err) => {
+                    if (err) return showNotification(err, "error");
+                    setPjSignatureImage(res);
+                    showNotification("Tanda tangan Penanggung Jawab diunggah.");
+                });
+                e.target.value = '';
+            };
+            const clearPjSignature = () => {
+                setPjSignatureImage(null);
+                showNotification("Tanda tangan dihapus.", "info");
+            };
+
+            const durasiHari = calculateWorkingDays(startDate, endDate);
+
+            const addRuangLingkup = () => {
+                setRuangLingkup([...ruangLingkup, { id: Date.now().toString() + '-' + Math.random().toString(36).slice(2, 6), uraian: "", volume: "", satuan: "", subs: [] }]);
+            };
+            const removeRuangLingkup = (parentIdx) => {
+                setRuangLingkup(ruangLingkup.filter((_, i) => i !== parentIdx));
+            };
+            const updateRuangLingkup = (parentIdx, field, value) => {
+                const updated = [...ruangLingkup];
+                updated[parentIdx] = { ...updated[parentIdx], [field]: value };
+                setRuangLingkup(updated);
+            };
+            const addSubPekerjaan = (parentIdx) => {
+                const updated = [...ruangLingkup];
+                const currentSubs = Array.isArray(updated[parentIdx].subs) ? updated[parentIdx].subs : [];
+                updated[parentIdx] = {
+                    ...updated[parentIdx],
+                    subs: [...currentSubs, { id: Date.now().toString() + '-' + Math.random().toString(36).slice(2, 6), uraian: "", volume: "", satuan: "" }]
+                };
+                setRuangLingkup(updated);
+            };
+            const updateSubPekerjaan = (parentIdx, subIdx, field, value) => {
+                const updated = [...ruangLingkup];
+                const subs = [...(updated[parentIdx].subs || [])];
+                subs[subIdx] = { ...subs[subIdx], [field]: value };
+                updated[parentIdx] = { ...updated[parentIdx], subs };
+                setRuangLingkup(updated);
+            };
+            const removeSubPekerjaan = (parentIdx, subIdx) => {
+                const updated = [...ruangLingkup];
+                updated[parentIdx] = {
+                    ...updated[parentIdx],
+                    subs: (updated[parentIdx].subs || []).filter((_, i) => i !== subIdx)
+                };
+                setRuangLingkup(updated);
+            };
+
+            const addMaterial = () => {
+                setMaterials([...materials, { id: Date.now().toString() + '-' + Math.random().toString(36).slice(2, 6), nama: "", qty: "", satuan: "", harga: "" }]);
+            };
+            const updateMaterial = (idx, field, value) => {
+                const updated = [...materials];
+                updated[idx] = { ...updated[idx], [field]: value };
+                setMaterials(updated);
+            };
+            const removeMaterial = (idx) => {
+                setMaterials(materials.filter((_, i) => i !== idx));
+            };
+
+            const addLaborHarian = () => {
+                setLaborHarian([...laborHarian, { id: Date.now().toString() + '-' + Math.random().toString(36).slice(2, 6), tenaga: "", satuan: "Hari/Orang", volume: "", harga: "" }]);
+            };
+            const updateLaborHarian = (idx, field, value) => {
+                const updated = [...laborHarian];
+                updated[idx] = { ...updated[idx], [field]: value };
+                setLaborHarian(updated);
+            };
+            const removeLaborHarian = (idx) => {
+                setLaborHarian(laborHarian.filter((_, i) => i !== idx));
+            };
+
+            const addLaborBorongan = () => {
+                setLaborBorongan([...laborBorongan, { id: Date.now().toString() + '-' + Math.random().toString(36).slice(2, 6), uraian: "", volume: "", satuan: "", harga: "" }]);
+            };
+            const updateLaborBorongan = (idx, field, value) => {
+                const updated = [...laborBorongan];
+                updated[idx] = { ...updated[idx], [field]: value };
+                setLaborBorongan(updated);
+            };
+            const removeLaborBorongan = (idx) => {
+                setLaborBorongan(laborBorongan.filter((_, i) => i !== idx));
+            };
+
+            const totalMaterial = materials.reduce((sum, m) => sum + ((parseFloat(m.qty) || 0) * (parseFloat(m.harga) || 0)), 0);
+            const totalLabor = laborType === 'harian'
+                ? laborHarian.reduce((sum, l) => sum + ((parseFloat(l.volume) || 0) * (parseFloat(l.harga) || 0)), 0)
+                : laborBorongan.reduce((sum, l) => sum + ((parseFloat(l.volume) || 0) * (parseFloat(l.harga) || 0)), 0);
+            const grandTotal = totalMaterial + totalLabor;
+
+            // ================= HANDLER SPK TIPE 30 =================
+            const formatT30LokasiText = (list) => {
+                if (!list || list.length === 0) return "Proyek Lembah Bunder Regency (Tipe 30)";
+                const unitStrings = list.map(loc => `Blok ${loc.huruf}-${loc.nomor}${loc.detail ? ` (${loc.detail})` : ''}`);
+                return `Proyek Lembah Bunder Regency ${unitStrings.join(', ')} (Tipe 30)`;
+            };
+            const handleAddT30Lokasi = () => {
+                const exists = t30MultiLokasi.some(loc => loc.huruf === t30BlokHuruf && loc.nomor === t30BlokNomor);
+                if (exists) {
+                    showNotification(`Blok ${t30BlokHuruf}-${t30BlokNomor} sudah ada dalam daftar.`, "info");
+                    return;
+                }
+                const newList = [...t30MultiLokasi, { huruf: t30BlokHuruf, nomor: t30BlokNomor, detail: t30DetailPekerjaanOpsional.trim() }];
+                setT30MultiLokasi(newList);
+                setT30LokasiPekerjaanDetail(formatT30LokasiText(newList));
+                setT30DetailPekerjaanOpsional("");
+                showNotification(`Unit Blok ${t30BlokHuruf}-${t30BlokNomor} ditambahkan.`);
+            };
+            const handleRemoveT30Lokasi = (idx) => {
+                const newList = t30MultiLokasi.filter((_, i) => i !== idx);
+                setT30MultiLokasi(newList);
+                setT30LokasiPekerjaanDetail(formatT30LokasiText(newList));
+            };
+            const handleT30ResetData = () => {
+                setT30ActiveSpkId(null);
+                setT30HariPembuatan("");
+                setT30TanggalPembuatan("");
+                setT30NamaPemborong("");
+                setT30HpPemborong("");
+                setT30AlamatPemborong("");
+                setT30DetailPekerjaanOpsional("");
+                setT30LokasiPekerjaanDetail("Proyek Lembah Bunder Regency Blok F-2 (Tipe 30)");
+                setT30BlokHuruf("F");
+                setT30BlokNomor("2");
+                setT30MultiLokasi([]);
+                setT30NilaiBorongan("");
+                setT30NilaiBoronganTerbilang("");
+                setT30WaktuPelaksanaan("30");
+                setT30WaktuToleransi("10");
+                setT30TotalWaktuPelaksanaan("40");
+                setT30DendaKeterlambatan("");
+                setT30DendaKeterlambatanTerbilang("");
+                setT30JamGudangPagiMulai("07.30");
+                setT30JamGudangPagiSelesai("08.30");
+                setT30JamGudangSiangMulai("12.30");
+                setT30JamGudangSiangSelesai("13.30");
+                setT30TempatDitetapkan("Malang");
+                setT30TanggalDitetapkan(getLocalDateString());
+                setT30LampiranImage(null);
+                setT30PjSignatureImage(null);
+                setT30InstansiName("PT. BANGUN CINTA ALAM");
+                setT30InstansiAddress("Jl. Langsep No. 78 Perum.Puri Firdaus Blok J1 Pendem - Kota Batu\nTelp. 0856-9529-7970 | Email: pt.banguncintaalam@gmail.com");
+                setT30LogoKiri(null);
+                setT30LogoKanan(null);
+                showNotification("Formulir SPK Tipe 30 dikosongkan!", "info");
+            };
+            const handleT30SaveSpk = () => {
+                if (!t30NamaPemborong.trim()) {
+                    showNotification("Isi nama pemborong terlebih dahulu!", "error");
+                    return;
+                }
+                const data = {
+                    id: t30ActiveSpkId || (Date.now().toString() + '-' + Math.floor(Math.random() * 1000)),
+                    t30HariPembuatan, t30TanggalPembuatan, t30NamaPemborong, t30HpPemborong, t30AlamatPemborong,
+                    t30DetailPekerjaanOpsional, t30LokasiPekerjaanDetail, t30BlokHuruf, t30BlokNomor, t30MultiLokasi,
+                    t30NilaiBorongan, t30NilaiBoronganTerbilang, t30WaktuPelaksanaan, t30WaktuToleransi, t30TotalWaktuPelaksanaan,
+                    t30DendaKeterlambatan, t30DendaKeterlambatanTerbilang, t30JamGudangPagiMulai, t30JamGudangPagiSelesai,
+                    t30JamGudangSiangMulai, t30JamGudangSiangSelesai, t30TempatDitetapkan, t30TanggalDitetapkan,
+                    t30LampiranImage, t30PjSignatureImage, t30InstansiName, t30InstansiAddress, t30LogoKiri, t30LogoKanan,
+                    lastUpdated: new Date().toLocaleString('id-ID')
+                };
+                if (t30ActiveSpkId) {
+                    setT30DaftarSpk(t30DaftarSpk.map(item => String(item.id) === String(t30ActiveSpkId) ? data : item));
+                    showNotification("SPK Tipe 30 diperbarui!");
+                } else {
+                    setT30DaftarSpk([...t30DaftarSpk, data]);
+                    setT30ActiveSpkId(data.id);
+                    showNotification("SPK Tipe 30 disimpan!");
+                }
+            };
+            const handleT30Print = () => {
+                const ot = document.title;
+                document.title = `SPK_Tipe30_${t30NamaPemborong ? t30NamaPemborong.replace(/\s+/g, '_') : 'Baru'}`;
+                window.print();
+                setTimeout(() => document.title = ot, 2000);
+            };
+            const handleT30DeleteSpk = (id, e) => {
+                if (e) e.stopPropagation();
+                setT30DaftarSpk(t30DaftarSpk.filter(item => String(item.id) !== String(id)));
+                if (String(t30ActiveSpkId) === String(id)) setT30ActiveSpkId(null);
+                showNotification("SPK Tipe 30 dihapus.", "error");
+            };
+            const handleT30LogoUpload = (e, side) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+                processImageUpload(file, 400, (res, err) => {
+                    if (err) return showNotification(err, "error");
+                    if (side === 'kiri') {
+                        setT30LogoKiri(res);
+                        showNotification("Logo kiri Tipe 30 diunggah.");
+                    } else {
+                        setT30LogoKanan(res);
+                        showNotification("Logo kanan Tipe 30 diunggah.");
+                    }
+                });
+                e.target.value = '';
+            };
+            const clearT30Logo = (side) => {
+                if (side === 'kiri') {
+                    setT30LogoKiri(null);
+                    showNotification("Logo kiri dihapus.", "info");
+                } else {
+                    setT30LogoKanan(null);
+                    showNotification("Logo kanan dihapus.", "info");
+                }
+            };
+            const handleT30PjSignatureUpload = (e) => {
+                const file = e.target.files && e.target.files[0];
+                if (!file) return;
+                processImageUpload(file, 400, (res, err) => {
+                    if (err) return showNotification(err, "error");
+                    setT30PjSignatureImage(res);
+                    showNotification("TTD Penanggung Jawab diunggah.");
+                });
+                e.target.value = '';
+            };
+            const clearT30PjSignature = () => {
+                setT30PjSignatureImage(null);
+                showNotification("TTD Penanggung Jawab dihapus.", "info");
+            };
             const handleT30LoadSpk = (id) => {
                 const target = t30DaftarSpk.find(item => String(item.id) === String(id));
                 if (!target) {
@@ -1050,6 +1308,52 @@
                 } catch (err) {
                     console.error("Error saat memuat SPK Tipe 30:", err);
                     showNotification("Gagal memuat dokumen SPK Tipe 30.", "error");
+                }
+            };
+            const handlePoResetData = () => {
+                const d = new Date();
+                setPoActiveId(null);
+                setPoLogo(null);
+                setPoCompanyName("PT WALI BAROKAH LAND");
+                setPoNo(`${d.getDate().toString().padStart(2, '0')}${(d.getMonth() + 1).toString().padStart(2, '0')}${d.getFullYear()}`);
+                setPoProyekPilihan("Lembah Bunder Regency");
+                setPoTerimaDari("Lembah Bunder Regency");
+                setPoAlamat("Sidorahayu, Wagir");
+                setPoUntukPembayaran("Blesscon");
+                setPoTableLeft(Array.from({ length: 6 }, () => ({ noCek: "", bank: "", tanggal: "", jumlah: "" })));
+                setPoTotalLeft("");
+                setPoTableRight(Array.from({ length: 6 }, () => ({ noFaktur: "", tanggal: "", jumlah: "" })));
+                setPoTotalRight("");
+                setPoCatatan("tempo 30 hari");
+                setPoTempatTanggal("Malang, Agustus 2026");
+                setPoPenerima1Nama("Busro Khufidon");
+                setPoPenerima1Hp("0821-4224-2120");
+                setPoPenerima2Nama("");
+                setPoPenerima1Signature(null);
+                showNotification("Formulir PO Bata Ringan dikosongkan!", "info");
+            };
+            const recalculatePoRight = (rows) => {
+                if (!Array.isArray(rows) || rows.length < 3) return;
+                const ritMatch = String(rows[0]?.noFaktur || "").match(/(\d+)/);
+                const rit = ritMatch ? parseInt(ritMatch[1], 10) : 0;
+                const ukuran = String(rows[1]?.noFaktur || "");
+                let volPerRit = 0;
+                if (ukuran === "Blesscon 10 cm") volPerRit = 11.52;
+                else if (ukuran === "Blesscon 7,5 cm") volPerRit = 11.88;
+                else {
+                    const volMatch = String(rows[1]?.jumlah || "").replace(',', '.').match(/(\d+(\.\d+)?)/);
+                    if (volMatch) volPerRit = parseFloat(volMatch[1]) || 0;
+                }
+                const hargaSat = parseFloat(String(rows[0]?.jumlah || "").replace(/[^0-9]/g, '')) || 0;
+
+                if (rit > 0 && volPerRit > 0) {
+                    rows[2].noFaktur = `${volPerRit.toString().replace('.', ',')} x ${rit}`;
+                    if (hargaSat > 0) {
+                        const totalVal = Math.round(rit * volPerRit * hargaSat);
+                        const formatted = formatRpString(totalVal);
+                        rows[2].jumlah = formatted;
+                        setPoTotalRight(formatted);
+                    }
                 }
             };
             const handlePoSave = () => {
@@ -2385,7 +2689,7 @@
                                                                 <table className="w-full mb-3 text-[11pt]"><tbody><tr><td className="w-40 py-1">Proyek / Lokasi</td><td>: <strong>{resolvedProyekName || "............................................"}</strong></td></tr><tr><td className="py-1">Waktu Pelaksanaan</td><td>: {startDate ? formatDateIndo(startDate) : "............."} <strong>s/d</strong> {endDate ? formatDateIndo(endDate) : "............."}</td></tr></tbody></table>
                                                             </div>
                                                             <div className="print-avoid-break mt-4">
-                                                                <p className="font-bold border-b-2 border-black pb-1 mb-3 uppercase tracking-wider text-sm flex justify-between"><span>D. Tenaga Kerja</span><span className="text-[10px] bg-slate-200 px-2 py-0.5 rounded font-mono">Sistem: {(laborType || 'harian').toUpperCase()}</span></p>
+                                                                <p className="font-bold border-b-2 border-black pb-1 mb-3 uppercase tracking-wider text-sm">B. Ruang Lingkup Pekerjaan</p>
                                                                 {ruangLingkup.length > 0 ? (
                                                                     <table className="w-full border-collapse border border-black text-[10pt]">
                                                                         <thead><tr className="bg-slate-100"><th className="border border-black p-1.5 w-10 text-center">No</th><th className="border border-black p-1.5 text-left">Uraian Jenis Pekerjaan</th><th className="border border-black p-1.5 w-16 text-center">Vol</th><th className="border border-black p-1.5 w-16 text-center">Sat</th></tr></thead>
@@ -2516,7 +2820,7 @@
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(
-            <AppErrorBoundary>
+            <AppErrorBoundary onReset={() => window.location.hash = ''}>
                 <App />
             </AppErrorBoundary>
         );
