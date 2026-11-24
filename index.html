@@ -834,7 +834,7 @@
             }
         };
 
-        const compressImageFile = (file, maxWidth = 600, maxHeight = 600) => {
+        const compressImageFile = (file, maxWidth = 550, maxHeight = 550) => {
             return new Promise((resolve, reject) => {
                 if (!file || !file.type.startsWith('image/')) {
                     reject(new Error("File bukan gambar yang valid."));
@@ -1564,7 +1564,7 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 try {
-                    const compressed = await compressImageFile(file, 400, 400);
+                    const compressed = await compressImageFile(file, 550, 550);
                     if (target === 'kiri') setLogoKiri(compressed);
                     if (target === 'kanan') setLogoKanan(compressed);
                     showNotification("Logo berhasil diunggah!");
@@ -1578,7 +1578,7 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 try {
-                    const compressed = await compressImageFile(file, 450, 250);
+                    const compressed = await compressImageFile(file, 600, 340);
                     setPjSignatureImage(compressed);
                     showNotification("Tanda tangan berhasil diunggah.");
                 } catch (err) {
@@ -1817,7 +1817,7 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 try {
-                    const compressed = await compressImageFile(file, 400, 400);
+                    const compressed = await compressImageFile(file, 550, 550);
                     if (target === 'kiri') setT30LogoKiri(compressed);
                     if (target === 'kanan') setT30LogoKanan(compressed);
                     showNotification("Logo diunggah.");
@@ -1831,7 +1831,7 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 try {
-                    const compressed = await compressImageFile(file, 450, 250);
+                    const compressed = await compressImageFile(file, 600, 340);
                     setT30PjSignatureImage(compressed);
                     showNotification("Tanda tangan diunggah.");
                 } catch (err) {
@@ -1993,7 +1993,7 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 try {
-                    const compressed = await compressImageFile(file, 400, 400);
+                    const compressed = await compressImageFile(file, 550, 550);
                     setPoLogo(compressed);
                     showNotification("Logo kop berhasil diunggah.");
                 } catch (err) {
@@ -2006,7 +2006,7 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 try {
-                    const compressed = await compressImageFile(file, 450, 250);
+                    const compressed = await compressImageFile(file, 600, 340);
                     setPoPenerima1Signature(compressed);
                     showNotification("TTD Penerima 1 diunggah.");
                 } catch (err) {
@@ -2153,7 +2153,7 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 try {
-                    const compressed = await compressImageFile(file, 400, 400);
+                    const compressed = await compressImageFile(file, 550, 550);
                     setPopLogo(compressed);
                     showNotification("Logo PO berhasil diunggah.");
                 } catch (err) {
@@ -2166,7 +2166,7 @@
                 const file = e.target.files[0];
                 if (!file) return;
                 try {
-                    const compressed = await compressImageFile(file, 450, 250);
+                    const compressed = await compressImageFile(file, 600, 340);
                     if (target === 'dibuat') setPopDibuatSignature(compressed);
                     if (target === 'disetujui') setPopDisetujuiSignature(compressed);
                     showNotification("Tanda tangan berhasil diunggah.");
@@ -2604,8 +2604,8 @@
                                         <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Nama Instansi</label><input type="text" value={t30InstansiName} onChange={(e) => setT30InstansiName(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"/></div>
                                         <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Alamat Lengkap</label><textarea rows="3" value={t30InstansiAddress} onChange={(e) => setT30InstansiAddress(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 transition-all"/></div>
                                         <div className="grid grid-cols-2 gap-4">
-                                            <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-950/40"><span className="block text-[10px] font-bold text-slate-500 text-center mb-2">Logo Kiri</span>{t30LogoKiri ? <div className="relative group aspect-square h-24 mx-auto bg-white rounded-lg flex items-center justify-center p-2 border"><img src={t30LogoKiri} className="max-h-full"/><button onClick={() => clearT30Logo('kiri')} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity">Hapus</button></div> : <label className="cursor-pointer flex flex-col items-center justify-center h-24 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-slate-400 hover:border-teal-400 hover:text-teal-500 transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1" /><span className="text-[10px]">Upload</span><input type="file" accept="image/*" className="hidden" onChange={(e) => handleT30LogoUpload(e, 'kiri')} /></label>}</div>
-                                            <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-950/40"><span className="block text-[10px] font-bold text-slate-500 text-center mb-2">Logo Kanan</span>{t30LogoKanan ? <div className="relative group aspect-square h-24 mx-auto bg-white rounded-lg flex items-center justify-center p-2 border"><img src={t30LogoKanan} className="max-h-full"/><button onClick={() => clearT30Logo('kanan')} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity">Hapus</button></div> : <label className="cursor-pointer flex flex-col items-center justify-center h-24 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-slate-400 hover:border-teal-400 hover:text-teal-500 transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1" /><span className="text-[10px]">Upload</span><input type="file" accept="image/*" className="hidden" onChange={(e) => handleT30LogoUpload(e, 'kanan')} /></label>}</div>
+                                            <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-950/40"><span className="block text-[10px] font-bold text-slate-500 text-center mb-2">Logo Kiri</span>{t30LogoKiri ? <div className="relative group aspect-square h-28 mx-auto bg-white rounded-lg flex items-center justify-center p-2 border"><img src={t30LogoKiri} className="max-h-full max-w-full object-contain"/><button onClick={() => clearT30Logo('kiri')} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity">Hapus</button></div> : <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-slate-400 hover:border-teal-400 hover:text-teal-500 transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1" /><span className="text-[10px]">Upload</span><input type="file" accept="image/*" className="hidden" onChange={(e) => handleT30LogoUpload(e, 'kiri')} /></label>}</div>
+                                            <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-950/40"><span className="block text-[10px] font-bold text-slate-500 text-center mb-2">Logo Kanan</span>{t30LogoKanan ? <div className="relative group aspect-square h-28 mx-auto bg-white rounded-lg flex items-center justify-center p-2 border"><img src={t30LogoKanan} className="max-h-full max-w-full object-contain"/><button onClick={() => clearT30Logo('kanan')} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity">Hapus</button></div> : <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-slate-400 hover:border-teal-400 hover:text-teal-500 transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1" /><span className="text-[10px]">Upload</span><input type="file" accept="image/*" className="hidden" onChange={(e) => handleT30LogoUpload(e, 'kanan')} /></label>}</div>
                                         </div>
                                     </div>
                                 </div>
@@ -2703,9 +2703,9 @@
                                             <div className="md:col-span-2 pt-3 border-t border-slate-100 dark:border-slate-800">
                                                 <label className="block text-[10px] font-bold text-teal-600 uppercase mb-3 flex items-center gap-2"><LucideIcon name="pen-tool" className="w-3.5 h-3.5" />Tanda Tangan Penanggung Jawab (Supardi)</label>
                                                 {t30PjSignatureImage ? (
-                                                    <div className="relative group p-3 bg-white rounded-xl border flex items-center justify-center h-28 overflow-hidden shadow-sm"><img src={t30PjSignatureImage} className="max-h-full max-w-full object-contain"/><button onClick={clearT30PjSignature} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-xl transition-opacity text-xs font-bold"><LucideIcon name="trash-2" className="w-6 h-6 mb-2 text-red-400" />Hapus Tanda Tangan</button></div>
+                                                    <div className="relative group p-3 bg-white rounded-xl border flex items-center justify-center h-32 overflow-hidden shadow-sm"><img src={t30PjSignatureImage} className="max-h-full max-w-full object-contain"/><button onClick={clearT30PjSignature} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-xl transition-opacity text-xs font-bold"><LucideIcon name="trash-2" className="w-6 h-6 mb-2 text-red-400" />Hapus Tanda Tangan</button></div>
                                                 ) : (
-                                                    <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-teal-400 rounded-xl transition-all group bg-white dark:bg-slate-950"><div className="p-2 bg-white dark:bg-slate-900 border shadow-sm rounded-full mb-2 group-hover:bg-teal-100 transition-colors"><LucideIcon name="upload-cloud" className="w-5 h-5 text-slate-400 group-hover:text-teal-600" /></div><span className="text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-teal-700">Unggah Scan Tanda Tangan</span><input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload} /></label>
+                                                    <label className="cursor-pointer flex flex-col items-center justify-center h-32 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-teal-400 rounded-xl transition-all group bg-white dark:bg-slate-950"><div className="p-2 bg-white dark:bg-slate-900 border shadow-sm rounded-full mb-2 group-hover:bg-teal-100 transition-colors"><LucideIcon name="upload-cloud" className="w-5 h-5 text-slate-400 group-hover:text-teal-600" /></div><span className="text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-teal-700">Unggah Scan Tanda Tangan</span><input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload} /></label>
                                                 )}
                                             </div>
                                         </div>
@@ -2735,9 +2735,9 @@
                                                     <td>
                                                         <div className="pb-3">
                                                             <div className="flex items-center justify-between w-full gap-4">
-                                                                <div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">{t30LogoKiri ? <img src={t30LogoKiri} className="max-h-full max-w-full object-contain"/> : <div className="w-16 h-16 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKIRI</span></div>}</div>
+                                                                <div className="w-28 h-28 flex items-center justify-center overflow-hidden shrink-0">{t30LogoKiri ? <img src={t30LogoKiri} className="max-h-full max-w-full object-contain"/> : <div className="w-24 h-24 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKIRI</span></div>}</div>
                                                                 <div className="flex-1 text-center flex flex-col justify-center"><h2 className="text-2xl font-black tracking-tight text-slate-950 uppercase">{t30InstansiName}</h2><p className="whitespace-pre-line text-[11px] text-slate-800 font-semibold mt-1.5">{t30InstansiAddress}</p></div>
-                                                                <div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">{t30LogoKanan ? <img src={t30LogoKanan} className="max-h-full max-w-full object-contain"/> : <div className="w-16 h-16 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKANAN</span></div>}</div>
+                                                                <div className="w-28 h-28 flex items-center justify-center overflow-hidden shrink-0">{t30LogoKanan ? <img src={t30LogoKanan} className="max-h-full max-w-full object-contain"/> : <div className="w-24 h-24 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKANAN</span></div>}</div>
                                                             </div>
                                                         </div>
                                                         <div className="w-full border-b border-slate-900 mb-[2px]"></div><div className="w-full border-b-[3px] border-slate-900 mb-6"></div>
@@ -2767,26 +2767,26 @@
                                                             
                                                             <div className="mt-8 text-[11pt] text-slate-900 print-avoid-break">
                                                                 <div>Ditetapkan di : {t30TempatDitetapkan || "____________________"}<br/>Tanggal : {t30TanggalDitetapkan ? formatDateIndo(t30TanggalDitetapkan) : "_________________________"}</div>
-                                                                <div className="grid grid-cols-3 gap-4 text-center mt-10 max-w-full mx-auto print-cols-3 text-[10pt] items-end h-32 mb-10">
-                                                                    <div className="flex flex-col justify-between h-[130px] relative">
+                                                                <div className="grid grid-cols-3 gap-4 text-center mt-10 max-w-full mx-auto print-cols-3 text-[10pt] items-end h-40 mb-10">
+                                                                    <div className="flex flex-col justify-between h-[156px] relative">
                                                                         <p className="font-bold mb-auto mt-0">Pemborong,</p><div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">{t30NamaPemborong || "( ........................ )"}</p>
                                                                     </div>
-                                                                    <div className="flex flex-col justify-between h-[130px] relative group">
+                                                                    <div className="flex flex-col justify-between h-[156px] relative group">
                                                                         <span className="font-bold mb-auto mt-0">Penanggungjawab,</span>
                                                                         {t30PjSignatureImage ? (
-                                                                            <div className="flex items-center justify-center h-20 w-full overflow-hidden absolute inset-0 top-1/2 -translate-y-1/2 z-0"><img src={t30PjSignatureImage} className="signature-img max-h-full object-contain mix-blend-multiply opacity-90"/><label className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded"><LucideIcon name="upload-cloud" className="w-4 h-4 text-teal-600 mb-1" /><span className="text-[9px] font-bold text-teal-700">Ubah TTD</span><input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload}/></label></div>
+                                                                            <div className="flex items-center justify-center h-28 w-full overflow-hidden my-auto relative z-0"><img src={t30PjSignatureImage} className="signature-img max-h-28 max-w-[185px] object-contain mix-blend-multiply opacity-95"/><label className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded"><LucideIcon name="upload-cloud" className="w-4 h-4 text-teal-600 mb-1" /><span className="text-[9px] font-bold text-teal-700">Ubah TTD</span><input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload}/></label></div>
                                                                         ) : (
-                                                                            <div className="relative z-10 w-full flex justify-center my-auto"><label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-24 h-12 border border-dashed border-teal-400 hover:border-teal-600 rounded bg-teal-50"><span className="text-[8px] text-teal-600 font-bold">Upload TTD</span><input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload} /></label><div className="hidden print:block text-[10px] text-slate-400 italic py-4">Tanda Tangan</div></div>
+                                                                            <div className="relative z-10 w-full flex justify-center my-auto"><label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-28 h-14 border border-dashed border-teal-400 hover:border-teal-600 rounded bg-teal-50"><span className="text-[8px] text-teal-600 font-bold">Upload TTD</span><input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload} /></label><div className="hidden print:block text-[10px] text-slate-400 italic py-4">Tanda Tangan</div></div>
                                                                         )}
                                                                         <div className="relative z-10 mt-auto"><span className="font-bold underline underline-offset-2 whitespace-nowrap block">Supardi</span></div>
                                                                     </div>
-                                                                    <div className="flex flex-col justify-between h-[130px] relative">
+                                                                    <div className="flex flex-col justify-between h-[156px] relative">
                                                                         <p className="font-bold mb-auto mt-0">Pemberi Tugas,</p><div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Farizal Zainur Rozikin</p>
                                                                     </div>
                                                                 </div>
-                                                                <div className="grid grid-cols-2 gap-4 text-center w-3/4 mx-auto print-cols-2 text-[10pt] items-end h-32">
-                                                                    <div className="flex flex-col justify-between h-[130px] relative"><p className="font-bold mb-auto mt-0 leading-tight">Mengetahui,<br/>Keuangan</p><div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Sita Dita Cahyani</p></div>
-                                                                    <div className="flex flex-col justify-between h-[130px] relative"><p className="font-bold mb-auto mt-0 leading-tight">Menyetujui,<br/>Kepala Kantor</p><div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Fika Faradila Cahyanti</p></div>
+                                                                <div className="grid grid-cols-2 gap-4 text-center w-3/4 mx-auto print-cols-2 text-[10pt] items-end h-36">
+                                                                    <div className="flex flex-col justify-between h-[140px] relative"><p className="font-bold mb-auto mt-0 leading-tight">Mengetahui,<br/>Keuangan</p><div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Sita Dita Cahyani</p></div>
+                                                                    <div className="flex flex-col justify-between h-[140px] relative"><p className="font-bold mb-auto mt-0 leading-tight">Menyetujui,<br/>Kepala Kantor</p><div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Fika Faradila Cahyanti</p></div>
                                                                 </div>
                                                             </div>
 
@@ -2890,9 +2890,9 @@
                                     <div>
                                         <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Logo Kop (Kiri)</label>
                                         {poLogo ? (
-                                            <div className="relative group w-24 h-24 bg-white rounded-lg flex items-center justify-center p-2 border shadow-sm mx-auto"><img src={poLogo} className="max-h-full max-w-full object-contain" /><button onClick={() => setPoLogo(null)} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity"><LucideIcon name="trash-2" className="w-4 h-4 mr-1" /> Hapus</button></div>
+                                            <div className="relative group w-28 h-28 bg-white rounded-lg flex items-center justify-center p-2 border shadow-sm mx-auto"><img src={poLogo} className="max-h-full max-w-full object-contain" /><button onClick={() => setPoLogo(null)} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity"><LucideIcon name="trash-2" className="w-4 h-4 mr-1" /> Hapus</button></div>
                                         ) : (
-                                            <label className="cursor-pointer flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-orange-400 rounded-lg transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1 text-slate-400" /><span className="text-[10px] font-medium text-slate-400">Unggah Logo</span><input type="file" accept="image/*" className="hidden" onChange={handlePoLogoUpload} /></label>
+                                            <label className="cursor-pointer flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-orange-400 rounded-lg transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1 text-slate-400" /><span className="text-[10px] font-medium text-slate-400">Unggah Logo</span><input type="file" accept="image/*" className="hidden" onChange={handlePoLogoUpload} /></label>
                                         )}
                                     </div>
                                 </div>
@@ -3003,9 +3003,9 @@
                                                     <input type="text" value={poPenerima1Hp} onChange={(e) => setPoPenerima1Hp(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-sm outline-none" placeholder="Nomor HP/Keterangan" readOnly={poProyekPilihan !== "Manual"} />
                                                     <div className="pt-1">
                                                         {poPenerima1Signature ? (
-                                                            <div className="relative group p-1 bg-white rounded-lg border flex items-center justify-center h-14 overflow-hidden shadow-sm"><img src={poPenerima1Signature} className="max-h-full max-w-full object-contain"/><button onClick={clearPoPenerima1Signature} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity font-bold text-[10px] rounded-lg">Hapus TTD</button></div>
+                                                            <div className="relative group p-2 bg-white rounded-lg border flex items-center justify-center h-20 overflow-hidden shadow-sm"><img src={poPenerima1Signature} className="max-h-full max-w-full object-contain"/><button onClick={clearPoPenerima1Signature} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity font-bold text-[10px] rounded-lg">Hapus TTD</button></div>
                                                         ) : (
-                                                            <label className="cursor-pointer flex flex-col items-center justify-center h-14 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-orange-400 rounded-lg bg-white dark:bg-slate-950 transition-colors"><span className="text-[10px] font-medium text-slate-500">Unggah TTD Penerima 1</span><input type="file" accept="image/*" className="hidden" onChange={handlePoPenerima1SignatureUpload} /></label>
+                                                            <label className="cursor-pointer flex flex-col items-center justify-center h-20 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-orange-400 rounded-lg bg-white dark:bg-slate-950 transition-colors"><span className="text-[10px] font-medium text-slate-500">Unggah TTD Penerima 1</span><input type="file" accept="image/*" className="hidden" onChange={handlePoPenerima1SignatureUpload} /></label>
                                                         )}
                                                     </div>
                                                 </div>
@@ -3021,8 +3021,8 @@
                                         <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 border border-orange-200/70 dark:border-orange-800">VIEWPORT // A4 READY</span>
                                     </div>
                                     <div ref={previewRef} className="po-print-document paper-preview px-12 py-12 print:p-0 print:m-0 print:shadow-none print:max-w-full print:rounded-none print:border-none text-black" style={{ fontFamily: '"Calibri", "Carlito", "Montserrat", sans-serif' }}>
-                                        <div className="flex items-center gap-4 mb-8">
-                                            {poLogo && <img src={poLogo} alt="Logo" className="h-[50px] object-contain" />}
+                                        <div className="flex items-center gap-5 mb-8">
+                                            {poLogo && <img src={poLogo} alt="Logo" className="h-[76px] max-w-[160px] object-contain" />}
                                             <h1 className="text-[15pt] font-bold tracking-wide uppercase">{poCompanyName}</h1>
                                         </div>
                                         <div className="text-center mb-6"><h2 className="text-[13pt] font-bold">TANDA TERIMA PEMBAYARAN</h2></div>
@@ -3056,12 +3056,12 @@
                                             <div className="w-1/2 flex flex-col items-center">
                                                 <div className="mb-4 text-black underline decoration-black underline-offset-4">{poTempatTanggal}</div>
                                                 <div className="w-full flex justify-between px-4 mt-4 text-center">
-                                                    <div className="w-[45%] flex flex-col h-[160px] group items-center">
+                                                    <div className="w-[46%] flex flex-col h-[182px] group items-center">
                                                         <p className="mt-0 text-black">Yang menerima,</p>
-                                                        <div className="relative my-2 flex h-20 w-full items-center justify-center overflow-hidden">
+                                                        <div className="relative my-2 flex h-28 w-full items-center justify-center overflow-hidden">
                                                             {poPenerima1Signature ? (
                                                                 <>
-                                                                    <img src={poPenerima1Signature} className="signature-img max-h-full object-contain mix-blend-multiply opacity-90"/>
+                                                                    <img src={poPenerima1Signature} className="signature-img max-h-28 max-w-[180px] object-contain mix-blend-multiply opacity-95"/>
                                                                     <label className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded">
                                                                         <LucideIcon name="upload-cloud" className="w-4 h-4 text-orange-600 mb-1" />
                                                                         <span className="text-[9px] font-bold text-orange-700">Ubah TTD</span>
@@ -3069,7 +3069,7 @@
                                                                     </label>
                                                                 </>
                                                             ) : (
-                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-24 h-12 border border-dashed border-orange-400 hover:border-orange-600 rounded bg-orange-50 hover:bg-orange-100 transition-colors">
+                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-28 h-14 border border-dashed border-orange-400 hover:border-orange-600 rounded bg-orange-50 hover:bg-orange-100 transition-colors">
                                                                     <span className="text-[8px] text-orange-600 font-bold text-center leading-tight">Upload TTD</span>
                                                                     <input type="file" accept="image/*" className="hidden" onChange={handlePoPenerima1SignatureUpload} />
                                                                 </label>
@@ -3081,7 +3081,7 @@
                                                         </div>
                                                     </div>
 
-                                                    <div className="w-[45%] flex flex-col justify-between h-[160px] relative group items-center">
+                                                    <div className="w-[46%] flex flex-col justify-between h-[182px] relative group items-center">
                                                         <p className="mb-auto mt-0 text-black">Yang menerima,</p>
                                                         <div className="w-full relative z-10 mt-auto flex flex-col items-center">
                                                             <p className="border-b border-black w-full pb-0.5 whitespace-nowrap overflow-hidden text-center">{poPenerima2Nama || "\u00A0"}</p>
@@ -3187,9 +3187,9 @@
                                     <div>
                                         <label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Logo Perusahaan (Kiri)</label>
                                         {popLogo ? (
-                                            <div className="relative group w-24 h-24 bg-white rounded-lg flex items-center justify-center p-2 border shadow-sm mx-auto"><img src={popLogo} className="max-h-full max-w-full object-contain" /><button onClick={() => setPopLogo(null)} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity"><LucideIcon name="trash-2" className="w-4 h-4 mr-1" /> Hapus</button></div>
+                                            <div className="relative group w-28 h-28 bg-white rounded-lg flex items-center justify-center p-2 border shadow-sm mx-auto"><img src={popLogo} className="max-h-full max-w-full object-contain" /><button onClick={() => setPopLogo(null)} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity"><LucideIcon name="trash-2" className="w-4 h-4 mr-1" /> Hapus</button></div>
                                         ) : (
-                                            <label className="cursor-pointer flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-400 rounded-lg transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1 text-slate-400" /><span className="text-[10px] font-medium text-slate-400">Unggah Logo</span><input type="file" accept="image/*" className="hidden" onChange={handlePopLogoUpload} /></label>
+                                            <label className="cursor-pointer flex flex-col items-center justify-center w-full h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-400 rounded-lg transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1 text-slate-400" /><span className="text-[10px] font-medium text-slate-400">Unggah Logo</span><input type="file" accept="image/*" className="hidden" onChange={handlePopLogoUpload} /></label>
                                         )}
                                     </div>
                                 </div>
@@ -3262,18 +3262,18 @@
                                             <label className="block text-[10px] font-bold text-slate-500 uppercase">Dibuat Oleh</label>
                                             <input type="text" value={popDibuatOleh} onChange={(e) => setPopDibuatOleh(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none"/>
                                             {popDibuatSignature ? (
-                                                <div className="relative group p-2 bg-white rounded-xl border flex items-center justify-center h-20"><img src={popDibuatSignature} className="max-h-full object-contain"/><button onClick={() => setPopDibuatSignature(null)} className="absolute inset-0 bg-slate-900/60 text-white text-xs font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-xl transition-opacity">Hapus TTD</button></div>
+                                                <div className="relative group p-2 bg-white rounded-xl border flex items-center justify-center h-24"><img src={popDibuatSignature} className="max-h-full max-w-full object-contain"/><button onClick={() => setPopDibuatSignature(null)} className="absolute inset-0 bg-slate-900/60 text-white text-xs font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-xl transition-opacity">Hapus TTD</button></div>
                                             ) : (
-                                                <label className="cursor-pointer flex items-center justify-center h-14 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-400 rounded-xl text-xs text-slate-500 transition-colors">Unggah TTD Dibuat Oleh<input type="file" accept="image/*" className="hidden" onChange={(e) => handlePopSignatureUpload(e, 'dibuat')} /></label>
+                                                <label className="cursor-pointer flex items-center justify-center h-20 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-400 rounded-xl text-xs text-slate-500 transition-colors">Unggah TTD Dibuat Oleh<input type="file" accept="image/*" className="hidden" onChange={(e) => handlePopSignatureUpload(e, 'dibuat')} /></label>
                                             )}
                                         </div>
                                         <div className="space-y-2">
                                             <label className="block text-[10px] font-bold text-slate-500 uppercase">Disetujui Oleh</label>
                                             <input type="text" value={popDisetujuiOleh} onChange={(e) => setPopDisetujuiOleh(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-sm outline-none"/>
                                             {popDisetujuiSignature ? (
-                                                <div className="relative group p-2 bg-white rounded-xl border flex items-center justify-center h-20"><img src={popDisetujuiSignature} className="max-h-full object-contain"/><button onClick={() => setPopDisetujuiSignature(null)} className="absolute inset-0 bg-slate-900/60 text-white text-xs font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-xl transition-opacity">Hapus TTD</button></div>
+                                                <div className="relative group p-2 bg-white rounded-xl border flex items-center justify-center h-24"><img src={popDisetujuiSignature} className="max-h-full max-w-full object-contain"/><button onClick={() => setPopDisetujuiSignature(null)} className="absolute inset-0 bg-slate-900/60 text-white text-xs font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-xl transition-opacity">Hapus TTD</button></div>
                                             ) : (
-                                                <label className="cursor-pointer flex items-center justify-center h-14 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-400 rounded-xl text-xs text-slate-500 transition-colors">Unggah TTD Disetujui Oleh<input type="file" accept="image/*" className="hidden" onChange={(e) => handlePopSignatureUpload(e, 'disetujui')} /></label>
+                                                <label className="cursor-pointer flex items-center justify-center h-20 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-400 rounded-xl text-xs text-slate-500 transition-colors">Unggah TTD Disetujui Oleh<input type="file" accept="image/*" className="hidden" onChange={(e) => handlePopSignatureUpload(e, 'disetujui')} /></label>
                                             )}
                                         </div>
                                     </div>
@@ -3288,7 +3288,7 @@
                                     <div ref={previewRef} className="po-print-document paper-preview px-12 py-12 print:p-0 print:m-0 print:shadow-none print:max-w-full print:rounded-none print:border-none text-black" style={{ fontFamily: '"Calibri", "Carlito", "Montserrat", sans-serif' }}>
                                         {/* Header Logo + Judul */}
                                         <div className="flex items-center gap-5 mb-8">
-                                            {popLogo && <img src={popLogo} alt="Logo" className="h-14 w-auto object-contain" />}
+                                            {popLogo && <img src={popLogo} alt="Logo" className="h-20 max-w-[180px] w-auto object-contain" />}
                                             <h1 className="text-[16pt] font-bold tracking-wide uppercase">{popJudulDokumen}</h1>
                                         </div>
 
@@ -3414,17 +3414,17 @@
 
                                         {/* Blok Tanda Tangan */}
                                         <div className="grid grid-cols-2 gap-8 text-center text-[11pt] print-cols-2 mt-8 print-avoid-break">
-                                            <div className="flex flex-col justify-between h-36 items-center">
+                                            <div className="flex flex-col justify-between h-44 items-center">
                                                 <p>Dibuat Oleh,</p>
-                                                <div className="h-20 flex items-center justify-center my-auto">
-                                                    {popDibuatSignature && <img src={popDibuatSignature} className="signature-img max-h-full object-contain mix-blend-multiply" />}
+                                                <div className="h-28 w-full flex items-center justify-center my-auto">
+                                                    {popDibuatSignature && <img src={popDibuatSignature} className="signature-img max-h-28 max-w-[200px] object-contain mix-blend-multiply" />}
                                                 </div>
                                                 <p className="font-bold underline underline-offset-4">{popDibuatOleh || "....................."}</p>
                                             </div>
-                                            <div className="flex flex-col justify-between h-36 items-center">
+                                            <div className="flex flex-col justify-between h-44 items-center">
                                                 <p>Disetujui Oleh,</p>
-                                                <div className="h-20 flex items-center justify-center my-auto">
-                                                    {popDisetujuiSignature && <img src={popDisetujuiSignature} className="signature-img max-h-full object-contain mix-blend-multiply" />}
+                                                <div className="h-28 w-full flex items-center justify-center my-auto">
+                                                    {popDisetujuiSignature && <img src={popDisetujuiSignature} className="signature-img max-h-28 max-w-[200px] object-contain mix-blend-multiply" />}
                                                 </div>
                                                 <p className="font-bold underline underline-offset-4">{popDisetujuiOleh || "....................."}</p>
                                             </div>
@@ -3544,8 +3544,8 @@
                                     <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Nama Instansi</label><input type="text" value={instansiName} onChange={(e) => setInstansiName(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all"/></div>
                                     <div><label className="block text-[10px] font-bold text-slate-500 uppercase mb-2">Alamat Lengkap</label><textarea rows="3" value={instansiAddress} onChange={(e) => setInstansiAddress(e.target.value)} className="w-full bg-white dark:bg-slate-950 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-sm outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all"/></div>
                                     <div className="grid grid-cols-2 gap-4">
-                                        <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-950/40"><span className="block text-[10px] font-bold text-slate-500 text-center mb-2">Logo Kiri</span>{logoKiri ? <div className="relative group aspect-square h-24 mx-auto bg-white rounded-lg flex items-center justify-center p-2 border"><img src={logoKiri} className="max-h-full"/><button onClick={() => clearLogo('kiri')} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity">Hapus</button></div> : <label className="cursor-pointer flex flex-col items-center justify-center h-24 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-slate-400 hover:border-cyan-400 hover:text-cyan-500 transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1" /><span className="text-[10px]">Upload</span><input type="file" accept="image/*" className="hidden" onChange={(e) => handleLogoUpload(e, 'kiri')} /></label>}</div>
-                                        <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-950/40"><span className="block text-[10px] font-bold text-slate-500 text-center mb-2">Logo Kanan</span>{logoKanan ? <div className="relative group aspect-square h-24 mx-auto bg-white rounded-lg flex items-center justify-center p-2 border"><img src={logoKanan} className="max-h-full"/><button onClick={() => clearLogo('kanan')} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity">Hapus</button></div> : <label className="cursor-pointer flex flex-col items-center justify-center h-24 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-slate-400 hover:border-cyan-400 hover:text-cyan-500 transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1" /><span className="text-[10px]">Upload</span><input type="file" accept="image/*" className="hidden" onChange={(e) => handleLogoUpload(e, 'kanan')} /></label>}</div>
+                                        <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-950/40"><span className="block text-[10px] font-bold text-slate-500 text-center mb-2">Logo Kiri</span>{logoKiri ? <div className="relative group aspect-square h-28 mx-auto bg-white rounded-lg flex items-center justify-center p-2 border"><img src={logoKiri} className="max-h-full max-w-full object-contain"/><button onClick={() => clearLogo('kiri')} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity">Hapus</button></div> : <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-slate-400 hover:border-cyan-400 hover:text-cyan-500 transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1" /><span className="text-[10px]">Upload</span><input type="file" accept="image/*" className="hidden" onChange={(e) => handleLogoUpload(e, 'kiri')} /></label>}</div>
+                                        <div className="p-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50/50 dark:bg-slate-950/40"><span className="block text-[10px] font-bold text-slate-500 text-center mb-2">Logo Kanan</span>{logoKanan ? <div className="relative group aspect-square h-28 mx-auto bg-white rounded-lg flex items-center justify-center p-2 border"><img src={logoKanan} className="max-h-full max-w-full object-contain"/><button onClick={() => clearLogo('kanan')} className="absolute inset-0 bg-slate-900/60 text-white font-bold opacity-0 group-hover:opacity-100 flex items-center justify-center rounded-lg text-xs transition-opacity">Hapus</button></div> : <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-slate-400 hover:border-cyan-400 hover:text-cyan-500 transition-colors"><LucideIcon name="upload" className="w-5 h-5 mb-1" /><span className="text-[10px]">Upload</span><input type="file" accept="image/*" className="hidden" onChange={(e) => handleLogoUpload(e, 'kanan')} /></label>}</div>
                                     </div>
                                 </div>
                             </div>
@@ -3560,9 +3560,9 @@
                                     <div className="pt-3 border-t border-slate-100 dark:border-slate-800">
                                         <label className="block text-[10px] font-bold text-cyan-600 dark:text-cyan-400 uppercase mb-3 flex items-center gap-2"><LucideIcon name="pen-tool" className="w-3.5 h-3.5" />Tanda Tangan Penanggung Jawab ({resolvedPjName || "Pilih PJ"})</label>
                                         {pjSignatureImage ? (
-                                            <div className="relative group p-3 bg-white rounded-xl border flex items-center justify-center h-28 overflow-hidden shadow-sm"><img src={pjSignatureImage} className="max-h-full max-w-full object-contain"/><button onClick={clearPjSignature} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-xl transition-opacity font-bold text-xs"><LucideIcon name="trash-2" className="w-6 h-6 mb-2 text-red-400" />Hapus Tanda Tangan</button></div>
+                                            <div className="relative group p-3 bg-white rounded-xl border flex items-center justify-center h-32 overflow-hidden shadow-sm"><img src={pjSignatureImage} className="max-h-full max-w-full object-contain"/><button onClick={clearPjSignature} className="absolute inset-0 bg-slate-900/60 text-white opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center rounded-xl transition-opacity font-bold text-xs"><LucideIcon name="trash-2" className="w-6 h-6 mb-2 text-red-400" />Hapus Tanda Tangan</button></div>
                                         ) : (
-                                            <label className="cursor-pointer flex flex-col items-center justify-center h-28 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-cyan-400 rounded-xl bg-white dark:bg-slate-950 transition-colors"><div className="p-2 bg-white dark:bg-slate-900 border shadow-sm rounded-full mb-2"><LucideIcon name="upload-cloud" className="w-5 h-5 text-slate-400" /></div><span className="text-xs font-medium text-slate-600 dark:text-slate-300">Unggah Scan Tanda Tangan</span><input type="file" accept="image/*" className="hidden" onChange={handlePjSignatureUpload} /></label>
+                                            <label className="cursor-pointer flex flex-col items-center justify-center h-32 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-cyan-400 rounded-xl bg-white dark:bg-slate-950 transition-colors"><div className="p-2 bg-white dark:bg-slate-900 border shadow-sm rounded-full mb-2"><LucideIcon name="upload-cloud" className="w-5 h-5 text-slate-400" /></div><span className="text-xs font-medium text-slate-600 dark:text-slate-300">Unggah Scan Tanda Tangan</span><input type="file" accept="image/*" className="hidden" onChange={handlePjSignatureUpload} /></label>
                                         )}
                                     </div>
                                 </div>
@@ -3678,7 +3678,7 @@
                                         <thead className="table-header-group">
                                             <tr>
                                                 <td>
-                                                    <div className="pb-3"><div className="flex items-center justify-between w-full gap-4"><div className="w-20 h-20 flex items-center justify-center shrink-0">{logoKiri ? <img src={logoKiri} className="max-h-full object-contain"/> : <div className="w-16 h-16 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKIRI</span></div>}</div><div className="flex-1 text-center"><h2 className="text-2xl font-black tracking-tight text-slate-950 uppercase">{instansiName}</h2><p className="whitespace-pre-line text-[11px] text-slate-800 font-semibold mt-1.5">{instansiAddress}</p></div><div className="w-20 h-20 flex items-center justify-center shrink-0">{logoKanan ? <img src={logoKanan} className="max-h-full object-contain"/> : <div className="w-16 h-16 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKANAN</span></div>}</div></div></div>
+                                                    <div className="pb-3"><div className="flex items-center justify-between w-full gap-4"><div className="w-28 h-28 flex items-center justify-center overflow-hidden shrink-0">{logoKiri ? <img src={logoKiri} className="max-h-full max-w-full object-contain"/> : <div className="w-24 h-24 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKIRI</span></div>}</div><div className="flex-1 text-center"><h2 className="text-2xl font-black tracking-tight text-slate-950 uppercase">{instansiName}</h2><p className="whitespace-pre-line text-[11px] text-slate-800 font-semibold mt-1.5">{instansiAddress}</p></div><div className="w-28 h-28 flex items-center justify-center overflow-hidden shrink-0">{logoKanan ? <img src={logoKanan} className="max-h-full max-w-full object-contain"/> : <div className="w-24 h-24 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKANAN</span></div>}</div></div></div>
                                                     <div className="w-full border-b border-slate-900 mb-[2px]"></div><div className="w-full border-b-[3px] border-slate-900 mb-6"></div>
                                                 </td>
                                             </tr>
@@ -3741,22 +3741,22 @@
                                                         </div>
                                                         <div className="pt-8 print-avoid-break">
                                                             <div className="grid grid-cols-4 gap-3 text-center text-[10pt] print-cols-4 items-end">
-                                                                <div className="flex flex-col justify-between h-32">
+                                                                <div className="flex flex-col justify-between h-40">
                                                                     <p className="font-bold">Pemberi Tugas,</p>
                                                                     <p className="font-bold underline underline-offset-2">{pemberiTugas || "....................."}</p>
                                                                 </div>
-                                                                <div className="flex flex-col justify-between h-32 relative group">
+                                                                <div className="flex flex-col justify-between h-40 relative group">
                                                                     <p className="font-bold">Penanggung Jawab,</p>
-                                                                    <div className="h-16 flex items-center justify-center my-auto">
-                                                                        {pjSignatureImage && <img src={pjSignatureImage} className="signature-img max-h-full object-contain mix-blend-multiply" />}
+                                                                    <div className="h-24 w-full flex items-center justify-center my-auto overflow-hidden">
+                                                                        {pjSignatureImage && <img src={pjSignatureImage} className="signature-img max-h-24 max-w-[165px] object-contain mix-blend-multiply" />}
                                                                     </div>
                                                                     <p className="font-bold underline underline-offset-2">{resolvedPjName || "....................."}</p>
                                                                 </div>
-                                                                <div className="flex flex-col justify-between h-32">
+                                                                <div className="flex flex-col justify-between h-40">
                                                                     <p className="font-bold">Keuangan,</p>
                                                                     <p className="font-bold underline underline-offset-2">{keuanganName || "....................."}</p>
                                                                 </div>
-                                                                <div className="flex flex-col justify-between h-32">
+                                                                <div className="flex flex-col justify-between h-40">
                                                                     <p className="font-bold">Kepala Kantor,</p>
                                                                     <p className="font-bold underline underline-offset-2">{kepalaKantorName || "....................."}</p>
                                                                 </div>
