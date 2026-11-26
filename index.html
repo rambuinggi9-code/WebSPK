@@ -32,11 +32,11 @@
     </script>
     <style>
         /* =========================================================
-           ATURAN CETAK (PRINT A4 - PRESISI & BERSIH)
+           ATURAN CETAK (PRINT A4 - COMPACT, PRESISI & BERSIH)
            ========================================================= */
         @page {
             size: A4;
-            margin: 12mm;
+            margin: 10mm;
         }
 
         @media print {
@@ -45,6 +45,7 @@
                 color: #000000 !important;
                 padding: 0 !important;
                 margin: 0 !important;
+                font-size: 9pt !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
@@ -65,6 +66,8 @@
                 box-shadow: none !important;
                 background: #ffffff !important;
                 color: #000000 !important;
+                font-size: 9pt !important;
+                line-height: 1.35 !important;
             }
             .paper-preview::before,
             .paper-preview::after {
@@ -424,6 +427,8 @@
                 background: #ffffff;
                 color: #0f172a;
                 font-family: "Calibri", "Carlito", "Montserrat", sans-serif;
+                font-size: 9pt;
+                line-height: 1.38;
                 border: 1px solid rgba(14, 165, 233, 0.35);
                 border-radius: 1.5rem;
                 box-shadow: 0 30px 70px -20px rgba(14, 116, 144, 0.22), 0 0 0 6px rgba(255, 255, 255, 0.65);
@@ -3124,32 +3129,32 @@
                                         <h3 className="text-sm font-bold flex items-center gap-2 uppercase tracking-wider text-slate-700 dark:text-slate-200"><LucideIcon name="eye" className="w-4 h-4 text-teal-500" /> Pratinjau Kertas A4</h3>
                                         <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-teal-50 dark:bg-teal-950 text-teal-700 dark:text-teal-300 border border-teal-200/70 dark:border-teal-800">VIEWPORT // A4 READY</span>
                                     </div>
-                                    <div ref={previewRef} className="paper-preview px-10 py-12 print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-full print:rounded-none">
+                                    <div ref={previewRef} className="paper-preview px-8 py-8 print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-full print:rounded-none">
                                         <table className="w-full border-collapse">
                                             <thead className="table-header-group">
                                                 <tr>
                                                     <td>
-                                                        <div className="pb-3">
-                                                            <div className="flex items-center justify-between w-full gap-4">
-                                                                <div className="w-28 h-28 flex items-center justify-center overflow-hidden shrink-0">{t30LogoKiri ? <img src={t30LogoKiri} className="max-h-full max-w-full object-contain"/> : <div className="w-24 h-24 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKIRI</span></div>}</div>
-                                                                <div className="flex-1 text-center flex flex-col justify-center"><h2 className="text-2xl font-black tracking-tight text-slate-950 uppercase">{t30InstansiName}</h2><p className="whitespace-pre-line text-[11px] text-slate-800 font-semibold mt-1.5">{t30InstansiAddress}</p></div>
-                                                                <div className="w-28 h-28 flex items-center justify-center overflow-hidden shrink-0">{t30LogoKanan ? <img src={t30LogoKanan} className="max-h-full max-w-full object-contain"/> : <div className="w-24 h-24 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKANAN</span></div>}</div>
+                                                        <div className="pb-2">
+                                                            <div className="flex items-center justify-between w-full gap-3">
+                                                                <div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">{t30LogoKiri ? <img src={t30LogoKiri} className="max-h-full max-w-full object-contain"/> : <div className="w-16 h-16 border border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[8px] font-black text-slate-400">LOGOKIRI</span></div>}</div>
+                                                                <div className="flex-1 text-center flex flex-col justify-center"><h2 className="text-lg font-black tracking-tight text-slate-950 uppercase leading-tight">{t30InstansiName}</h2><p className="whitespace-pre-line text-[10px] text-slate-800 font-semibold mt-1 leading-snug">{t30InstansiAddress}</p></div>
+                                                                <div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">{t30LogoKanan ? <img src={t30LogoKanan} className="max-h-full max-w-full object-contain"/> : <div className="w-16 h-16 border border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[8px] font-black text-slate-400">LOGOKANAN</span></div>}</div>
                                                             </div>
                                                         </div>
-                                                        <div className="w-full border-b border-slate-900 mb-[2px]"></div><div className="w-full border-b-[3px] border-slate-900 mb-6"></div>
+                                                        <div className="w-full border-b border-slate-900 mb-[2px]"></div><div className="w-full border-b-[2px] border-slate-900 mb-3.5"></div>
                                                     </td>
                                                 </tr>
                                             </thead>
                                             <tbody className="table-row-group">
                                                 <tr>
                                                     <td>
-                                                        <div className="space-y-6 pt-2">
-                                                            <div className="text-center mb-8"><h1 className="font-serif text-lg font-bold tracking-[0.18em] uppercase text-slate-950 underline underline-offset-4">SURAT PERINTAH KERJA</h1></div>
-                                                            <div className="text-[11pt] text-slate-900 leading-relaxed text-justify">
+                                                        <div className="space-y-3 pt-1">
+                                                            <div className="text-center mb-4"><h1 className="font-serif text-[13pt] font-bold tracking-[0.16em] uppercase text-slate-950 underline underline-offset-4">SURAT PERINTAH KERJA</h1></div>
+                                                            <div className="text-[9.5pt] text-slate-900 leading-[1.4] text-justify">
                                                                 <p>Pada hari {t30HariPembuatan ? <span className="font-bold">{t30HariPembuatan}</span> : "__________"}, tanggal {t30TanggalPembuatan ? <span className="font-bold">{formatDateIndo(t30TanggalPembuatan)}</span> : "__________"}, berdasarkan kebutuhan pelaksanaan pembangunan rumah pada Proyek Lembah Bunder Regency serta untuk menjamin kelancaran dan ketertiban pelaksanaan pekerjaan sesuai dengan spesifikasi dan desain yang telah disepakati, maka Perusahaan dengan ini menunjuk dan memberikan tugas kepada:</p>
-                                                                <table className="ml-4 my-3 w-full"><tbody><tr><td className="w-24 align-top">Nama</td><td className="w-4 align-top">:</td><td className="font-bold">{t30NamaPemborong || "____________________________"}</td></tr><tr><td className="align-top pt-1">No. HP</td><td className="align-top pt-1">:</td><td className="font-bold pt-1">{t30HpPemborong || "____________________________"}</td></tr><tr><td className="align-top pt-1">Alamat</td><td className="align-top pt-1">:</td><td className="font-bold pt-1">{t30AlamatPemborong || "____________________________"}</td></tr></tbody></table>
+                                                                <table className="ml-4 my-2 w-full"><tbody><tr><td className="w-20 align-top">Nama</td><td className="w-3 align-top">:</td><td className="font-bold">{t30NamaPemborong || "____________________________"}</td></tr><tr><td className="align-top pt-0.5">No. HP</td><td className="align-top pt-0.5">:</td><td className="font-bold pt-0.5">{t30HpPemborong || "____________________________"}</td></tr><tr><td className="align-top pt-0.5">Alamat</td><td className="align-top pt-0.5">:</td><td className="font-bold pt-0.5">{t30AlamatPemborong || "____________________________"}</td></tr></tbody></table>
                                                                 <p>Selanjutnya disebut sebagai <strong>Pemborong/Pelaksana Pekerjaan</strong>, untuk melaksanakan pembangunan rumah di <strong>{t30LokasiPekerjaanDetail}</strong> sesuai dengan gambar kerja dan desain yang telah disetujui bersama, dengan ketentuan sebagai berikut:</p>
-                                                                <ol className="list-decimal pl-6 space-y-3 mt-4">
+                                                                <ol className="list-decimal pl-5 space-y-1.5 mt-2.5">
                                                                     <li className="pl-1 print-avoid-break">Nilai borongan pekerjaan ditetapkan sebesar <strong>{formatRupiah(t30NilaiBorongan)} ({t30NilaiBoronganTerbilang || ".............................."}).</strong></li>
                                                                     <li className="pl-1 print-avoid-break">Jangka waktu pelaksanaan pekerjaan adalah <strong>{t30WaktuPelaksanaan || "30"} ({terbilangAngka(t30WaktuPelaksanaan) || "tiga puluh"})</strong> hari kalender sejak diterbitkannya Surat Perintah Kerja (SPK), dengan masa toleransi keterlambatan selama <strong>{t30WaktuToleransi || "10"} ({terbilangAngka(t30WaktuToleransi) || "sepuluh"})</strong> hari kalender, sehingga total waktu pelaksanaan maksimal adalah <strong>{t30TotalWaktuPelaksanaan || "40"} ({terbilangAngka(t30TotalWaktuPelaksanaan) || "empat puluh"})</strong> hari kalender. Jangka waktu tersebut tidak dapat diubah, kecuali terdapat pekerjaan tambahan yang diperintahkan secara tertulis oleh Perusahaan dan dinyatakan secara tegas adanya penambahan waktu penyelesaian.</li>
                                                                     <li className="pl-1 print-avoid-break">Apabila Pemborong tidak dapat menyelesaikan pekerjaan sampai dengan berakhirnya batas waktu pelaksanaan sebagaimana dimaksud pada angka 2, maka Pemborong dikenakan denda keterlambatan sebesar <strong>{formatRupiah(t30DendaKeterlambatan)} ({t30DendaKeterlambatanTerbilang || ".............................."}).</strong></li>
@@ -3158,38 +3163,38 @@
                                                                     <li className="pl-1 print-avoid-break">Pengambilan material di gudang hanya dapat dilakukan pada pukul <strong>{t30JamGudangPagiMulai || "07.30"}–{t30JamGudangPagiSelesai || "08.30"} WIB</strong> dan <strong>{t30JamGudangSiangMulai || "12.30"}–{t30JamGudangSiangSelesai || "13.30"} WIB.</strong></li>
                                                                     <li className="pl-1 print-avoid-break">Apabila Pemborong melakukan penambahan, perubahan, atau pekerjaan di luar desain dan spesifikasi yang telah disetujui tanpa sepengetahuan dan persetujuan Perusahaan, maka Perusahaan berhak memutuskan hubungan kerja atau kontrak secara sepihak tanpa kewajiban memberikan kompensasi kepada Pemborong.</li>
                                                                 </ol>
-                                                                <p className="mt-4 print-avoid-break">Demikian Surat Perintah Kerja ini dibuat untuk dipahami dan dilaksanakan dengan sebaik-baiknya serta penuh tanggung jawab oleh pihak yang ditunjuk.</p>
+                                                                <p className="mt-2.5 print-avoid-break">Demikian Surat Perintah Kerja ini dibuat untuk dipahami dan dilaksanakan dengan sebaik-baiknya serta penuh tanggung jawab oleh pihak yang ditunjuk.</p>
                                                             </div>
                                                             
-                                                            <div className="mt-8 text-[11pt] text-slate-900 print-avoid-break">
-                                                                <div>Ditetapkan di : {t30TempatDitetapkan || "____________________"}<br/>Tanggal : {t30TanggalDitetapkan ? formatDateIndo(t30TanggalDitetapkan) : "_________________________"}</div>
-                                                                <div className="grid grid-cols-3 gap-4 text-center mt-10 max-w-full mx-auto print-cols-3 text-[10pt] items-end h-40 mb-10">
-                                                                    <div className="flex flex-col justify-between h-[156px] relative">
-                                                                        <p className="font-bold mb-auto mt-0">Pemborong,</p><div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">{t30NamaPemborong || "( ........................ )"}</p>
+                                                            <div className="mt-4 text-[9.5pt] text-slate-900 print-avoid-break">
+                                                                <div className="leading-snug">Ditetapkan di : {t30TempatDitetapkan || "____________________"}<br/>Tanggal : {t30TanggalDitetapkan ? formatDateIndo(t30TanggalDitetapkan) : "_________________________"}</div>
+                                                                <div className="grid grid-cols-3 gap-4 text-center mt-4 max-w-full mx-auto print-cols-3 text-[9pt] items-end h-28 mb-4">
+                                                                    <div className="flex flex-col justify-between h-[110px] relative">
+                                                                        <p className="font-bold mb-auto mt-0">Pemborong,</p><div className="hidden print:block text-[8px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">{t30NamaPemborong || "( ........................ )"}</p>
                                                                     </div>
-                                                                    <div className="flex flex-col justify-between h-[156px] relative group">
+                                                                    <div className="flex flex-col justify-between h-[110px] relative group">
                                                                         <span className="font-bold mb-auto mt-0">Penanggungjawab,</span>
                                                                         {t30PjSignatureImage ? (
-                                                                            <div className="flex items-center justify-center h-28 w-full overflow-hidden my-auto relative z-0"><img src={t30PjSignatureImage} className="signature-img max-h-28 max-w-[185px] object-contain mix-blend-multiply opacity-95"/><label className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded"><LucideIcon name="upload-cloud" className="w-4 h-4 text-teal-600 mb-1" /><span className="text-[9px] font-bold text-teal-700">Ubah TTD</span><input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload}/></label></div>
+                                                                            <div className="flex items-center justify-center h-20 w-full overflow-hidden my-auto relative z-0"><img src={t30PjSignatureImage} className="signature-img max-h-20 max-w-[150px] object-contain mix-blend-multiply opacity-95"/><label className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded"><LucideIcon name="upload-cloud" className="w-4 h-4 text-teal-600 mb-0.5" /><span className="text-[8px] font-bold text-teal-700">Ubah TTD</span><input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload}/></label></div>
                                                                         ) : (
-                                                                            <div className="relative z-10 w-full flex justify-center my-auto"><label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-28 h-14 border border-dashed border-teal-400 hover:border-teal-600 rounded bg-teal-50"><span className="text-[8px] text-teal-600 font-bold">Upload TTD</span><input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload} /></label><div className="hidden print:block text-[10px] text-slate-400 italic py-4">Tanda Tangan</div></div>
+                                                                            <div className="relative z-10 w-full flex justify-center my-auto"><label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-24 h-11 border border-dashed border-teal-400 hover:border-teal-600 rounded bg-teal-50"><span className="text-[8px] text-teal-600 font-bold">Upload TTD</span><input type="file" accept="image/*" className="hidden" onChange={handleT30PjSignatureUpload} /></label><div className="hidden print:block text-[8px] text-slate-400 italic py-2">Tanda Tangan</div></div>
                                                                         )}
                                                                         <div className="relative z-10 mt-auto"><span className="font-bold underline underline-offset-2 whitespace-nowrap block">Supardi</span></div>
                                                                     </div>
-                                                                    <div className="flex flex-col justify-between h-[156px] relative">
-                                                                        <p className="font-bold mb-auto mt-0">Pemberi Tugas,</p><div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Farizal Zainur Rozikin</p>
+                                                                    <div className="flex flex-col justify-between h-[110px] relative">
+                                                                        <p className="font-bold mb-auto mt-0">Pemberi Tugas,</p><div className="hidden print:block text-[8px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Farizal Zainur Rozikin</p>
                                                                     </div>
                                                                 </div>
-                                                                <div className="grid grid-cols-2 gap-4 text-center w-3/4 mx-auto print-cols-2 text-[10pt] items-end h-36">
-                                                                    <div className="flex flex-col justify-between h-[140px] relative"><p className="font-bold mb-auto mt-0 leading-tight">Mengetahui,<br/>Keuangan</p><div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Sita Dita Cahyani</p></div>
-                                                                    <div className="flex flex-col justify-between h-[140px] relative"><p className="font-bold mb-auto mt-0 leading-tight">Menyetujui,<br/>Kepala Kantor</p><div className="hidden print:block text-[10px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Fika Faradila Cahyanti</p></div>
+                                                                <div className="grid grid-cols-2 gap-4 text-center w-3/4 mx-auto print-cols-2 text-[9pt] items-end h-24">
+                                                                    <div className="flex flex-col justify-between h-[96px] relative"><p className="font-bold mb-auto mt-0 leading-tight">Mengetahui,<br/>Keuangan</p><div className="hidden print:block text-[8px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Sita Dita Cahyani</p></div>
+                                                                    <div className="flex flex-col justify-between h-[96px] relative"><p className="font-bold mb-auto mt-0 leading-tight">Menyetujui,<br/>Kepala Kantor</p><div className="hidden print:block text-[8px] text-slate-400 italic my-auto">Tanda Tangan</div><p className="font-bold underline underline-offset-2 whitespace-nowrap block mt-auto">Fika Faradila Cahyanti</p></div>
                                                                 </div>
                                                             </div>
 
                                                             {t30LampiranImage && (
-                                                                <div className="pt-8 border-t border-dashed border-slate-300 mt-12 break-before-page print:break-before-page" style={{ pageBreakBefore: 'always' }}>
-                                                                    <div className="text-center mb-6"><h2 className="text-base font-black tracking-widest uppercase text-slate-950 underline underline-offset-4">LAMPIRAN SPK</h2></div>
-                                                                    <div className="flex justify-center items-center p-4 border border-slate-200 bg-slate-50/50 rounded-xl max-w-full"><img src={t30LampiranImage} className="max-h-[220mm] object-contain shadow-md rounded" /></div>
+                                                                <div className="pt-6 border-t border-dashed border-slate-300 mt-8 break-before-page print:break-before-page" style={{ pageBreakBefore: 'always' }}>
+                                                                    <div className="text-center mb-4"><h2 className="text-sm font-black tracking-widest uppercase text-slate-950 underline underline-offset-4">LAMPIRAN SPK</h2></div>
+                                                                    <div className="flex justify-center items-center p-3 border border-slate-200 bg-slate-50/50 rounded-xl max-w-full"><img src={t30LampiranImage} className="max-h-[220mm] object-contain shadow-md rounded" /></div>
                                                                 </div>
                                                             )}
                                                         </div>
@@ -3416,56 +3421,56 @@
                                         <h3 className="text-slate-700 dark:text-slate-200 text-sm font-bold flex items-center gap-2 uppercase tracking-wider"><LucideIcon name="eye" className="w-4 h-4 text-orange-500" /> Pratinjau Tanda Terima</h3>
                                         <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-orange-50 dark:bg-orange-950 text-orange-700 dark:text-orange-300 border border-orange-200/70 dark:border-orange-800">VIEWPORT // A4 READY</span>
                                     </div>
-                                    <div ref={previewRef} className="po-print-document paper-preview px-12 py-12 print:p-0 print:m-0 print:shadow-none print:max-w-full print:rounded-none print:border-none text-black" style={{ fontFamily: '"Calibri", "Carlito", "Montserrat", sans-serif' }}>
-                                        <div className="flex items-center gap-5 mb-8">
-                                            {poLogo && <img src={poLogo} alt="Logo" className="h-[76px] max-w-[160px] object-contain" />}
-                                            <h1 className="text-[15pt] font-bold tracking-wide uppercase">{poCompanyName}</h1>
+                                    <div ref={previewRef} className="po-print-document paper-preview px-8 py-8 print:p-0 print:m-0 print:shadow-none print:max-w-full print:rounded-none print:border-none text-black" style={{ fontFamily: '"Calibri", "Carlito", "Montserrat", sans-serif' }}>
+                                        <div className="flex items-center gap-4 mb-4">
+                                            {poLogo && <img src={poLogo} alt="Logo" className="h-14 max-w-[130px] object-contain" />}
+                                            <h1 className="text-[13pt] font-bold tracking-wide uppercase">{poCompanyName}</h1>
                                         </div>
-                                        <div className="text-center mb-6"><h2 className="text-[13pt] font-bold">TANDA TERIMA PEMBAYARAN</h2></div>
-                                        <div className="text-right font-bold text-[11pt] underline underline-offset-4 mb-4"><u>No : {poNo}</u></div>
-                                        <table className="w-full text-[11pt] mb-6 border-collapse">
+                                        <div className="text-center mb-3"><h2 className="text-[11.5pt] font-bold">TANDA TERIMA PEMBAYARAN</h2></div>
+                                        <div className="text-right font-bold text-[9.5pt] underline underline-offset-4 mb-3"><u>No : {poNo}</u></div>
+                                        <table className="w-full text-[9.5pt] mb-4 border-collapse">
                                             <tbody>
-                                                <tr><td className="w-40 py-1 align-top">Telah terima dari</td><td className="w-4 py-1 align-top">:</td><td className="py-1 align-top border-b border-black">{poTerimaDari}</td></tr>
-                                                <tr><td className="py-1 align-top">Alamat</td><td className="py-1 align-top">:</td><td className="py-1 align-top border-b border-black">{poAlamat}</td></tr>
-                                                <tr><td className="py-1 align-top">Untuk Pembayaran</td><td className="py-1 align-top">:</td><td className="py-1 align-top border-b border-black">{poUntukPembayaran}</td></tr>
-                                                <tr><td colSpan="2"></td><td className="py-3 border-b border-black"></td></tr>
+                                                <tr><td className="w-36 py-0.5 align-top">Telah terima dari</td><td className="w-3 py-0.5 align-top">:</td><td className="py-0.5 align-top border-b border-black">{poTerimaDari}</td></tr>
+                                                <tr><td className="py-0.5 align-top">Alamat</td><td className="py-0.5 align-top">:</td><td className="py-0.5 align-top border-b border-black">{poAlamat}</td></tr>
+                                                <tr><td className="py-0.5 align-top">Untuk Pembayaran</td><td className="py-0.5 align-top">:</td><td className="py-0.5 align-top border-b border-black">{poUntukPembayaran}</td></tr>
+                                                <tr><td colSpan="2"></td><td className="py-2 border-b border-black"></td></tr>
                                             </tbody>
                                         </table>
-                                        <div className="flex gap-4 mb-8 text-[10pt]">
+                                        <div className="flex gap-3 mb-5 text-[8.5pt]">
                                             <table className="w-1/2 border-collapse border border-black" style={{ tableLayout: 'fixed' }}>
                                                 <thead><tr className="bg-slate-100"><th className="border border-black p-1 text-center font-bold w-1/4">NO CEK/BG</th><th className="border border-black p-1 text-center font-bold w-1/4">BANK</th><th className="border border-black p-1 text-center font-bold w-1/4">TANGGAL</th><th className="border border-black p-1 text-center font-bold w-1/4">JUMLAH</th></tr></thead>
-                                                <tbody>{poTableLeft.map((r, i) => (<tr key={i} className="h-6"><td className="border border-black px-1 break-words">{r.noCek}</td><td className="border border-black px-1 break-words">{r.bank}</td><td className="border border-black px-1 break-words">{r.tanggal}</td><td className="border border-black px-1 text-right break-words">{r.jumlah}</td></tr>))}</tbody>
-                                                <tfoot><tr className="bg-slate-50"><td colSpan="3" className="text-center font-bold py-1 border border-black">TOTAL</td><td className="border border-black px-1 text-right font-bold break-words">{poTotalLeft}</td></tr></tfoot>
+                                                <tbody>{poTableLeft.map((r, i) => (<tr key={i} className="h-5"><td className="border border-black px-1 break-words">{r.noCek}</td><td className="border border-black px-1 break-words">{r.bank}</td><td className="border border-black px-1 break-words">{r.tanggal}</td><td className="border border-black px-1 text-right break-words">{r.jumlah}</td></tr>))}</tbody>
+                                                <tfoot><tr className="bg-slate-50"><td colSpan="3" className="text-center font-bold py-0.5 border border-black">TOTAL</td><td className="border border-black px-1 text-right font-bold break-words">{poTotalLeft}</td></tr></tfoot>
                                             </table>
                                             <table className="w-1/2 border-collapse border border-black" style={{ tableLayout: 'fixed' }}>
                                                 <thead><tr className="bg-slate-100"><th className="border border-black p-1 text-center font-bold w-1/3">NO FAKTUR</th><th className="border border-black p-1 text-center font-bold w-1/3">TANGGAL</th><th className="border border-black p-1 text-center font-bold w-1/3">JUMLAH</th></tr></thead>
-                                                <tbody>{poTableRight.map((r, i) => (<tr key={i} className="h-6"><td className="border border-black px-1 break-words">{r.noFaktur}</td><td className="border border-black px-1 break-words">{r.tanggal}</td><td className="border border-black px-1 text-right break-words">{r.jumlah}</td></tr>))}</tbody>
-                                                <tfoot><tr className="bg-slate-50"><td colSpan="2" className="text-center font-bold py-1 border border-black">TOTAL</td><td className="border border-black px-1 text-right font-bold break-words">{poTotalRight}</td></tr></tfoot>
+                                                <tbody>{poTableRight.map((r, i) => (<tr key={i} className="h-5"><td className="border border-black px-1 break-words">{r.noFaktur}</td><td className="border border-black px-1 break-words">{r.tanggal}</td><td className="border border-black px-1 text-right break-words">{r.jumlah}</td></tr>))}</tbody>
+                                                <tfoot><tr className="bg-slate-50"><td colSpan="2" className="text-center font-bold py-0.5 border border-black">TOTAL</td><td className="border border-black px-1 text-right font-bold break-words">{poTotalRight}</td></tr></tfoot>
                                             </table>
                                         </div>
-                                        <div className="flex justify-between items-start text-[11pt]">
+                                        <div className="flex justify-between items-start text-[9.5pt]">
                                             <div className="w-1/2 pr-4">
-                                                <div className="flex mb-12"><span className="w-24 underline decoration-red-500 underline-offset-4 decoration-wavy">Catatan :</span><span className="flex-1 border-b border-black">{poCatatan}</span></div>
-                                                <div className="border-b border-black mb-8"></div>
-                                                <div className="flex"><span className="w-24 text-black italic underline">Gambar :</span><ol className="list-decimal list-inside text-red-700 italic"><li>Untuk customer</li><li>Untuk Penagihan</li><li>Untuk Administrasi</li><li>Untuk Arsip</li></ol></div>
+                                                <div className="flex mb-7"><span className="w-20 underline decoration-red-500 underline-offset-4 decoration-wavy">Catatan :</span><span className="flex-1 border-b border-black">{poCatatan}</span></div>
+                                                <div className="border-b border-black mb-5"></div>
+                                                <div className="flex"><span className="w-20 text-black italic underline">Gambar :</span><ol className="list-decimal list-inside text-red-700 italic leading-snug"><li>Untuk customer</li><li>Untuk Penagihan</li><li>Untuk Administrasi</li><li>Untuk Arsip</li></ol></div>
                                             </div>
                                             <div className="w-1/2 flex flex-col items-center">
-                                                <div className="mb-4 text-black underline decoration-black underline-offset-4">{poTempatTanggal}</div>
-                                                <div className="w-full flex justify-between px-4 mt-4 text-center">
-                                                    <div className="w-[46%] flex flex-col h-[182px] group items-center">
+                                                <div className="mb-2.5 text-black underline decoration-black underline-offset-4">{poTempatTanggal}</div>
+                                                <div className="w-full flex justify-between px-3 mt-2 text-center">
+                                                    <div className="w-[46%] flex flex-col h-[135px] group items-center">
                                                         <p className="mt-0 text-black">Yang menerima,</p>
-                                                        <div className="relative my-2 flex h-28 w-full items-center justify-center overflow-hidden">
+                                                        <div className="relative my-1.5 flex h-20 w-full items-center justify-center overflow-hidden">
                                                             {poPenerima1Signature ? (
                                                                 <>
-                                                                    <img src={poPenerima1Signature} className="signature-img max-h-28 max-w-[180px] object-contain mix-blend-multiply opacity-95"/>
+                                                                    <img src={poPenerima1Signature} className="signature-img max-h-20 max-w-[150px] object-contain mix-blend-multiply opacity-95"/>
                                                                     <label className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity print:hidden rounded">
-                                                                        <LucideIcon name="upload-cloud" className="w-4 h-4 text-orange-600 mb-1" />
-                                                                        <span className="text-[9px] font-bold text-orange-700">Ubah TTD</span>
+                                                                        <LucideIcon name="upload-cloud" className="w-4 h-4 text-orange-600 mb-0.5" />
+                                                                        <span className="text-[8px] font-bold text-orange-700">Ubah TTD</span>
                                                                         <input type="file" accept="image/*" className="hidden" onChange={handlePoPenerima1SignatureUpload}/>
                                                                     </label>
                                                                 </>
                                                             ) : (
-                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-28 h-14 border border-dashed border-orange-400 hover:border-orange-600 rounded bg-orange-50 hover:bg-orange-100 transition-colors">
+                                                                <label className="cursor-pointer print:hidden flex flex-col items-center justify-center w-24 h-11 border border-dashed border-orange-400 hover:border-orange-600 rounded bg-orange-50 hover:bg-orange-100 transition-colors">
                                                                     <span className="text-[8px] text-orange-600 font-bold text-center leading-tight">Upload TTD</span>
                                                                     <input type="file" accept="image/*" className="hidden" onChange={handlePoPenerima1SignatureUpload} />
                                                                 </label>
@@ -3473,15 +3478,15 @@
                                                         </div>
                                                         <div className="w-full mt-auto flex flex-col items-center bg-white/60 print:bg-transparent">
                                                             <p className="border-b border-black w-full pb-0.5 whitespace-nowrap overflow-hidden text-center">{poPenerima1Nama || "\u00A0"}</p>
-                                                            <p className="pt-0.5 min-h-[1.5rem] text-center">{poPenerima1Hp || "\u00A0"}</p>
+                                                            <p className="pt-0.5 min-h-[1.25rem] text-center">{poPenerima1Hp || "\u00A0"}</p>
                                                         </div>
                                                     </div>
 
-                                                    <div className="w-[46%] flex flex-col justify-between h-[182px] relative group items-center">
+                                                    <div className="w-[46%] flex flex-col justify-between h-[135px] relative group items-center">
                                                         <p className="mb-auto mt-0 text-black">Yang menerima,</p>
                                                         <div className="w-full relative z-10 mt-auto flex flex-col items-center">
                                                             <p className="border-b border-black w-full pb-0.5 whitespace-nowrap overflow-hidden text-center">{poPenerima2Nama || "\u00A0"}</p>
-                                                            <p className="pt-0.5 min-h-[1.5rem] text-center">&nbsp;</p>
+                                                            <p className="pt-0.5 min-h-[1.25rem] text-center">&nbsp;</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -3681,37 +3686,37 @@
                                         <h3 className="text-slate-700 dark:text-slate-200 text-sm font-bold flex items-center gap-2 uppercase tracking-wider"><LucideIcon name="eye" className="w-4 h-4 text-indigo-500" /> Pratinjau Purchase Order</h3>
                                         <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-indigo-50 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800">VIEWPORT // A4 READY</span>
                                     </div>
-                                    <div ref={previewRef} className="po-print-document paper-preview px-12 py-12 print:p-0 print:m-0 print:shadow-none print:max-w-full print:rounded-none print:border-none text-black" style={{ fontFamily: '"Calibri", "Carlito", "Montserrat", sans-serif' }}>
+                                    <div ref={previewRef} className="po-print-document paper-preview px-8 py-8 print:p-0 print:m-0 print:shadow-none print:max-w-full print:rounded-none print:border-none text-black" style={{ fontFamily: '"Calibri", "Carlito", "Montserrat", sans-serif' }}>
                                         {/* Header Logo + Judul */}
-                                        <div className="flex items-center gap-5 mb-8">
-                                            {popLogo && <img src={popLogo} alt="Logo" className="h-20 max-w-[180px] w-auto object-contain" />}
-                                            <h1 className="text-[16pt] font-bold tracking-wide uppercase">{popJudulDokumen}</h1>
+                                        <div className="flex items-center gap-4 mb-5">
+                                            {popLogo && <img src={popLogo} alt="Logo" className="h-14 max-w-[140px] w-auto object-contain" />}
+                                            <h1 className="text-[13.5pt] font-bold tracking-wide uppercase">{popJudulDokumen}</h1>
                                         </div>
 
                                         {/* Info Atas 2 Kolom */}
-                                        <table className="w-full text-[11pt] mb-6 border-collapse">
+                                        <table className="w-full text-[9.5pt] mb-4 border-collapse">
                                             <tbody>
                                                 <tr>
-                                                    <td className="w-24 py-1 align-top">No. PO</td>
-                                                    <td className="w-4 py-1 align-top">:</td>
-                                                    <td className="w-[45%] py-1 align-top">{popNo}</td>
-                                                    <td className="w-24 py-1 align-top">Tanggal</td>
-                                                    <td className="w-4 py-1 align-top">:</td>
-                                                    <td className="py-1 align-top">{popTanggal}</td>
+                                                    <td className="w-20 py-0.5 align-top">No. PO</td>
+                                                    <td className="w-3 py-0.5 align-top">:</td>
+                                                    <td className="w-[45%] py-0.5 align-top">{popNo}</td>
+                                                    <td className="w-20 py-0.5 align-top">Tanggal</td>
+                                                    <td className="w-3 py-0.5 align-top">:</td>
+                                                    <td className="py-0.5 align-top">{popTanggal}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td className="py-1 align-top">Kepada</td>
-                                                    <td className="py-1 align-top">:</td>
-                                                    <td className="py-1 align-top">{popKepada}</td>
-                                                    <td className="py-1 align-top">UP</td>
-                                                    <td className="py-1 align-top">:</td>
-                                                    <td className="py-1 align-top">{popUp}</td>
+                                                    <td className="py-0.5 align-top">Kepada</td>
+                                                    <td className="py-0.5 align-top">:</td>
+                                                    <td className="py-0.5 align-top">{popKepada}</td>
+                                                    <td className="py-0.5 align-top">UP</td>
+                                                    <td className="py-0.5 align-top">:</td>
+                                                    <td className="py-0.5 align-top">{popUp}</td>
                                                 </tr>
                                             </tbody>
                                         </table>
 
                                         {/* Alamat Perusahaan & Alamat Pengiriman */}
-                                        <div className="space-y-4 text-[11pt] mb-6">
+                                        <div className="space-y-2.5 text-[9.5pt] mb-4 leading-snug">
                                             <div>
                                                 <p className="font-bold">Alamat Perusahaan:</p>
                                                 <p>{popAlamatPerusahaan}</p>
@@ -3723,15 +3728,15 @@
                                         </div>
 
                                         {/* Tabel Barang */}
-                                        <table className="w-full border-collapse border border-black text-[10pt] mb-6">
+                                        <table className="w-full border-collapse border border-black text-[9pt] mb-4">
                                             <thead>
                                                 <tr className="bg-slate-100 font-bold text-center">
-                                                    <th className="border border-black py-2 px-1.5 w-9">No.</th>
-                                                    <th className="border border-black py-2 px-2">Deskripsi / Spesifikasi Barang</th>
-                                                    <th className="border border-black py-2 px-1.5 w-20 leading-tight">Volume /<br/>Qty</th>
-                                                    <th className="border border-black py-2 px-1.5 w-16">Satuan</th>
-                                                    <th className="border border-black py-2 px-2 w-28 leading-tight">Harga Satuan<br/>(Rp)</th>
-                                                    <th className="border border-black py-2 px-2 w-32 leading-tight">Total Harga<br/>(Rp)</th>
+                                                    <th className="border border-black py-1.5 px-1.5 w-8">No.</th>
+                                                    <th className="border border-black py-1.5 px-2">Deskripsi / Spesifikasi Barang</th>
+                                                    <th className="border border-black py-1.5 px-1.5 w-16 leading-tight">Volume /<br/>Qty</th>
+                                                    <th className="border border-black py-1.5 px-1.5 w-14">Satuan</th>
+                                                    <th className="border border-black py-1.5 px-2 w-24 leading-tight">Harga Satuan<br/>(Rp)</th>
+                                                    <th className="border border-black py-1.5 px-2 w-28 leading-tight">Total Harga<br/>(Rp)</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -3741,17 +3746,17 @@
                                                     const total = volNum * hrgNum;
                                                     return (
                                                         <tr key={item.id}>
-                                                            <td className="border border-black py-2 px-1.5 text-center">{idx + 1}</td>
-                                                            <td className="border border-black py-2 px-2">{item.deskripsi}</td>
-                                                            <td className="border border-black py-2 px-1.5 text-center">{item.volumeStr}</td>
-                                                            <td className="border border-black py-2 px-1.5 text-center">{item.satuan}</td>
-                                                            <td className="border border-black py-2 px-2">
+                                                            <td className="border border-black py-1.5 px-1.5 text-center">{idx + 1}</td>
+                                                            <td className="border border-black py-1.5 px-2">{item.deskripsi}</td>
+                                                            <td className="border border-black py-1.5 px-1.5 text-center">{item.volumeStr}</td>
+                                                            <td className="border border-black py-1.5 px-1.5 text-center">{item.satuan}</td>
+                                                            <td className="border border-black py-1.5 px-2">
                                                                 <div className="flex justify-between">
                                                                     <span>Rp</span>
                                                                     <span>{formatAngkaSaja(hrgNum)}</span>
                                                                 </div>
                                                             </td>
-                                                            <td className="border border-black py-2 px-2">
+                                                            <td className="border border-black py-1.5 px-2">
                                                                 <div className="flex justify-between font-semibold">
                                                                     <span>Rp</span>
                                                                     <span>{formatAngkaSaja(total)}</span>
@@ -3761,20 +3766,20 @@
                                                     );
                                                 })}
                                                 {popItems.length < 3 && Array.from({ length: 3 - popItems.length }).map((_, emptyIdx) => (
-                                                    <tr key={`empty-${emptyIdx}`} className="h-8">
-                                                        <td className="border border-black py-2 px-1.5"></td>
-                                                        <td className="border border-black py-2 px-2"></td>
-                                                        <td className="border border-black py-2 px-1.5"></td>
-                                                        <td className="border border-black py-2 px-1.5"></td>
-                                                        <td className="border border-black py-2 px-2"></td>
-                                                        <td className="border border-black py-2 px-2"></td>
+                                                    <tr key={`empty-${emptyIdx}`} className="h-6">
+                                                        <td className="border border-black py-1 px-1.5"></td>
+                                                        <td className="border border-black py-1 px-2"></td>
+                                                        <td className="border border-black py-1 px-1.5"></td>
+                                                        <td className="border border-black py-1 px-1.5"></td>
+                                                        <td className="border border-black py-1 px-2"></td>
+                                                        <td className="border border-black py-1 px-2"></td>
                                                     </tr>
                                                 ))}
                                             </tbody>
                                             <tfoot>
                                                 <tr className="bg-slate-50 font-bold">
-                                                    <td colSpan="5" className="border border-black py-2 px-3 text-right uppercase">TOTAL</td>
-                                                    <td className="border border-black py-2 px-2">
+                                                    <td colSpan="5" className="border border-black py-1.5 px-3 text-right uppercase">TOTAL</td>
+                                                    <td className="border border-black py-1.5 px-2">
                                                         <div className="flex justify-between">
                                                             <span>Rp</span>
                                                             <span>{formatAngkaSaja(popGrandTotal)}</span>
@@ -3785,23 +3790,23 @@
                                         </table>
 
                                         {/* Ketentuan & Persyaratan */}
-                                        <div className="text-[11pt] mb-10">
-                                            <p className="font-bold mb-1.5">Ketentuan &amp; Persyaratan:</p>
+                                        <div className="text-[9.5pt] mb-6 leading-snug">
+                                            <p className="font-bold mb-1">Ketentuan &amp; Persyaratan:</p>
                                             <table className="w-full border-collapse">
                                                 <tbody>
                                                     <tr>
-                                                        <td className="w-44 py-0.5 align-top">1. Term of Payment</td>
-                                                        <td className="w-4 py-0.5 align-top">:</td>
+                                                        <td className="w-40 py-0.5 align-top">1. Term of Payment</td>
+                                                        <td className="w-3 py-0.5 align-top">:</td>
                                                         <td className="py-0.5 align-top">{popTermOfPayment}</td>
                                                     </tr>
                                                     <tr>
                                                         <td className="py-0.5 align-top">2. Sistem Pembayaran</td>
-                                                        <td className="w-4 py-0.5 align-top">:</td>
+                                                        <td className="w-3 py-0.5 align-top">:</td>
                                                         <td className="py-0.5 align-top">{popSistemPembayaran}</td>
                                                     </tr>
                                                     <tr>
                                                         <td className="py-0.5 align-top">3. Catatan Lain</td>
-                                                        <td className="w-4 py-0.5 align-top">:</td>
+                                                        <td className="w-3 py-0.5 align-top">:</td>
                                                         <td className="py-0.5 align-top">{popCatatanLain}</td>
                                                     </tr>
                                                 </tbody>
@@ -3809,18 +3814,18 @@
                                         </div>
 
                                         {/* Blok Tanda Tangan */}
-                                        <div className="grid grid-cols-2 gap-8 text-center text-[11pt] print-cols-2 mt-8 print-avoid-break">
-                                            <div className="flex flex-col justify-between h-44 items-center">
+                                        <div className="grid grid-cols-2 gap-8 text-center text-[9.5pt] print-cols-2 mt-5 print-avoid-break">
+                                            <div className="flex flex-col justify-between h-32 items-center">
                                                 <p>Dibuat Oleh,</p>
-                                                <div className="h-28 w-full flex items-center justify-center my-auto">
-                                                    {popDibuatSignature && <img src={popDibuatSignature} className="signature-img max-h-28 max-w-[200px] object-contain mix-blend-multiply" />}
+                                                <div className="h-20 w-full flex items-center justify-center my-auto">
+                                                    {popDibuatSignature && <img src={popDibuatSignature} className="signature-img max-h-20 max-w-[160px] object-contain mix-blend-multiply" />}
                                                 </div>
                                                 <p className="font-bold underline underline-offset-4">{popDibuatOleh || "....................."}</p>
                                             </div>
-                                            <div className="flex flex-col justify-between h-44 items-center">
+                                            <div className="flex flex-col justify-between h-32 items-center">
                                                 <p>Disetujui Oleh,</p>
-                                                <div className="h-28 w-full flex items-center justify-center my-auto">
-                                                    {popDisetujuiSignature && <img src={popDisetujuiSignature} className="signature-img max-h-28 max-w-[200px] object-contain mix-blend-multiply" />}
+                                                <div className="h-20 w-full flex items-center justify-center my-auto">
+                                                    {popDisetujuiSignature && <img src={popDisetujuiSignature} className="signature-img max-h-20 max-w-[160px] object-contain mix-blend-multiply" />}
                                                 </div>
                                                 <p className="font-bold underline underline-offset-4">{popDisetujuiOleh || "....................."}</p>
                                             </div>
@@ -4069,63 +4074,63 @@
                                     <h3 className="text-sm font-bold flex items-center gap-2 uppercase tracking-wider text-slate-700 dark:text-slate-200"><LucideIcon name="eye" className="w-4 h-4 text-cyan-500" /> Pratinjau Kertas A4</h3>
                                     <span className="text-[11px] font-mono font-bold px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 border border-cyan-200/70 dark:border-cyan-800">VIEWPORT // A4 READY</span>
                                 </div>
-                                <div ref={previewRef} className="paper-preview px-10 py-12 print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-full print:rounded-none">
+                                <div ref={previewRef} className="paper-preview px-8 py-8 print:border-none print:shadow-none print:p-0 print:m-0 print:max-w-full print:rounded-none">
                                     <table className="w-full border-collapse">
                                         <thead className="table-header-group">
                                             <tr>
                                                 <td>
-                                                    <div className="pb-3"><div className="flex items-center justify-between w-full gap-4"><div className="w-28 h-28 flex items-center justify-center overflow-hidden shrink-0">{logoKiri ? <img src={logoKiri} className="max-h-full max-w-full object-contain"/> : <div className="w-24 h-24 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKIRI</span></div>}</div><div className="flex-1 text-center"><h2 className="text-2xl font-black tracking-tight text-slate-950 uppercase">{instansiName}</h2><p className="whitespace-pre-line text-[11px] text-slate-800 font-semibold mt-1.5">{instansiAddress}</p></div><div className="w-28 h-28 flex items-center justify-center overflow-hidden shrink-0">{logoKanan ? <img src={logoKanan} className="max-h-full max-w-full object-contain"/> : <div className="w-24 h-24 border-2 border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[10px] font-black text-slate-400">LOGOKANAN</span></div>}</div></div></div>
-                                                    <div className="w-full border-b border-slate-900 mb-[2px]"></div><div className="w-full border-b-[3px] border-slate-900 mb-6"></div>
+                                                    <div className="pb-2"><div className="flex items-center justify-between w-full gap-3"><div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">{logoKiri ? <img src={logoKiri} className="max-h-full max-w-full object-contain"/> : <div className="w-16 h-16 border border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[8px] font-black text-slate-400">LOGOKIRI</span></div>}</div><div className="flex-1 text-center"><h2 className="text-lg font-black tracking-tight text-slate-950 uppercase leading-tight">{instansiName}</h2><p className="whitespace-pre-line text-[10px] text-slate-800 font-semibold mt-1 leading-snug">{instansiAddress}</p></div><div className="w-20 h-20 flex items-center justify-center overflow-hidden shrink-0">{logoKanan ? <img src={logoKanan} className="max-h-full max-w-full object-contain"/> : <div className="w-16 h-16 border border-slate-300 rounded flex items-center justify-center p-1 bg-slate-50"><span className="text-[8px] font-black text-slate-400">LOGOKANAN</span></div>}</div></div></div>
+                                                    <div className="w-full border-b border-slate-900 mb-[2px]"></div><div className="w-full border-b-[2px] border-slate-900 mb-3.5"></div>
                                                 </td>
                                             </tr>
                                         </thead>
                                         <tbody className="table-row-group">
                                             <tr>
                                                 <td>
-                                                    <div className="space-y-6 pt-2">
-                                                        <div className="text-center mb-8"><h1 className="font-serif text-xl font-bold tracking-[0.16em] uppercase text-slate-950 underline underline-offset-4">SURAT PERINTAH KERJA (SPK)</h1><p className="text-sm font-mono font-bold mt-2">Nomor : {spkNumber || "......................................................."}</p></div>
+                                                    <div className="space-y-3.5 pt-1">
+                                                        <div className="text-center mb-4"><h1 className="font-serif text-[13pt] font-bold tracking-[0.14em] uppercase text-slate-950 underline underline-offset-4">SURAT PERINTAH KERJA (SPK)</h1><p className="text-[9.5pt] font-mono font-bold mt-1">Nomor : {spkNumber || "......................................................."}</p></div>
                                                         <div className="print-avoid-break">
-                                                            <h3 className="print-keep-with-next text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">A. INFORMASI PROYEK &amp; PELAKSANA</h3>
-                                                            <table className="w-full text-[11pt] border-collapse">
+                                                            <h3 className="print-keep-with-next text-[9pt] font-extrabold uppercase bg-slate-100 border border-slate-300 px-2.5 py-1 mb-1.5">A. INFORMASI PROYEK &amp; PELAKSANA</h3>
+                                                            <table className="w-full text-[9pt] border-collapse">
                                                                 <tbody>
-                                                                    <tr><td className="py-1 px-2 font-semibold w-44">Nama Proyek</td><td className="py-1 w-4">:</td><td className="py-1 px-2 font-bold">{resolvedProyekName}</td></tr>
-                                                                    <tr><td className="py-1 px-2 font-semibold">Lokasi Proyek</td><td className="py-1">:</td><td className="py-1 px-2">{resolvedProyekLokasi}</td></tr>
-                                                                    <tr><td className="py-1 px-2 font-semibold">Pemberi Tugas</td><td className="py-1">:</td><td className="py-1 px-2">{pemberiTugas}</td></tr>
-                                                                    <tr><td className="py-1 px-2 font-semibold">Penanggung Jawab</td><td className="py-1">:</td><td className="py-1 px-2 font-bold">{resolvedPjName}</td></tr>
-                                                                    <tr><td className="py-1 px-2 font-semibold">Jabatan PJ</td><td className="py-1">:</td><td className="py-1 px-2">{resolvedPjJabatan}</td></tr>
-                                                                    <tr><td className="py-1 px-2 font-semibold">Waktu Pelaksanaan</td><td className="py-1">:</td><td className="py-1 px-2">{startDate ? formatDateIndo(startDate) : "..."} s/d {endDate ? formatDateIndo(endDate) : "..."} <strong className="ml-2">({durasiHari} Hari Kerja)</strong></td></tr>
+                                                                    <tr><td className="py-0.5 px-2 font-semibold w-40">Nama Proyek</td><td className="py-0.5 w-3">:</td><td className="py-0.5 px-2 font-bold">{resolvedProyekName}</td></tr>
+                                                                    <tr><td className="py-0.5 px-2 font-semibold">Lokasi Proyek</td><td className="py-0.5">:</td><td className="py-0.5 px-2">{resolvedProyekLokasi}</td></tr>
+                                                                    <tr><td className="py-0.5 px-2 font-semibold">Pemberi Tugas</td><td className="py-0.5">:</td><td className="py-0.5 px-2">{pemberiTugas}</td></tr>
+                                                                    <tr><td className="py-0.5 px-2 font-semibold">Penanggung Jawab</td><td className="py-0.5">:</td><td className="py-0.5 px-2 font-bold">{resolvedPjName}</td></tr>
+                                                                    <tr><td className="py-0.5 px-2 font-semibold">Jabatan PJ</td><td className="py-0.5">:</td><td className="py-0.5 px-2">{resolvedPjJabatan}</td></tr>
+                                                                    <tr><td className="py-0.5 px-2 font-semibold">Waktu Pelaksanaan</td><td className="py-0.5">:</td><td className="py-0.5 px-2">{startDate ? formatDateIndo(startDate) : "..."} s/d {endDate ? formatDateIndo(endDate) : "..."} <strong className="ml-1.5">({durasiHari} Hari Kerja)</strong></td></tr>
                                                                 </tbody>
                                                             </table>
                                                         </div>
                                                         <div className="print-avoid-break">
-                                                            <h3 className="print-keep-with-next text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">B. RUANG LINGKUP PEKERJAAN</h3>
-                                                            <table className="w-full text-[11pt] border-collapse border border-slate-400">
-                                                                <thead><tr className="bg-slate-200"><th className="border border-slate-400 py-1.5 px-2 text-center w-12">No</th><th className="border border-slate-400 py-1.5 px-3 text-left">Uraian Pekerjaan</th><th className="border border-slate-400 py-1.5 px-2 text-center w-24">Volume</th><th className="border border-slate-400 py-1.5 px-2 text-center w-24">Satuan</th></tr></thead>
+                                                            <h3 className="print-keep-with-next text-[9pt] font-extrabold uppercase bg-slate-100 border border-slate-300 px-2.5 py-1 mb-1.5">B. RUANG LINGKUP PEKERJAAN</h3>
+                                                            <table className="w-full text-[9pt] border-collapse border border-slate-400">
+                                                                <thead><tr className="bg-slate-200"><th className="border border-slate-400 py-1 px-1.5 text-center w-10">No</th><th className="border border-slate-400 py-1 px-2 text-left">Uraian Pekerjaan</th><th className="border border-slate-400 py-1 px-1.5 text-center w-20">Volume</th><th className="border border-slate-400 py-1 px-1.5 text-center w-20">Satuan</th></tr></thead>
                                                                 <tbody>
-                                                                    {ruangLingkup.length === 0 ? <tr><td colSpan="4" className="border border-slate-400 py-2 text-center text-slate-400 italic">Belum ada rincian pekerjaan.</td></tr> : ruangLingkup.map((item, idx) => (
+                                                                    {ruangLingkup.length === 0 ? <tr><td colSpan="4" className="border border-slate-400 py-1.5 text-center text-slate-400 italic">Belum ada rincian pekerjaan.</td></tr> : ruangLingkup.map((item, idx) => (
                                                                         <React.Fragment key={item.id}>
-                                                                            <tr className="print-avoid-break"><td className="border border-slate-400 py-1.5 px-2 text-center font-bold">{idx + 1}</td><td className="border border-slate-400 py-1.5 px-3 font-semibold">{item.uraian}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.volume}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.satuan}</td></tr>
-                                                                            {(item.subs || []).map((sub, sIdx) => <tr key={sub.id} className="print-avoid-break"><td className="border border-slate-400 py-1 pl-4 pr-2 text-right font-mono text-xs">{idx + 1}.{sIdx + 1}</td><td className="border border-slate-400 py-1 pl-6 pr-3">{sub.uraian}</td><td className="border border-slate-400 py-1 px-2 text-center">{sub.volume}</td><td className="border border-slate-400 py-1 px-2 text-center">{sub.satuan}</td></tr>)}
+                                                                            <tr className="print-avoid-break"><td className="border border-slate-400 py-1 px-1.5 text-center font-bold">{idx + 1}</td><td className="border border-slate-400 py-1 px-2 font-semibold">{item.uraian}</td><td className="border border-slate-400 py-1 px-1.5 text-center">{item.volume}</td><td className="border border-slate-400 py-1 px-1.5 text-center">{item.satuan}</td></tr>
+                                                                            {(item.subs || []).map((sub, sIdx) => <tr key={sub.id} className="print-avoid-break"><td className="border border-slate-400 py-0.5 pl-3 pr-1.5 text-right font-mono text-[8pt]">{idx + 1}.{sIdx + 1}</td><td className="border border-slate-400 py-0.5 pl-5 pr-2">{sub.uraian}</td><td className="border border-slate-400 py-0.5 px-1.5 text-center">{sub.volume}</td><td className="border border-slate-400 py-0.5 px-1.5 text-center">{sub.satuan}</td></tr>)}
                                                                         </React.Fragment>
                                                                     ))}
                                                                 </tbody>
                                                             </table>
                                                         </div>
                                                         <div className="print-avoid-break">
-                                                            <h3 className="print-keep-with-next text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">C. KEBUTUHAN MATERIAL</h3>
-                                                            <table className="w-full text-[11pt] border-collapse border border-slate-400">
-                                                                <thead><tr className="bg-slate-200"><th className="border border-slate-400 py-1.5 px-2 text-center w-12">No</th><th className="border border-slate-400 py-1.5 px-3 text-left">Material</th><th className="border border-slate-400 py-1.5 px-2 text-center w-16">Qty</th><th className="border border-slate-400 py-1.5 px-2 text-center w-20">Satuan</th><th className="border border-slate-400 py-1.5 px-3 text-right w-32">Harga</th><th className="border border-slate-400 py-1.5 px-3 text-right w-36">Subtotal</th></tr></thead>
+                                                            <h3 className="print-keep-with-next text-[9pt] font-extrabold uppercase bg-slate-100 border border-slate-300 px-2.5 py-1 mb-1.5">C. KEBUTUHAN MATERIAL</h3>
+                                                            <table className="w-full text-[9pt] border-collapse border border-slate-400">
+                                                                <thead><tr className="bg-slate-200"><th className="border border-slate-400 py-1 px-1.5 text-center w-10">No</th><th className="border border-slate-400 py-1 px-2 text-left">Material</th><th className="border border-slate-400 py-1 px-1.5 text-center w-14">Qty</th><th className="border border-slate-400 py-1 px-1.5 text-center w-16">Satuan</th><th className="border border-slate-400 py-1 px-2 text-right w-28">Harga</th><th className="border border-slate-400 py-1 px-2 text-right w-32">Subtotal</th></tr></thead>
                                                                 {materials.length === 0 ? (
                                                                     <tbody>
-                                                                        <tr><td colSpan="6" className="border border-slate-400 py-2 text-center text-slate-400 italic">Tidak ada kebutuhan material.</td></tr>
-                                                                        <tr className="bg-slate-100 font-bold"><td colSpan="5" className="border border-slate-400 py-1.5 px-3 text-right">SUBTOTAL MATERIAL</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(totalMaterial)}</td></tr>
+                                                                        <tr><td colSpan="6" className="border border-slate-400 py-1.5 text-center text-slate-400 italic">Tidak ada kebutuhan material.</td></tr>
+                                                                        <tr className="bg-slate-100 font-bold"><td colSpan="5" className="border border-slate-400 py-1 px-2 text-right">SUBTOTAL MATERIAL</td><td className="border border-slate-400 py-1 px-2 text-right font-mono">{formatRupiah(totalMaterial)}</td></tr>
                                                                     </tbody>
                                                                 ) : (
                                                                     <>
                                                                         {materials.length > 1 && (
                                                                             <tbody>
                                                                                 {materials.slice(0, -1).map((m, idx) => (
-                                                                                    <tr key={m.id} className="print-avoid-break"><td className="border border-slate-400 py-1.5 px-2 text-center">{idx + 1}</td><td className="border border-slate-400 py-1.5 px-3">{m.nama}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{m.qty}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{m.satuan}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(m.harga)}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono font-semibold">{formatRupiah((Number(m.qty) || 0) * (Number(m.harga) || 0))}</td></tr>
+                                                                                    <tr key={m.id} className="print-avoid-break"><td className="border border-slate-400 py-1 px-1.5 text-center">{idx + 1}</td><td className="border border-slate-400 py-1 px-2">{m.nama}</td><td className="border border-slate-400 py-1 px-1.5 text-center">{m.qty}</td><td className="border border-slate-400 py-1 px-1.5 text-center">{m.satuan}</td><td className="border border-slate-400 py-1 px-2 text-right font-mono">{formatRupiah(m.harga)}</td><td className="border border-slate-400 py-1 px-2 text-right font-mono font-semibold">{formatRupiah((Number(m.qty) || 0) * (Number(m.harga) || 0))}</td></tr>
                                                                                 ))}
                                                                             </tbody>
                                                                         )}
@@ -4134,26 +4139,26 @@
                                                                                 const lastIdx = materials.length - 1;
                                                                                 const lastMat = materials[lastIdx];
                                                                                 return (
-                                                                                    <tr key={lastMat.id} className="print-avoid-break"><td className="border border-slate-400 py-1.5 px-2 text-center">{lastIdx + 1}</td><td className="border border-slate-400 py-1.5 px-3">{lastMat.nama}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{lastMat.qty}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{lastMat.satuan}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(lastMat.harga)}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono font-semibold">{formatRupiah((Number(lastMat.qty) || 0) * (Number(lastMat.harga) || 0))}</td></tr>
+                                                                                    <tr key={lastMat.id} className="print-avoid-break"><td className="border border-slate-400 py-1 px-1.5 text-center">{lastIdx + 1}</td><td className="border border-slate-400 py-1 px-2">{lastMat.nama}</td><td className="border border-slate-400 py-1 px-1.5 text-center">{lastMat.qty}</td><td className="border border-slate-400 py-1 px-1.5 text-center">{lastMat.satuan}</td><td className="border border-slate-400 py-1 px-2 text-right font-mono">{formatRupiah(lastMat.harga)}</td><td className="border border-slate-400 py-1 px-2 text-right font-mono font-semibold">{formatRupiah((Number(lastMat.qty) || 0) * (Number(lastMat.harga) || 0))}</td></tr>
                                                                                 );
                                                                             })()}
-                                                                            <tr className="bg-slate-100 font-bold print-avoid-break"><td colSpan="5" className="border border-slate-400 py-1.5 px-3 text-right">SUBTOTAL MATERIAL</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(totalMaterial)}</td></tr>
+                                                                            <tr className="bg-slate-100 font-bold print-avoid-break"><td colSpan="5" className="border border-slate-400 py-1 px-2 text-right">SUBTOTAL MATERIAL</td><td className="border border-slate-400 py-1 px-2 text-right font-mono">{formatRupiah(totalMaterial)}</td></tr>
                                                                         </tbody>
                                                                     </>
                                                                 )}
                                                             </table>
                                                         </div>
                                                         <div className="print-avoid-break">
-                                                            <h3 className="print-keep-with-next text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">D. TENAGA KERJA ({laborType.toUpperCase()})</h3>
-                                                            <table className="w-full text-[11pt] border-collapse border border-slate-400">
-                                                                <thead><tr className="bg-slate-200"><th className="border border-slate-400 py-1.5 px-2 text-center w-12">No</th><th className="border border-slate-400 py-1.5 px-3 text-left">{laborType === 'harian' ? 'Tenaga Kerja' : 'Uraian'}</th><th className="border border-slate-400 py-1.5 px-2 text-center w-28">Satuan</th><th className="border border-slate-400 py-1.5 px-2 text-center w-20">Volume</th><th className="border border-slate-400 py-1.5 px-3 text-right w-32">Upah / Harga</th><th className="border border-slate-400 py-1.5 px-3 text-right w-36">Subtotal</th></tr></thead>
+                                                            <h3 className="print-keep-with-next text-[9pt] font-extrabold uppercase bg-slate-100 border border-slate-300 px-2.5 py-1 mb-1.5">D. TENAGA KERJA ({laborType.toUpperCase()})</h3>
+                                                            <table className="w-full text-[9pt] border-collapse border border-slate-400">
+                                                                <thead><tr className="bg-slate-200"><th className="border border-slate-400 py-1 px-1.5 text-center w-10">No</th><th className="border border-slate-400 py-1 px-2 text-left">{laborType === 'harian' ? 'Tenaga Kerja' : 'Uraian'}</th><th className="border border-slate-400 py-1 px-1.5 text-center w-24">Satuan</th><th className="border border-slate-400 py-1 px-1.5 text-center w-16">Volume</th><th className="border border-slate-400 py-1 px-2 text-right w-28">Upah / Harga</th><th className="border border-slate-400 py-1 px-2 text-right w-32">Subtotal</th></tr></thead>
                                                                 {(() => {
                                                                     const activeLabor = laborType === 'harian' ? laborHarian : laborBorongan;
                                                                     if (activeLabor.length === 0) {
                                                                         return (
                                                                             <tbody>
-                                                                                <tr><td colSpan="6" className="border border-slate-400 py-2 text-center text-slate-400 italic">Tidak ada rincian tenaga kerja.</td></tr>
-                                                                                <tr className="bg-slate-100 font-bold"><td colSpan="5" className="border border-slate-400 py-1.5 px-3 text-right">SUBTOTAL TENAGA KERJA</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(totalLabor)}</td></tr>
+                                                                                <tr><td colSpan="6" className="border border-slate-400 py-1.5 text-center text-slate-400 italic">Tidak ada rincian tenaga kerja.</td></tr>
+                                                                                <tr className="bg-slate-100 font-bold"><td colSpan="5" className="border border-slate-400 py-1 px-2 text-right">SUBTOTAL TENAGA KERJA</td><td className="border border-slate-400 py-1 px-2 text-right font-mono">{formatRupiah(totalLabor)}</td></tr>
                                                                             </tbody>
                                                                         );
                                                                     }
@@ -4164,41 +4169,41 @@
                                                                             {activeLabor.length > 1 && (
                                                                                 <tbody>
                                                                                     {activeLabor.slice(0, -1).map((item, idx) => (
-                                                                                        <tr key={item.id} className="print-avoid-break"><td className="border border-slate-400 py-1.5 px-2 text-center">{idx + 1}</td><td className="border border-slate-400 py-1.5 px-3">{laborType === 'harian' ? item.tenaga : item.uraian}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.satuan}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.volume}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(item.harga)}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono font-semibold">{formatRupiah((Number(item.volume) || 0) * (Number(item.harga) || 0))}</td></tr>
+                                                                                        <tr key={item.id} className="print-avoid-break"><td className="border border-slate-400 py-1 px-1.5 text-center">{idx + 1}</td><td className="border border-slate-400 py-1 px-2">{laborType === 'harian' ? item.tenaga : item.uraian}</td><td className="border border-slate-400 py-1 px-1.5 text-center">{item.satuan}</td><td className="border border-slate-400 py-1 px-1.5 text-center">{item.volume}</td><td className="border border-slate-400 py-1 px-2 text-right font-mono">{formatRupiah(item.harga)}</td><td className="border border-slate-400 py-1 px-2 text-right font-mono font-semibold">{formatRupiah((Number(item.volume) || 0) * (Number(item.harga) || 0))}</td></tr>
                                                                                     ))}
                                                                                 </tbody>
                                                                             )}
                                                                             <tbody className="print-avoid-break">
-                                                                                <tr key={lastItem.id} className="print-avoid-break"><td className="border border-slate-400 py-1.5 px-2 text-center">{lastIdx + 1}</td><td className="border border-slate-400 py-1.5 px-3">{laborType === 'harian' ? lastItem.tenaga : lastItem.uraian}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{lastItem.satuan}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{lastItem.volume}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(lastItem.harga)}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono font-semibold">{formatRupiah((Number(lastItem.volume) || 0) * (Number(lastItem.harga) || 0))}</td></tr>
-                                                                                <tr className="bg-slate-100 font-bold print-avoid-break"><td colSpan="5" className="border border-slate-400 py-1.5 px-3 text-right">SUBTOTAL TENAGA KERJA</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(totalLabor)}</td></tr>
+                                                                                <tr key={lastItem.id} className="print-avoid-break"><td className="border border-slate-400 py-1 px-1.5 text-center">{lastIdx + 1}</td><td className="border border-slate-400 py-1 px-2">{laborType === 'harian' ? lastItem.tenaga : lastItem.uraian}</td><td className="border border-slate-400 py-1 px-1.5 text-center">{lastItem.satuan}</td><td className="border border-slate-400 py-1 px-1.5 text-center">{lastItem.volume}</td><td className="border border-slate-400 py-1 px-2 text-right font-mono">{formatRupiah(lastItem.harga)}</td><td className="border border-slate-400 py-1 px-2 text-right font-mono font-semibold">{formatRupiah((Number(lastItem.volume) || 0) * (Number(lastItem.harga) || 0))}</td></tr>
+                                                                                <tr className="bg-slate-100 font-bold print-avoid-break"><td colSpan="5" className="border border-slate-400 py-1 px-2 text-right">SUBTOTAL TENAGA KERJA</td><td className="border border-slate-400 py-1 px-2 text-right font-mono">{formatRupiah(totalLabor)}</td></tr>
                                                                             </tbody>
                                                                         </>
                                                                     );
                                                                 })()}
                                                             </table>
                                                         </div>
-                                                        <div className="border-2 border-slate-900 bg-slate-100 p-3 print-avoid-break">
-                                                            <div className="flex justify-between items-center text-sm font-black uppercase"><span>GRAND TOTAL ANGGARAN (C + D)</span><span className="font-mono text-base">{formatRupiah(grandTotal)}</span></div>
-                                                            <p className="text-[11px] italic font-semibold mt-1 capitalize">Terbilang: {formatTerbilangRupiah(grandTotal) || "Nol rupiah"}</p>
+                                                        <div className="border-[1.5px] border-slate-900 bg-slate-100 p-2.5 print-avoid-break">
+                                                            <div className="flex justify-between items-center text-[9.5pt] font-black uppercase"><span>GRAND TOTAL ANGGARAN (C + D)</span><span className="font-mono text-[11pt]">{formatRupiah(grandTotal)}</span></div>
+                                                            <p className="text-[8.5pt] italic font-semibold mt-0.5 capitalize">Terbilang: {formatTerbilangRupiah(grandTotal) || "Nol rupiah"}</p>
                                                         </div>
-                                                        <div className="pt-8 print-avoid-break">
-                                                            <div className="grid grid-cols-4 gap-3 text-center text-[10pt] print-cols-4 items-end">
-                                                                <div className="flex flex-col justify-between h-40">
+                                                        <div className="pt-4 print-avoid-break">
+                                                            <div className="grid grid-cols-4 gap-3 text-center text-[9pt] print-cols-4 items-end">
+                                                                <div className="flex flex-col justify-between h-28">
                                                                     <p className="font-bold">Pemberi Tugas,</p>
                                                                     <p className="font-bold underline underline-offset-2">{pemberiTugas || "....................."}</p>
                                                                 </div>
-                                                                <div className="flex flex-col justify-between h-40 relative group">
+                                                                <div className="flex flex-col justify-between h-28 relative group">
                                                                     <p className="font-bold">Penanggung Jawab,</p>
-                                                                    <div className="h-24 w-full flex items-center justify-center my-auto overflow-hidden">
-                                                                        {pjSignatureImage && <img src={pjSignatureImage} className="signature-img max-h-24 max-w-[165px] object-contain mix-blend-multiply" />}
+                                                                    <div className="h-16 w-full flex items-center justify-center my-auto overflow-hidden">
+                                                                        {pjSignatureImage && <img src={pjSignatureImage} className="signature-img max-h-16 max-w-[140px] object-contain mix-blend-multiply" />}
                                                                     </div>
                                                                     <p className="font-bold underline underline-offset-2">{resolvedPjName || "....................."}</p>
                                                                 </div>
-                                                                <div className="flex flex-col justify-between h-40">
+                                                                <div className="flex flex-col justify-between h-28">
                                                                     <p className="font-bold">Keuangan,</p>
                                                                     <p className="font-bold underline underline-offset-2">{keuanganName || "....................."}</p>
                                                                 </div>
-                                                                <div className="flex flex-col justify-between h-40">
+                                                                <div className="flex flex-col justify-between h-28">
                                                                     <p className="font-bold">Kepala Kantor,</p>
                                                                     <p className="font-bold underline underline-offset-2">{kepalaKantorName || "....................."}</p>
                                                                 </div>
