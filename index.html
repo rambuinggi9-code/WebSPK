@@ -71,8 +71,12 @@
                 display: none !important;
             }
             .print-avoid-break {
-                break-inside: avoid;
-                page-break-inside: avoid;
+                break-inside: avoid !important;
+                page-break-inside: avoid !important;
+            }
+            .print-keep-with-next {
+                break-after: avoid !important;
+                page-break-after: avoid !important;
             }
             .print-cols-2 {
                 display: grid !important;
@@ -4080,8 +4084,8 @@
                                                 <td>
                                                     <div className="space-y-6 pt-2">
                                                         <div className="text-center mb-8"><h1 className="font-serif text-xl font-bold tracking-[0.16em] uppercase text-slate-950 underline underline-offset-4">SURAT PERINTAH KERJA (SPK)</h1><p className="text-sm font-mono font-bold mt-2">Nomor : {spkNumber || "......................................................."}</p></div>
-                                                        <div>
-                                                            <h3 className="text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">A. INFORMASI PROYEK &amp; PELAKSANA</h3>
+                                                        <div className="print-avoid-break">
+                                                            <h3 className="print-keep-with-next text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">A. INFORMASI PROYEK &amp; PELAKSANA</h3>
                                                             <table className="w-full text-[11pt] border-collapse">
                                                                 <tbody>
                                                                     <tr><td className="py-1 px-2 font-semibold w-44">Nama Proyek</td><td className="py-1 w-4">:</td><td className="py-1 px-2 font-bold">{resolvedProyekName}</td></tr>
@@ -4093,38 +4097,84 @@
                                                                 </tbody>
                                                             </table>
                                                         </div>
-                                                        <div>
-                                                            <h3 className="text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">B. RUANG LINGKUP PEKERJAAN</h3>
+                                                        <div className="print-avoid-break">
+                                                            <h3 className="print-keep-with-next text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">B. RUANG LINGKUP PEKERJAAN</h3>
                                                             <table className="w-full text-[11pt] border-collapse border border-slate-400">
                                                                 <thead><tr className="bg-slate-200"><th className="border border-slate-400 py-1.5 px-2 text-center w-12">No</th><th className="border border-slate-400 py-1.5 px-3 text-left">Uraian Pekerjaan</th><th className="border border-slate-400 py-1.5 px-2 text-center w-24">Volume</th><th className="border border-slate-400 py-1.5 px-2 text-center w-24">Satuan</th></tr></thead>
                                                                 <tbody>
                                                                     {ruangLingkup.length === 0 ? <tr><td colSpan="4" className="border border-slate-400 py-2 text-center text-slate-400 italic">Belum ada rincian pekerjaan.</td></tr> : ruangLingkup.map((item, idx) => (
                                                                         <React.Fragment key={item.id}>
-                                                                            <tr><td className="border border-slate-400 py-1.5 px-2 text-center font-bold">{idx + 1}</td><td className="border border-slate-400 py-1.5 px-3 font-semibold">{item.uraian}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.volume}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.satuan}</td></tr>
-                                                                            {(item.subs || []).map((sub, sIdx) => <tr key={sub.id}><td className="border border-slate-400 py-1 pl-4 pr-2 text-right font-mono text-xs">{idx + 1}.{sIdx + 1}</td><td className="border border-slate-400 py-1 pl-6 pr-3">{sub.uraian}</td><td className="border border-slate-400 py-1 px-2 text-center">{sub.volume}</td><td className="border border-slate-400 py-1 px-2 text-center">{sub.satuan}</td></tr>)}
+                                                                            <tr className="print-avoid-break"><td className="border border-slate-400 py-1.5 px-2 text-center font-bold">{idx + 1}</td><td className="border border-slate-400 py-1.5 px-3 font-semibold">{item.uraian}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.volume}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.satuan}</td></tr>
+                                                                            {(item.subs || []).map((sub, sIdx) => <tr key={sub.id} className="print-avoid-break"><td className="border border-slate-400 py-1 pl-4 pr-2 text-right font-mono text-xs">{idx + 1}.{sIdx + 1}</td><td className="border border-slate-400 py-1 pl-6 pr-3">{sub.uraian}</td><td className="border border-slate-400 py-1 px-2 text-center">{sub.volume}</td><td className="border border-slate-400 py-1 px-2 text-center">{sub.satuan}</td></tr>)}
                                                                         </React.Fragment>
                                                                     ))}
                                                                 </tbody>
                                                             </table>
                                                         </div>
-                                                        <div>
-                                                            <h3 className="text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">C. KEBUTUHAN MATERIAL</h3>
+                                                        <div className="print-avoid-break">
+                                                            <h3 className="print-keep-with-next text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">C. KEBUTUHAN MATERIAL</h3>
                                                             <table className="w-full text-[11pt] border-collapse border border-slate-400">
                                                                 <thead><tr className="bg-slate-200"><th className="border border-slate-400 py-1.5 px-2 text-center w-12">No</th><th className="border border-slate-400 py-1.5 px-3 text-left">Material</th><th className="border border-slate-400 py-1.5 px-2 text-center w-16">Qty</th><th className="border border-slate-400 py-1.5 px-2 text-center w-20">Satuan</th><th className="border border-slate-400 py-1.5 px-3 text-right w-32">Harga</th><th className="border border-slate-400 py-1.5 px-3 text-right w-36">Subtotal</th></tr></thead>
-                                                                <tbody>
-                                                                    {materials.length === 0 ? <tr><td colSpan="6" className="border border-slate-400 py-2 text-center text-slate-400 italic">Tidak ada kebutuhan material.</td></tr> : materials.map((m, idx) => <tr key={m.id}><td className="border border-slate-400 py-1.5 px-2 text-center">{idx + 1}</td><td className="border border-slate-400 py-1.5 px-3">{m.nama}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{m.qty}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{m.satuan}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(m.harga)}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono font-semibold">{formatRupiah((Number(m.qty) || 0) * (Number(m.harga) || 0))}</td></tr>)}
-                                                                    <tr className="bg-slate-100 font-bold"><td colSpan="5" className="border border-slate-400 py-1.5 px-3 text-right">SUBTOTAL MATERIAL</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(totalMaterial)}</td></tr>
-                                                                </tbody>
+                                                                {materials.length === 0 ? (
+                                                                    <tbody>
+                                                                        <tr><td colSpan="6" className="border border-slate-400 py-2 text-center text-slate-400 italic">Tidak ada kebutuhan material.</td></tr>
+                                                                        <tr className="bg-slate-100 font-bold"><td colSpan="5" className="border border-slate-400 py-1.5 px-3 text-right">SUBTOTAL MATERIAL</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(totalMaterial)}</td></tr>
+                                                                    </tbody>
+                                                                ) : (
+                                                                    <>
+                                                                        {materials.length > 1 && (
+                                                                            <tbody>
+                                                                                {materials.slice(0, -1).map((m, idx) => (
+                                                                                    <tr key={m.id} className="print-avoid-break"><td className="border border-slate-400 py-1.5 px-2 text-center">{idx + 1}</td><td className="border border-slate-400 py-1.5 px-3">{m.nama}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{m.qty}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{m.satuan}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(m.harga)}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono font-semibold">{formatRupiah((Number(m.qty) || 0) * (Number(m.harga) || 0))}</td></tr>
+                                                                                ))}
+                                                                            </tbody>
+                                                                        )}
+                                                                        <tbody className="print-avoid-break">
+                                                                            {(() => {
+                                                                                const lastIdx = materials.length - 1;
+                                                                                const lastMat = materials[lastIdx];
+                                                                                return (
+                                                                                    <tr key={lastMat.id} className="print-avoid-break"><td className="border border-slate-400 py-1.5 px-2 text-center">{lastIdx + 1}</td><td className="border border-slate-400 py-1.5 px-3">{lastMat.nama}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{lastMat.qty}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{lastMat.satuan}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(lastMat.harga)}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono font-semibold">{formatRupiah((Number(lastMat.qty) || 0) * (Number(lastMat.harga) || 0))}</td></tr>
+                                                                                );
+                                                                            })()}
+                                                                            <tr className="bg-slate-100 font-bold print-avoid-break"><td colSpan="5" className="border border-slate-400 py-1.5 px-3 text-right">SUBTOTAL MATERIAL</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(totalMaterial)}</td></tr>
+                                                                        </tbody>
+                                                                    </>
+                                                                )}
                                                             </table>
                                                         </div>
-                                                        <div>
-                                                            <h3 className="text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">D. TENAGA KERJA ({laborType.toUpperCase()})</h3>
+                                                        <div className="print-avoid-break">
+                                                            <h3 className="print-keep-with-next text-xs font-extrabold uppercase bg-slate-100 border border-slate-300 px-3 py-1.5 mb-2">D. TENAGA KERJA ({laborType.toUpperCase()})</h3>
                                                             <table className="w-full text-[11pt] border-collapse border border-slate-400">
                                                                 <thead><tr className="bg-slate-200"><th className="border border-slate-400 py-1.5 px-2 text-center w-12">No</th><th className="border border-slate-400 py-1.5 px-3 text-left">{laborType === 'harian' ? 'Tenaga Kerja' : 'Uraian'}</th><th className="border border-slate-400 py-1.5 px-2 text-center w-28">Satuan</th><th className="border border-slate-400 py-1.5 px-2 text-center w-20">Volume</th><th className="border border-slate-400 py-1.5 px-3 text-right w-32">Upah / Harga</th><th className="border border-slate-400 py-1.5 px-3 text-right w-36">Subtotal</th></tr></thead>
-                                                                <tbody>
-                                                                    {(laborType === 'harian' ? laborHarian : laborBorongan).map((item, idx) => <tr key={item.id}><td className="border border-slate-400 py-1.5 px-2 text-center">{idx + 1}</td><td className="border border-slate-400 py-1.5 px-3">{laborType === 'harian' ? item.tenaga : item.uraian}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.satuan}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.volume}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(item.harga)}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono font-semibold">{formatRupiah((Number(item.volume) || 0) * (Number(item.harga) || 0))}</td></tr>)}
-                                                                    <tr className="bg-slate-100 font-bold"><td colSpan="5" className="border border-slate-400 py-1.5 px-3 text-right">SUBTOTAL TENAGA KERJA</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(totalLabor)}</td></tr>
-                                                                </tbody>
+                                                                {(() => {
+                                                                    const activeLabor = laborType === 'harian' ? laborHarian : laborBorongan;
+                                                                    if (activeLabor.length === 0) {
+                                                                        return (
+                                                                            <tbody>
+                                                                                <tr><td colSpan="6" className="border border-slate-400 py-2 text-center text-slate-400 italic">Tidak ada rincian tenaga kerja.</td></tr>
+                                                                                <tr className="bg-slate-100 font-bold"><td colSpan="5" className="border border-slate-400 py-1.5 px-3 text-right">SUBTOTAL TENAGA KERJA</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(totalLabor)}</td></tr>
+                                                                            </tbody>
+                                                                        );
+                                                                    }
+                                                                    const lastIdx = activeLabor.length - 1;
+                                                                    const lastItem = activeLabor[lastIdx];
+                                                                    return (
+                                                                        <>
+                                                                            {activeLabor.length > 1 && (
+                                                                                <tbody>
+                                                                                    {activeLabor.slice(0, -1).map((item, idx) => (
+                                                                                        <tr key={item.id} className="print-avoid-break"><td className="border border-slate-400 py-1.5 px-2 text-center">{idx + 1}</td><td className="border border-slate-400 py-1.5 px-3">{laborType === 'harian' ? item.tenaga : item.uraian}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.satuan}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{item.volume}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(item.harga)}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono font-semibold">{formatRupiah((Number(item.volume) || 0) * (Number(item.harga) || 0))}</td></tr>
+                                                                                    ))}
+                                                                                </tbody>
+                                                                            )}
+                                                                            <tbody className="print-avoid-break">
+                                                                                <tr key={lastItem.id} className="print-avoid-break"><td className="border border-slate-400 py-1.5 px-2 text-center">{lastIdx + 1}</td><td className="border border-slate-400 py-1.5 px-3">{laborType === 'harian' ? lastItem.tenaga : lastItem.uraian}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{lastItem.satuan}</td><td className="border border-slate-400 py-1.5 px-2 text-center">{lastItem.volume}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(lastItem.harga)}</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono font-semibold">{formatRupiah((Number(lastItem.volume) || 0) * (Number(lastItem.harga) || 0))}</td></tr>
+                                                                                <tr className="bg-slate-100 font-bold print-avoid-break"><td colSpan="5" className="border border-slate-400 py-1.5 px-3 text-right">SUBTOTAL TENAGA KERJA</td><td className="border border-slate-400 py-1.5 px-3 text-right font-mono">{formatRupiah(totalLabor)}</td></tr>
+                                                                            </tbody>
+                                                                        </>
+                                                                    );
+                                                                })()}
                                                             </table>
                                                         </div>
                                                         <div className="border-2 border-slate-900 bg-slate-100 p-3 print-avoid-break">
